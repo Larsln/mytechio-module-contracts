@@ -5,6 +5,27 @@ Alle nennenswerten Änderungen an diesem Paket werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.1.0] - 2026-10-06
+
+### Added
+
+- `Modules\ModuleLifecycle` (+ `Modules\AbstractModuleLifecycle`) —
+  Lebenszyklus-Hooks `onInstall()`/`onEnable()`/`onDisable()`/
+  `onUninstall()`, vom Kern über den Manifest-Schlüssel `lifecycle`
+  aufgelöst; `onEnable()` darf werfen (Modul bleibt deaktiviert),
+  `onDisable()` nicht.
+- `Modules\HealthCheck` (+ `Modules\HealthStatus`) — Gesundheitsstatus für
+  die Modulübersicht (`ok`/`warning`/`error`/`unknown` über statische
+  Konstruktoren); der Kern ruft `health()` nur dort und mit
+  Timeout-Schutz auf.
+- Manifest-Erweiterungen dokumentiert: `lifecycle` (FQCN der
+  Lifecycle-/HealthCheck-Klasse) und `roles` (Standardzuordnung der
+  Modul-Permissions zu Kern-Rollen, `"*"` = alle Permissions).
+- `Fakes\FakeModuleLifecycle` (Aufrufzähler je Hook, `failOnEnable()`) und
+  `Fakes\FakeHealthCheck` (vorgegebener Status, `withStatus()`) samt
+  Unit-Tests.
+- `Contracts::VERSION` auf `1.1.0`.
+
 ## [1.0.0] - 2026-10-06
 
 ### Added

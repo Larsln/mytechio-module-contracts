@@ -34,6 +34,36 @@ composer require mytechio/module-contracts
 | `Invoices` | `Invoices` | `createDraft()` liefert immer eine Rechnung im Status Draft; Defaults (Bankkonto, Zahlungsziel, Steuerkategorie) ergänzt der Kern. Finalisierung/Versand/Storno bleiben Sache des Kern-UI. |
 | `Settings` | `ModuleSettings` | Modulspezifische Einstellungen; ENV/Config hat immer Vorrang vor der Datenbank (`isFromEnvironment()`). Implementierung erst Phase 3 — hier nur Interface + Fake. |
 | `Connectors` | `Connector` | Einheitlicher Satz an Status-Abfragen/Aktionen für externe Registrare/Lizenzserver; `sync()` darf lange laufen und gehört in eine Queue. |
+| `Modules` | `ModuleLifecycle` | Lebenszyklus-Hooks (`onInstall`/`onEnable`/`onDisable`/`onUninstall`), vom Kern über den Manifest-Schlüssel `lifecycle` aufgelöst; `onEnable()` darf werfen (Modul bleibt deaktiviert), `onDisable()` nicht. `AbstractModuleLifecycle` liefert leere Implementierungen zum Erben. |
+| `Modules` | `HealthCheck` | Gesundheitsstatus (`HealthStatus`) für die Modulübersicht; der Kern ruft `health()` nur dort und mit Timeout-Schutz auf — keine langsamen Netzaufrufe in Implementierungen. |
+
+## Modul-Lebenszyklus und Gesundheit
+
+Module können im Manifest zusätzlich eine `lifecycle`-Klasse angeben, die
+der Kern per Container auflöst:
+
+```json
+{
+    "lifecycle": "MyTechIO\\Domainrobot\\DomainrobotModule",
+    "roles": {
+        "superadmin": ["*"],
+        "admin": ["*"],
+        "sales": ["domainrobot.view"]
+    }
+}
+```
+
+- `lifecycle` (optional): FQCN einer Klasse, die `Modules\ModuleLifecycle`
+  und/oder `Modules\HealthCheck` implementiert. Der Kern ruft die
+  Lebenszyklus-Hooks beim Aktivieren/Deaktivieren auf (Reihenfolge beim
+  ersten Aktivieren: Migrationen → `onInstall()` → `onEnable()`) und
+  `health()` ausschließlich auf der Modulübersicht, mit Timeout-Schutz
+  (Fehler ⇒ `HealthStatus::error()`).
+- `roles` (optional): Standardzuordnung der Modul-Permissions zu
+  Kern-Rollen (`superadmin`, `admin`, `accountant`, `sales`, `viewer`);
+  `"*"` steht für alle Permissions des Moduls. Fehlt der Block, gilt das
+  bisherige Verhalten (alle Permissions an `superadmin` + `admin`).
+  Unbekannte Rollen führen zu einem Manifest-Fehler im Kern.
 
 Jedes Interface ist im Quellcode mit deutschem PHPDoc dokumentiert, das Verhalten und
 Kern-Semantik im Detail beschreibt — das ist die primäre Doku für Modulautoren.
@@ -64,6 +94,8 @@ $this->app->instance(CustomerAssets::class, new FakeCustomerAssets);
 - `FakeInvoices` — merkt sich Entwürfe, liefert immer Status `draft`.
 - `FakeModuleSettings` — `markFromEnvironment()` simuliert ENV-Vorrang.
 - `FakeConnector` — konfigurierbarer Schlüssel/Typen/Status/Aktionen/Ereignisse.
+- `FakeModuleLifecycle` — zählt Aufrufe je Hook, `failOnEnable()` simuliert einen fehlschlagenden `onEnable()`.
+- `FakeHealthCheck` — liefert einen vorgegebenen `HealthStatus`, `withStatus()` zum Umkonfigurieren.
 
 ## Versionierung
 
