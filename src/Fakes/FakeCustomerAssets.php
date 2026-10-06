@@ -1,0 +1,109 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MyTechIO\Contracts\Fakes;
+
+use MyTechIO\Contracts\Assets\AssetNotFoundException;
+use MyTechIO\Contracts\Assets\CustomerAssetData;
+use MyTechIO\Contracts\Assets\CustomerAssets;
+use MyTechIO\Contracts\Assets\NewCustomerAsset;
+
+/**
+ * Test-Double für `CustomerAssets`: In-Memory-Speicher mit Auto-IDs.
+ * `seed()` lässt Tests den Ausgangszustand vorgeben, inklusive bereits
+ * belegter IDs. `findByLabel()` sortiert wie die Kern-Implementierung
+ * aktive Objekte (`status === 'active'`) zuerst.
+ */
+final class FakeCustomerAssets implements CustomerAssets
+{
+    /**
+     * @var array<int, CustomerAssetData>
+     */
+    private array $assets = [];
+
+    private int $nextId = 1;
+
+    public function seed(CustomerAssetData $asset): void
+    {
+        $this->assets[$asset->id] = $asset;
+        $this->nextId = max($this->nextId, $asset->id + 1);
+    }
+
+    public function find(int $id): ?CustomerAssetData
+    {
+        return $this->assets[$id] ?? null;
+    }
+
+    public function forContact(int $contactId, ?string $type = null): array
+    {
+        return array_values(array_filter(
+            $this->assets,
+            static fn (CustomerAssetData $asset): bool => $asset->contactId === $contactId
+                && ($type === null || $asset->type === $type),
+        ));
+    }
+
+    public function findByLabel(string $type, string $label): array
+    {
+        $matches = array_values(array_filter(
+            $this->assets,
+            static fn (CustomerAssetData $asset): bool => $asset->type === $type && $asset->label === $label,
+        ));
+
+        usort($matches, static function (CustomerAssetData $a, CustomerAssetData $b): int {
+            $activeA = $a->status === 'active' ? 0 : 1;
+            $activeB = $b->status === 'active' ? 0 : 1;
+
+            return $activeA <=> $activeB ?: $a->id <=> $b->id;
+        });
+
+        return $matches;
+    }
+
+    public function create(NewCustomerAsset $asset): CustomerAssetData
+    {
+        $id = $this->nextId++;
+
+        $data = new CustomerAssetData(
+            id: $id,
+            contactId: $asset->contactId,
+            type: $asset->type,
+            label: $asset->label,
+            status: 'active',
+            acquiredAt: $asset->acquiredAt,
+            cancelledAt: null,
+            invoiceItemId: null,
+            notes: $asset->notes,
+        );
+
+        $this->assets[$id] = $data;
+
+        return $data;
+    }
+
+    public function cancel(int $id, ?string $cancelledAt = null): CustomerAssetData
+    {
+        $current = $this->assets[$id] ?? null;
+
+        if ($current === null) {
+            throw new AssetNotFoundException($id);
+        }
+
+        $cancelled = new CustomerAssetData(
+            id: $current->id,
+            contactId: $current->contactId,
+            type: $current->type,
+            label: $current->label,
+            status: 'cancelled',
+            acquiredAt: $current->acquiredAt,
+            cancelledAt: $cancelledAt ?? $current->cancelledAt,
+            invoiceItemId: $current->invoiceItemId,
+            notes: $current->notes,
+        );
+
+        $this->assets[$id] = $cancelled;
+
+        return $cancelled;
+    }
+}

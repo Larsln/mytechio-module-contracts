@@ -1,0 +1,66 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MyTechIO\Contracts\Fakes;
+
+use MyTechIO\Contracts\Contacts\ContactData;
+use MyTechIO\Contracts\Contacts\Contacts;
+
+/**
+ * Test-Double für `Contacts`: In-Memory-Speicher, `seed()` legt den
+ * Ausgangszustand fest. `search()` filtert einfach per Teilstring
+ * (case-insensitiv) über `displayName` — ausreichend für Modul-Tests,
+ * keine Relevanz-Sortierung wie im Kern.
+ */
+final class FakeContacts implements Contacts
+{
+    /**
+     * @var array<int, ContactData>
+     */
+    private array $contacts = [];
+
+    /**
+     * @var array<string, string>
+     */
+    private array $countries = [
+        'DE' => 'Deutschland',
+        'AT' => 'Österreich',
+        'CH' => 'Schweiz',
+    ];
+
+    public function seed(ContactData $contact): void
+    {
+        $this->contacts[$contact->id] = $contact;
+    }
+
+    public function find(int $id): ?ContactData
+    {
+        return $this->contacts[$id] ?? null;
+    }
+
+    public function search(string $query, int $limit = 20): array
+    {
+        $needle = mb_strtolower($query);
+
+        $matches = array_values(array_filter(
+            $this->contacts,
+            static fn (ContactData $contact): bool => str_contains(mb_strtolower($contact->displayName), $needle),
+        ));
+
+        return array_slice($matches, 0, $limit);
+    }
+
+    public function countries(): array
+    {
+        return $this->countries;
+    }
+
+    /**
+     * @param  array<string, string>  $countries  ISO-2 ⇒ Landesname (deutsch)
+     */
+    public function setCountries(array $countries): void
+    {
+        $this->countries = $countries;
+    }
+}

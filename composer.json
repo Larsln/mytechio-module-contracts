@@ -1,0 +1,42 @@
+{
+    "name": "mytechio/module-contracts",
+    "description": "Verträge (Interfaces, DTOs, Fakes) zwischen dem MyTechIO-Admin-Kern und seinen Modulen",
+    "type": "library",
+    "license": "proprietary",
+    "keywords": ["mytechio", "contracts", "interfaces", "dto"],
+    "authors": [
+        {
+            "name": "MyTechIO AG",
+            "email": "ai@lat.aixx.de"
+        }
+    ],
+    "require": {
+        "php": "^8.4"
+    },
+    "require-dev": {
+        "pestphp/pest": "^4.0",
+        "laravel/pint": "^1.18"
+    },
+    "autoload": {
+        "psr-4": {
+            "MyTechIO\\Contracts\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MyTechIO\\Contracts\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "vendor/bin/pest --compact",
+        "lint": "vendor/bin/pint"
+    }
+}
