@@ -5,6 +5,21 @@ Alle nennenswerten Änderungen an diesem Paket werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.3.0] - 2026-10-06
+
+### Added
+
+- `Contacts\ContactData`: neue optionale Felder `mobile`, `website`, `updatedAt` (angehängt, Defaults null).
+- `Invoices\InvoiceItemRef` (NEU) — Verweis auf eine Rechnungsposition
+  inkl. ihrer Rechnung (`id`, `invoiceId`, `invoiceNumber`,
+  `invoiceStatus`, `description`, `url`); `invoiceNumber` ist `null` für
+  Draft-Rechnungen, `url` ist die relative Kern-URL der Rechnung.
+- `Invoices\Invoices::findItem()` — liefert den `InvoiceItemRef` zu einer
+  Rechnungsposition anhand ihrer ID, oder `null`.
+- `Fakes\FakeInvoices::seedItem()` — hinterlegt einen `InvoiceItemRef` für
+  `findItem()` im In-Memory-Double.
+- `Contracts::VERSION` auf `1.3.0`.
+
 ## [1.2.0] - 2026-10-06
 
 ### Added

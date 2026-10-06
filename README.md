@@ -31,7 +31,7 @@ composer require mytechio/module-contracts
 | `Assets` | `AssetSource` | Objekt-Vorschläge externer Quellen für den künftigen Objekt-Picker (Zielbild Phase 5) — kein Bezug zu bereits angelegten Kundenobjekten nötig. |
 | `Contacts` | `Contacts` | Rein lesender Kontaktzugriff — Module legen/ändern keine Kontakte. |
 | `Accounting` | `Journal` | Soll=Haben wird erzwungen (`UnbalancedEntryException`), festgeschriebene Perioden lehnen ab (`PeriodClosedException`). |
-| `Invoices` | `Invoices` | `createDraft()` liefert immer eine Rechnung im Status Draft; Defaults (Bankkonto, Zahlungsziel, Steuerkategorie) ergänzt der Kern. Finalisierung/Versand/Storno bleiben Sache des Kern-UI. |
+| `Invoices` | `Invoices` | `createDraft()` liefert immer eine Rechnung im Status Draft; Defaults (Bankkonto, Zahlungsziel, Steuerkategorie) ergänzt der Kern. Finalisierung/Versand/Storno bleiben Sache des Kern-UI. `findItem()` liefert den Verweis auf eine Rechnungsposition (inkl. Rechnungsnummer/-status und Kern-URL) anhand ihrer ID, oder `null`. |
 | `Invoices` | `InvoiceItemExtension` | Positions-Erweiterung einer Rechnung durch ein Modul (siehe Abschnitt „Positions-Erweiterung"). |
 | `Settings` | `ModuleSettings` | Modulspezifische Einstellungen; ENV/Config hat immer Vorrang vor der Datenbank (`isFromEnvironment()`). Implementierung erst Phase 3 — hier nur Interface + Fake. |
 | `Connectors` | `Connector` | Einheitlicher Satz an Status-Abfragen/Aktionen für externe Registrare/Lizenzserver; `sync()` darf lange laufen und gehört in eine Queue. |
@@ -117,7 +117,7 @@ $this->app->instance(CustomerAssets::class, new FakeCustomerAssets);
 - `FakeContacts` — `seed()`, `setCountries()`.
 - `FakeJournal` — prüft Soll=Haben exakt über Integer-Arithmetik (keine Floats),
   `seedAccount()` für den Kontenplan.
-- `FakeInvoices` — merkt sich Entwürfe, liefert immer Status `draft`.
+- `FakeInvoices` — merkt sich Entwürfe, liefert immer Status `draft`; `seedItem()` für `findItem()`.
 - `FakeModuleSettings` — `markFromEnvironment()` simuliert ENV-Vorrang.
 - `FakeConnector` — konfigurierbarer Schlüssel/Typen/Status/Aktionen/Ereignisse.
 - `FakeModuleLifecycle` — zählt Aufrufe je Hook, `failOnEnable()` simuliert einen fehlschlagenden `onEnable()`.

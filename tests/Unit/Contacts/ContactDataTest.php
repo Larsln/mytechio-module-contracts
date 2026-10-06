@@ -22,6 +22,9 @@ it('converts to an array with snake_case keys', function () {
         city: 'Berlin',
         countryCode: 'DE',
         vatId: 'DE123456789',
+        mobile: '+49 170 1',
+        website: 'https://example.de',
+        updatedAt: '2026-10-07T08:00:00+00:00',
     );
 
     expect($contact->toArray())->toBe([
@@ -41,5 +44,8 @@ it('converts to an array with snake_case keys', function () {
         'city' => 'Berlin',
         'country_code' => 'DE',
         'vat_id' => 'DE123456789',
+        'mobile' => '+49 170 1',
+        'website' => 'https://example.de',
+        'updated_at' => '2026-10-07T08:00:00+00:00',
     ]);
 });

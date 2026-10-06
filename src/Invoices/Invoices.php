@@ -14,4 +14,10 @@ namespace MyTechIO\Contracts\Invoices;
 interface Invoices
 {
     public function createDraft(InvoiceDraft $draft): InvoiceRef;
+
+    /**
+     * Liefert den Verweis auf eine Rechnungsposition (inkl. ihrer Rechnung)
+     * anhand ihrer ID, oder `null`, wenn keine Position mit dieser ID existiert.
+     */
+    public function findItem(int $invoiceItemId): ?InvoiceItemRef;
 }

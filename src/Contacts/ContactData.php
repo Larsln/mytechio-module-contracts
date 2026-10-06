@@ -30,6 +30,10 @@ final readonly class ContactData
         public ?string $city,
         public ?string $countryCode,
         public ?string $vatId,
+        /** Seit 1.3.0 (Nextcloud-Modul): Mobilnummer, Website, letzte Änderung (ISO-8601). */
+        public ?string $mobile = null,
+        public ?string $website = null,
+        public ?string $updatedAt = null,
     ) {}
 
     /**
@@ -54,6 +58,9 @@ final readonly class ContactData
             'city' => $this->city,
             'country_code' => $this->countryCode,
             'vat_id' => $this->vatId,
+            'mobile' => $this->mobile,
+            'website' => $this->website,
+            'updated_at' => $this->updatedAt,
         ];
     }
 }
