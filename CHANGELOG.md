@@ -5,6 +5,42 @@ Alle nennenswerten Änderungen an diesem Paket werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.2.0] - 2026-10-06
+
+### Added
+
+- `Assets\CustomerAssetData` / `Assets\NewCustomerAsset` — neue Felder
+  `source`, `externalId`, `providerName`, `renewsAt`, `autorenew`,
+  `externalStatus` (nur `CustomerAssetData`) und `attributes` (alle mit
+  Default), damit Kundenobjekte eine externe Quelle (z. B.
+  `"domainrobot"`) oder einen Freitext-Anbieter (z. B. `"IONOS"`) sowie
+  typspezifische Attribute führen können.
+- `Assets\CustomerAssets::findBySource()` — findet ein Kundenobjekt
+  anhand seiner externen Kennung.
+- `Assets\CustomerAssets::attachSource()` — ordnet ein bisher manuelles
+  Objekt (Altbestand) nachträglich einer Quelle zu.
+- `Assets\CustomerAssets::updateFromSource()` — übernimmt eine
+  Connector-Rückmeldung (`Connectors\ConnectorStatus`) in das
+  Kundenobjekt; `attributes` werden gemergt, nicht ersetzt.
+- `Assets\CustomerAssets::forInvoiceItem()` — liefert die Kundenobjekte
+  einer Rechnungsposition.
+- `Invoices\InvoiceItemExtension` (NEU) — Positions-Erweiterung einer
+  Rechnung durch ein Modul: eigener Teil der `extras` einer Position
+  unter dem Schlüssel `key()` (muss dem Modulnamen entsprechen),
+  `validate()`, `afterItemsSynced()`, `annotate()` (Beleg-Zusatzzeilen)
+  und `duplicate()` (Belegkopie). Implementierungen werden über den
+  Container-Tag `mytechio.invoice_item_extensions` gesammelt.
+- `Fakes\FakeCustomerAssets` um `findBySource()`, `attachSource()`,
+  `updateFromSource()` und `forInvoiceItem()` erweitert (In-Memory).
+- `Fakes\FakeInvoiceItemExtension` (NEU) — zeichnet jeden Aufruf auf
+  (`validateCalls`, `afterItemsSyncedCalls`, `annotateCalls`,
+  `duplicateCalls`), `withValidationErrors()`/`withAnnotationLines()`
+  zum Umkonfigurieren der Rückgabewerte.
+- README: Abschnitt „Positions-Erweiterung" (Tag, `key()` = Modulname,
+  Zusammenspiel `validate`/`afterItemsSynced`/`annotate`/`duplicate`),
+  `CustomerAssets`-Zeile um Quelle/Anbieter/Attribute ergänzt.
+- `Contracts::VERSION` auf `1.2.0`.
+
 ## [1.1.0] - 2026-10-06
 
 ### Added

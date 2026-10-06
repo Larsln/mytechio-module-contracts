@@ -8,6 +8,7 @@ use MyTechIO\Contracts\Assets\AssetNotFoundException;
 use MyTechIO\Contracts\Assets\CustomerAssetData;
 use MyTechIO\Contracts\Assets\CustomerAssets;
 use MyTechIO\Contracts\Assets\NewCustomerAsset;
+use MyTechIO\Contracts\Connectors\ConnectorStatus;
 
 /**
  * Test-Double für `CustomerAssets`: In-Memory-Speicher mit Auto-IDs.
@@ -61,6 +62,17 @@ final class FakeCustomerAssets implements CustomerAssets
         return $matches;
     }
 
+    public function findBySource(string $source, string $externalId): ?CustomerAssetData
+    {
+        foreach ($this->assets as $asset) {
+            if ($asset->source === $source && $asset->externalId === $externalId) {
+                return $asset;
+            }
+        }
+
+        return null;
+    }
+
     public function create(NewCustomerAsset $asset): CustomerAssetData
     {
         $id = $this->nextId++;
@@ -75,11 +87,92 @@ final class FakeCustomerAssets implements CustomerAssets
             cancelledAt: null,
             invoiceItemId: null,
             notes: $asset->notes,
+            source: $asset->source,
+            externalId: $asset->externalId,
+            providerName: $asset->providerName,
+            renewsAt: $asset->renewsAt,
+            autorenew: $asset->autorenew,
+            attributes: $asset->attributes,
         );
 
         $this->assets[$id] = $data;
 
         return $data;
+    }
+
+    public function attachSource(int $id, string $source, string $externalId): CustomerAssetData
+    {
+        $current = $this->assets[$id] ?? null;
+
+        if ($current === null) {
+            throw new AssetNotFoundException($id);
+        }
+
+        $updated = new CustomerAssetData(
+            id: $current->id,
+            contactId: $current->contactId,
+            type: $current->type,
+            label: $current->label,
+            status: $current->status,
+            acquiredAt: $current->acquiredAt,
+            cancelledAt: $current->cancelledAt,
+            invoiceItemId: $current->invoiceItemId,
+            notes: $current->notes,
+            source: $source,
+            externalId: $externalId,
+            providerName: $current->providerName,
+            renewsAt: $current->renewsAt,
+            autorenew: $current->autorenew,
+            externalStatus: $current->externalStatus,
+            attributes: $current->attributes,
+        );
+
+        $this->assets[$id] = $updated;
+
+        return $updated;
+    }
+
+    public function updateFromSource(int $id, ConnectorStatus $status): CustomerAssetData
+    {
+        $current = $this->assets[$id] ?? null;
+
+        if ($current === null) {
+            throw new AssetNotFoundException($id);
+        }
+
+        $updated = new CustomerAssetData(
+            id: $current->id,
+            contactId: $current->contactId,
+            type: $current->type,
+            label: $current->label,
+            status: $current->status,
+            acquiredAt: $current->acquiredAt,
+            cancelledAt: $current->cancelledAt,
+            invoiceItemId: $current->invoiceItemId,
+            notes: $current->notes,
+            source: $current->source,
+            externalId: $current->externalId,
+            providerName: $current->providerName,
+            renewsAt: $status->renewsAt,
+            autorenew: $status->autorenew,
+            externalStatus: $status->status,
+            attributes: [...$current->attributes, ...$status->attributes],
+        );
+
+        $this->assets[$id] = $updated;
+
+        return $updated;
+    }
+
+    /**
+     * @return list<CustomerAssetData>
+     */
+    public function forInvoiceItem(int $invoiceItemId): array
+    {
+        return array_values(array_filter(
+            $this->assets,
+            static fn (CustomerAssetData $asset): bool => $asset->invoiceItemId === $invoiceItemId,
+        ));
     }
 
     public function cancel(int $id, ?string $cancelledAt = null): CustomerAssetData
@@ -100,6 +193,13 @@ final class FakeCustomerAssets implements CustomerAssets
             cancelledAt: $cancelledAt ?? $current->cancelledAt,
             invoiceItemId: $current->invoiceItemId,
             notes: $current->notes,
+            source: $current->source,
+            externalId: $current->externalId,
+            providerName: $current->providerName,
+            renewsAt: $current->renewsAt,
+            autorenew: $current->autorenew,
+            externalStatus: $current->externalStatus,
+            attributes: $current->attributes,
         );
 
         $this->assets[$id] = $cancelled;

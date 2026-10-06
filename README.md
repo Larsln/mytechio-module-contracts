@@ -27,11 +27,12 @@ composer require mytechio/module-contracts
 |---|---|---|
 | `Documents` | `DocumentStore` | Lokale GoBD-Ablage ist Besitzer, Paperless-NGX asynchroner Zweit-Viewer; feuert `DocumentStored`. |
 | `Mail` | `MailOutbox` | Versand im Branding-Layout, Eintrag im Postausgang, feuert `MailSent`. |
-| `Assets` | `CustomerAssets` | Lesen/Anlegen/Kündigen von Kundenobjekten; `create()`/`cancel()` feuern `CustomerAssetCreated`/`CustomerAssetCancelled`; `findByLabel()` liefert aktive Objekte zuerst. |
+| `Assets` | `CustomerAssets` | Lesen/Anlegen/Kündigen von Kundenobjekten; `create()`/`cancel()` feuern `CustomerAssetCreated`/`CustomerAssetCancelled`; `findByLabel()` liefert aktive Objekte zuerst. Ein Objekt hat entweder eine Quelle (`source`/`externalId`, z. B. `"domainrobot"`) oder einen Freitext-Anbieter (`providerName`, z. B. `"IONOS"`); `findBySource()` findet ein Objekt anhand seiner externen Kennung, `attachSource()` ordnet ein bisher manuelles Objekt nachträglich einer Quelle zu, `updateFromSource()` übernimmt eine Connector-Rückmeldung (Status, Verlängerung, Autorenew, `attributes` per Merge), `forInvoiceItem()` liefert die Objekte einer Rechnungsposition. |
 | `Assets` | `AssetSource` | Objekt-Vorschläge externer Quellen für den künftigen Objekt-Picker (Zielbild Phase 5) — kein Bezug zu bereits angelegten Kundenobjekten nötig. |
 | `Contacts` | `Contacts` | Rein lesender Kontaktzugriff — Module legen/ändern keine Kontakte. |
 | `Accounting` | `Journal` | Soll=Haben wird erzwungen (`UnbalancedEntryException`), festgeschriebene Perioden lehnen ab (`PeriodClosedException`). |
 | `Invoices` | `Invoices` | `createDraft()` liefert immer eine Rechnung im Status Draft; Defaults (Bankkonto, Zahlungsziel, Steuerkategorie) ergänzt der Kern. Finalisierung/Versand/Storno bleiben Sache des Kern-UI. |
+| `Invoices` | `InvoiceItemExtension` | Positions-Erweiterung einer Rechnung durch ein Modul (siehe Abschnitt „Positions-Erweiterung"). |
 | `Settings` | `ModuleSettings` | Modulspezifische Einstellungen; ENV/Config hat immer Vorrang vor der Datenbank (`isFromEnvironment()`). Implementierung erst Phase 3 — hier nur Interface + Fake. |
 | `Connectors` | `Connector` | Einheitlicher Satz an Status-Abfragen/Aktionen für externe Registrare/Lizenzserver; `sync()` darf lange laufen und gehört in eine Queue. |
 | `Modules` | `ModuleLifecycle` | Lebenszyklus-Hooks (`onInstall`/`onEnable`/`onDisable`/`onUninstall`), vom Kern über den Manifest-Schlüssel `lifecycle` aufgelöst; `onEnable()` darf werfen (Modul bleibt deaktiviert), `onDisable()` nicht. `AbstractModuleLifecycle` liefert leere Implementierungen zum Erben. |
@@ -65,6 +66,31 @@ der Kern per Container auflöst:
   bisherige Verhalten (alle Permissions an `superadmin` + `admin`).
   Unbekannte Rollen führen zu einem Manifest-Fehler im Kern.
 
+## Positions-Erweiterung
+
+Module können eine Rechnungsposition um eigene Daten ergänzen, ohne dass der Kern
+den fachlichen Inhalt kennen muss: `Invoices\InvoiceItemExtension` legt seinen
+Teil unter `extras[key()]` einer Position ab. Implementierungen werden über den
+Container-Tag `mytechio.invoice_item_extensions` gesammelt (analog zu
+`ConnectorRegistry`):
+
+```php
+app()->tag(InvoiceItemAssetsExtension::class, 'mytechio.invoice_item_extensions');
+```
+
+- `key()` **muss** dem Modulnamen entsprechen — der Kern filtert Erweiterungen
+  deaktivierter Module über diesen Schlüssel heraus.
+- `validate()` prüft den eigenen Teil der `extras` (z. B. ob verknüpfte IDs
+  existieren und zum Kontakt gehören); Fehler landen im Kern unter
+  `items.{i}.extras.{key}.{feld}`.
+- `afterItemsSynced()` läuft nach dem Neuanlegen aller Positionen einer
+  Rechnung, innerhalb der Kern-Transaktion — hier löst/erzeugt ein Modul z. B.
+  seine eigenen Verknüpfungen.
+- `annotate()` liefert Zusatzzeilen für den Beleg (PDF), die der Kern unter der
+  Positionsbeschreibung einfügt.
+- `duplicate()` liefert den eigenen Teil der `extras` für eine Belegkopie
+  (Duplizieren/Storno) — i. d. R. ohne Verknüpfungen zum Original.
+
 Jedes Interface ist im Quellcode mit deutschem PHPDoc dokumentiert, das Verhalten und
 Kern-Semantik im Detail beschreibt — das ist die primäre Doku für Modulautoren.
 
@@ -96,6 +122,7 @@ $this->app->instance(CustomerAssets::class, new FakeCustomerAssets);
 - `FakeConnector` — konfigurierbarer Schlüssel/Typen/Status/Aktionen/Ereignisse.
 - `FakeModuleLifecycle` — zählt Aufrufe je Hook, `failOnEnable()` simuliert einen fehlschlagenden `onEnable()`.
 - `FakeHealthCheck` — liefert einen vorgegebenen `HealthStatus`, `withStatus()` zum Umkonfigurieren.
+- `FakeInvoiceItemExtension` — zeichnet jeden Aufruf auf (`validateCalls`, `afterItemsSyncedCalls`, `annotateCalls`, `duplicateCalls`), `withValidationErrors()`/`withAnnotationLines()` zum Umkonfigurieren.
 
 ## Versionierung
 

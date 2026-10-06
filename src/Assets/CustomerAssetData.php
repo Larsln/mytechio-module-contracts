@@ -12,9 +12,20 @@ namespace MyTechIO\Contracts\Assets;
  * `'cancelled'`); `findByLabel()` sortiert aktive Objekte zuerst.
  * `invoiceItemId` verweist — falls das Objekt aus einer Rechnungsposition
  * entstanden ist — auf diese Position.
+ *
+ * `source` ist der Modulname einer externen Quelle (z. B. `"domainrobot"`)
+ * oder `null` bei einem manuell angelegten Objekt; `externalId` die
+ * Kennung dort (z. B. der Domainname). `providerName` ist der Freitext-
+ * Anbieter manuell angelegter Objekte (z. B. `"IONOS"`). `renewsAt`,
+ * `autorenew` und `externalStatus` stammen — wenn gesetzt — vom Connector
+ * der Quelle (`updateFromSource()`). `attributes` sind typspezifische
+ * Felder, deren Schema das jeweilige Modul definiert.
  */
 final readonly class CustomerAssetData
 {
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
     public function __construct(
         public int $id,
         public int $contactId,
@@ -25,6 +36,13 @@ final readonly class CustomerAssetData
         public ?string $cancelledAt,
         public ?int $invoiceItemId,
         public ?string $notes,
+        public ?string $source = null,
+        public ?string $externalId = null,
+        public ?string $providerName = null,
+        public ?string $renewsAt = null,
+        public ?bool $autorenew = null,
+        public ?string $externalStatus = null,
+        public array $attributes = [],
     ) {}
 
     /**
@@ -42,6 +60,13 @@ final readonly class CustomerAssetData
             'cancelled_at' => $this->cancelledAt,
             'invoice_item_id' => $this->invoiceItemId,
             'notes' => $this->notes,
+            'source' => $this->source,
+            'external_id' => $this->externalId,
+            'provider_name' => $this->providerName,
+            'renews_at' => $this->renewsAt,
+            'autorenew' => $this->autorenew,
+            'external_status' => $this->externalStatus,
+            'attributes' => $this->attributes,
         ];
     }
 }
