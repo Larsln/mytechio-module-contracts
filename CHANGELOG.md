@@ -5,6 +5,35 @@ Alle nennenswerten Änderungen an diesem Paket werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.4.0] - 2026-10-07
+
+### Added
+
+- `Documents\IncomingDocuments` (NEU) — Posteingang-Ingest für Module:
+  `ingest()` legt einen Beleg im Posteingang an (GoBD-Ablage durch den
+  Kern, feuert `DocumentStored`); eine Hash-Dublette (gleicher `sha256`
+  des Blobs wie ein bereits lebender Beleg) legt keinen neuen Beleg an,
+  sondern liefert den bestehenden mit `duplicate = true` zurück.
+  `find()` liefert den Verweis auf einen Beleg anhand seiner ID, oder
+  `null`.
+- `Documents\IngestOptions` (NEU) — Optionen für `ingest()`: `actorId`
+  und `metadata` (geht 1:1 an die Kern-Ablage durch; ein Flag wie das
+  frühere `skip_notify` ist hier nicht mehr vorgesehen, Module
+  entscheiden selbst anhand ihrer eigenen Daten).
+- `Documents\IngestedDocument` (NEU) — Ergebnis von `ingest()`: `id`,
+  `diskPath`, `sha256`, `duplicate`, `url`.
+- `Documents\IncomingDocumentRef` (NEU) — Verweis auf einen
+  Posteingang-Beleg: `id`, `source` (freier Modulschlüssel, z. B.
+  `paperless`, oder `upload` für Kern-Uploads), `status`, `diskPath`,
+  `sha256`, `incomingInvoiceId` (`null`, solange nicht einer
+  Eingangsrechnung zugeordnet), `url`.
+- `Fakes\FakeIncomingDocuments` (NEU) — In-Memory-Double: Dubletten-
+  Erkennung per `sha256`, Auto-IDs, deterministische `diskPath`/`url`;
+  `seed()` hinterlegt einen Beleg direkt für `find()`, `ingested()`
+  liefert alle Aufrufe von `ingest()` für Assertions.
+- README: Zeile für `Documents\IncomingDocuments` in der Verträge-Tabelle.
+- `Contracts::VERSION` auf `1.4.0`.
+
 ## [1.3.0] - 2026-10-06
 
 ### Added

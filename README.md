@@ -26,6 +26,7 @@ composer require mytechio/module-contracts
 | Namespace | Interface | Kern-Semantik |
 |---|---|---|
 | `Documents` | `DocumentStore` | Lokale GoBD-Ablage ist Besitzer, Paperless-NGX asynchroner Zweit-Viewer; feuert `DocumentStored`. |
+| `Documents` | `IncomingDocuments` | Posteingang-Ingest für Module (z. B. ein Pull von Paperless-NGX): `ingest()` legt den Beleg in der Kern-Ablage an und feuert `DocumentStored`, eine Hash-Dublette (`sha256`) liefert den bestehenden Beleg mit `duplicate = true` zurück, statt einen neuen anzulegen; `find()` liefert den Verweis auf einen Beleg anhand seiner ID, oder `null`. |
 | `Mail` | `MailOutbox` | Versand im Branding-Layout, Eintrag im Postausgang, feuert `MailSent`. |
 | `Assets` | `CustomerAssets` | Lesen/Anlegen/Kündigen von Kundenobjekten; `create()`/`cancel()` feuern `CustomerAssetCreated`/`CustomerAssetCancelled`; `findByLabel()` liefert aktive Objekte zuerst. Ein Objekt hat entweder eine Quelle (`source`/`externalId`, z. B. `"domainrobot"`) oder einen Freitext-Anbieter (`providerName`, z. B. `"IONOS"`); `findBySource()` findet ein Objekt anhand seiner externen Kennung, `attachSource()` ordnet ein bisher manuelles Objekt nachträglich einer Quelle zu, `updateFromSource()` übernimmt eine Connector-Rückmeldung (Status, Verlängerung, Autorenew, `attributes` per Merge), `forInvoiceItem()` liefert die Objekte einer Rechnungsposition. |
 | `Assets` | `AssetSource` | Objekt-Vorschläge externer Quellen für den künftigen Objekt-Picker (Zielbild Phase 5) — kein Bezug zu bereits angelegten Kundenobjekten nötig. |
