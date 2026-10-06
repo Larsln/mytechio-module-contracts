@@ -8,6 +8,7 @@ use MyTechIO\Contracts\Invoices\InvoiceDraft;
 use MyTechIO\Contracts\Invoices\InvoiceItemRef;
 use MyTechIO\Contracts\Invoices\InvoiceRef;
 use MyTechIO\Contracts\Invoices\Invoices;
+use MyTechIO\Contracts\Invoices\PaidDocument;
 
 /**
  * Test-Double für `Invoices`: merkt sich jeden Entwurf, liefert immer den
@@ -24,6 +25,11 @@ final class FakeInvoices implements Invoices
      * @var array<int, InvoiceItemRef>
      */
     private array $items = [];
+
+    /**
+     * @var list<PaidDocument>
+     */
+    private array $paidDocuments = [];
 
     private int $nextId = 1;
 
@@ -43,6 +49,26 @@ final class FakeInvoices implements Invoices
     public function seedItem(InvoiceItemRef $item): void
     {
         $this->items[$item->id] = $item;
+    }
+
+    /**
+     * @return list<PaidDocument>
+     */
+    public function paidBetween(string $from, string $to): array
+    {
+        $matches = array_values(array_filter(
+            $this->paidDocuments,
+            fn (PaidDocument $document): bool => $document->paidOn >= $from && $document->paidOn <= $to,
+        ));
+
+        usort($matches, fn (PaidDocument $a, PaidDocument $b) => $a->paidOn <=> $b->paidOn);
+
+        return $matches;
+    }
+
+    public function seedPaidDocument(PaidDocument $document): void
+    {
+        $this->paidDocuments[] = $document;
     }
 
     /**

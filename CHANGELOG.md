@@ -5,6 +5,60 @@ Alle nennenswerten Änderungen an diesem Paket werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.5.0] - 2026-10-07
+
+### Added
+
+- `Documents\InvoiceExtractor` (NEU) — KI-Extraktions-Provider für
+  Eingangsrechnungen, Container-Tag `mytechio.invoice_extractors`:
+  `extractorKey()`, `label()`, `configured()`, `extract()` liefert die rohe
+  §7.6-Payload (Validierung macht der Kern) und wirft
+  `ExtractionFailedException` bei Transportfehlern/blockierter Generierung.
+- `Documents\ExtractionContextData` (NEU) — Kontext für `extract()`:
+  aktive Aufwandskonten (`expenseAccounts`) und die kanonische
+  Einheitenliste (`units`).
+- `Documents\ExtractionFailedException` (NEU) — wird von
+  `InvoiceExtractor::extract()` geworfen.
+- `Fakes\FakeInvoiceExtractor` (NEU) — konfigurierbare Payload
+  (`returns()`) oder Ausnahme (`throws()`), zählt Aufrufe (`calls()`).
+- `Articles\ArticleStatistics` (NEU) — lesender Zugriff auf die
+  Artikel-BI-Auswertungen: `overview()` liefert eine `ArticleOverview`,
+  `forArticle()` eine `ArticleDetailStats` oder `null`.
+- `Articles\ArticleOverview` / `Articles\ArticleDetailStats` (NEU) — Array-
+  Formen entsprechen exakt der Kern-Implementierung
+  (`ArticleAnalyticsService::overview()`/`articleDetail()`);
+  `ArticleDetailStats::$priceHistory` bündelt die getrennten EK-/VK-
+  Preisreihen des Kerns unter den Schlüsseln `purchase`/`sale`.
+- `Fakes\FakeArticleStatistics` (NEU) — liefert eine leere Auswertung,
+  solange nichts gesät wurde; `seedOverview()`/`seedArticle()`.
+- `Invoices\Invoices::paidBetween()` (NEU) — liefert alle im Zeitraum
+  bezahlten Ausgangsrechnungen als `list<PaidDocument>`
+  (`type = "invoice"`), z. B. für den Profit-Split.
+- `Invoices\PaidDocument` (NEU) — lesender Verweis auf einen bezahlten
+  Beleg (Ausgangs- oder Eingangsrechnung): `type`, `id`, `number`,
+  `paidOn`, `netAmount`, `contactId`, `url`.
+- `Documents\IncomingInvoices` (NEU) — rein lesender Zugriff auf
+  Eingangsrechnungen: `paidBetween()` (`type = "incoming_invoice"`),
+  `find()` liefert einen `IncomingInvoiceRef` oder `null`.
+- `Documents\IncomingInvoiceRef` (NEU) — lesender Verweis auf eine
+  Eingangsrechnung: `id`, `number`, `status`, `contactId`, `url`.
+- `Fakes\FakeInvoices` um `paidBetween()`/`seedPaidDocument()` erweitert.
+- `Fakes\FakeIncomingInvoices` (NEU) — `seed()` für `find()`,
+  `seedPaidDocument()` für `paidBetween()`.
+- `Tax\VatIdChecker` (NEU) — VIES-Prüfung einer USt-ID: `check()` liefert
+  ein `VatIdCheckResult` oder wirft `VatIdCheckUnavailableException`
+  (Dienst nicht erreichbar) bzw. `InvalidVatIdFormatException` (Format).
+- `Tax\VatIdCheckResult` (NEU) — `valid`, `name`, `address`,
+  `requestIdentifier`, `checkedAt`.
+- `Tax\VatIdCheckUnavailableException` / `Tax\InvalidVatIdFormatException`
+  (NEU) — beide `extends ContractException`.
+- `Fakes\FakeVatIdChecker` (NEU) — Ergebnis je USt-ID konfigurierbar
+  (`seedResult()`), `unavailable()` simuliert „nicht erreichbar".
+- README: Zeilen für `IncomingInvoices`, `InvoiceExtractor`,
+  `ArticleStatistics`, `VatIdChecker` in der Verträge-Tabelle; neue Fakes
+  im Fakes-Abschnitt.
+- `Contracts::VERSION` auf `1.5.0`.
+
 ## [1.4.0] - 2026-10-07
 
 ### Added

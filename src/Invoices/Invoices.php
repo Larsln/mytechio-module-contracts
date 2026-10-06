@@ -20,4 +20,13 @@ interface Invoices
      * anhand ihrer ID, oder `null`, wenn keine Position mit dieser ID existiert.
      */
     public function findItem(int $invoiceItemId): ?InvoiceItemRef;
+
+    /**
+     * Liefert alle im Zeitraum (inklusive) bezahlten Ausgangsrechnungen,
+     * sortiert nach `paidOn`, z. B. für den Profit-Split. `type` ist bei
+     * jedem Eintrag stets `"invoice"`.
+     *
+     * @return list<PaidDocument>
+     */
+    public function paidBetween(string $from, string $to): array;
 }

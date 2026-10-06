@@ -32,8 +32,12 @@ composer require mytechio/module-contracts
 | `Assets` | `AssetSource` | Objekt-Vorschläge externer Quellen für den künftigen Objekt-Picker (Zielbild Phase 5) — kein Bezug zu bereits angelegten Kundenobjekten nötig. |
 | `Contacts` | `Contacts` | Rein lesender Kontaktzugriff — Module legen/ändern keine Kontakte. |
 | `Accounting` | `Journal` | Soll=Haben wird erzwungen (`UnbalancedEntryException`), festgeschriebene Perioden lehnen ab (`PeriodClosedException`). |
-| `Invoices` | `Invoices` | `createDraft()` liefert immer eine Rechnung im Status Draft; Defaults (Bankkonto, Zahlungsziel, Steuerkategorie) ergänzt der Kern. Finalisierung/Versand/Storno bleiben Sache des Kern-UI. `findItem()` liefert den Verweis auf eine Rechnungsposition (inkl. Rechnungsnummer/-status und Kern-URL) anhand ihrer ID, oder `null`. |
+| `Invoices` | `Invoices` | `createDraft()` liefert immer eine Rechnung im Status Draft; Defaults (Bankkonto, Zahlungsziel, Steuerkategorie) ergänzt der Kern. Finalisierung/Versand/Storno bleiben Sache des Kern-UI. `findItem()` liefert den Verweis auf eine Rechnungsposition (inkl. Rechnungsnummer/-status und Kern-URL) anhand ihrer ID, oder `null`. `paidBetween()` liefert alle im Zeitraum bezahlten Ausgangsrechnungen als `PaidDocument` (`type = "invoice"`), z. B. für den Profit-Split. |
 | `Invoices` | `InvoiceItemExtension` | Positions-Erweiterung einer Rechnung durch ein Modul (siehe Abschnitt „Positions-Erweiterung"). |
+| `Documents` | `IncomingInvoices` | Rein lesender Zugriff auf Eingangsrechnungen. `paidBetween()` liefert alle im Zeitraum bezahlten Eingangsrechnungen als `PaidDocument` (`type = "incoming_invoice"`); `find()` liefert den Verweis auf eine Eingangsrechnung anhand ihrer ID, oder `null`. |
+| `Documents` | `InvoiceExtractor` | KI-Extraktions-Provider für Eingangsrechnungen, Container-Tag `mytechio.invoice_extractors`. Der Kern wählt über eine Konfiguration genau einen Treiber aus; `extract()` liefert die rohe §7.6-Payload (Validierung macht der Kern) und wirft `ExtractionFailedException` bei Transportfehlern/blockierter Generierung. |
+| `Articles` | `ArticleStatistics` | Lesender Zugriff auf die Artikel-BI-Auswertungen (Umsatz, Wareneinsatz, Rohertrag); der Kern implementiert diesen Vertrag über die Kern-Tabellen, ein Modul zeigt die Daten nur an. Die Array-Formen in `ArticleOverview`/`ArticleDetailStats` entsprechen exakt der Kern-Implementierung. |
+| `Tax` | `VatIdChecker` | VIES-Prüfung einer USt-ID. Ohne aktives Modul bindet der Kern einen Null-Client, der stets `VatIdCheckUnavailableException` wirft (heutiger „VIES nicht erreichbar"-Pfad); `InvalidVatIdFormatException` bei formal ungültiger USt-ID. |
 | `Settings` | `ModuleSettings` | Modulspezifische Einstellungen; ENV/Config hat immer Vorrang vor der Datenbank (`isFromEnvironment()`). Implementierung erst Phase 3 — hier nur Interface + Fake. |
 | `Connectors` | `Connector` | Einheitlicher Satz an Status-Abfragen/Aktionen für externe Registrare/Lizenzserver; `sync()` darf lange laufen und gehört in eine Queue. |
 | `Modules` | `ModuleLifecycle` | Lebenszyklus-Hooks (`onInstall`/`onEnable`/`onDisable`/`onUninstall`), vom Kern über den Manifest-Schlüssel `lifecycle` aufgelöst; `onEnable()` darf werfen (Modul bleibt deaktiviert), `onDisable()` nicht. `AbstractModuleLifecycle` liefert leere Implementierungen zum Erben. |
@@ -118,12 +122,16 @@ $this->app->instance(CustomerAssets::class, new FakeCustomerAssets);
 - `FakeContacts` — `seed()`, `setCountries()`.
 - `FakeJournal` — prüft Soll=Haben exakt über Integer-Arithmetik (keine Floats),
   `seedAccount()` für den Kontenplan.
-- `FakeInvoices` — merkt sich Entwürfe, liefert immer Status `draft`; `seedItem()` für `findItem()`.
+- `FakeInvoices` — merkt sich Entwürfe, liefert immer Status `draft`; `seedItem()` für `findItem()`, `seedPaidDocument()` für `paidBetween()` (sortiert, auf den Zeitraum gefiltert).
 - `FakeModuleSettings` — `markFromEnvironment()` simuliert ENV-Vorrang.
 - `FakeConnector` — konfigurierbarer Schlüssel/Typen/Status/Aktionen/Ereignisse.
 - `FakeModuleLifecycle` — zählt Aufrufe je Hook, `failOnEnable()` simuliert einen fehlschlagenden `onEnable()`.
 - `FakeHealthCheck` — liefert einen vorgegebenen `HealthStatus`, `withStatus()` zum Umkonfigurieren.
 - `FakeInvoiceItemExtension` — zeichnet jeden Aufruf auf (`validateCalls`, `afterItemsSyncedCalls`, `annotateCalls`, `duplicateCalls`), `withValidationErrors()`/`withAnnotationLines()` zum Umkonfigurieren.
+- `FakeInvoiceExtractor` — liefert eine vorgegebene Payload (`returns()`) oder wirft eine vorgegebene `ExtractionFailedException` (`throws()`), zählt jeden Aufruf (`calls()`), `withConfigured()` zum Umschalten.
+- `FakeArticleStatistics` — liefert eine leere Auswertung, solange nichts gesät wurde; `seedOverview()`/`seedArticle()` legen die Ergebnisse fest.
+- `FakeIncomingInvoices` — `seed()` für `find()`, `seedPaidDocument()` für `paidBetween()` (sortiert, auf den Zeitraum gefiltert).
+- `FakeVatIdChecker` — Ergebnis je USt-ID konfigurierbar (`seedResult()`), `unavailable()` schaltet auf „nicht erreichbar" (wirft `VatIdCheckUnavailableException`), `calls()` für Assertions.
 
 ## Versionierung
 
