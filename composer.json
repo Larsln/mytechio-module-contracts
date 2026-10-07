@@ -3,11 +3,15 @@
     "description": "Contracts (interfaces, DTOs, fakes) between the MyTechIO Admin core and its modules",
     "type": "library",
     "license": "proprietary",
-    "keywords": ["mytechio", "contracts", "interfaces", "dto"],
+    "keywords": [
+        "mytechio",
+        "contracts",
+        "interfaces",
+        "dto"
+    ],
     "authors": [
         {
-            "name": "MyTechIO AG",
-            "email": "ai@lat.aixx.de"
+            "name": "MyTechIO AG"
         }
     ],
     "require": {
