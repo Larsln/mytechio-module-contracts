@@ -42,6 +42,7 @@ composer require mytechio/module-contracts
 | `Connectors` | `Connector` | Einheitlicher Satz an Status-Abfragen/Aktionen für externe Registrare/Lizenzserver; `sync()` darf lange laufen und gehört in eine Queue. |
 | `Modules` | `ModuleLifecycle` | Lebenszyklus-Hooks (`onInstall`/`onEnable`/`onDisable`/`onUninstall`), vom Kern über den Manifest-Schlüssel `lifecycle` aufgelöst; `onEnable()` darf werfen (Modul bleibt deaktiviert), `onDisable()` nicht. `AbstractModuleLifecycle` liefert leere Implementierungen zum Erben. |
 | `Modules` | `HealthCheck` | Gesundheitsstatus (`HealthStatus`) für die Modulübersicht; der Kern ruft `health()` nur dort und mit Timeout-Schutz auf — keine langsamen Netzaufrufe in Implementierungen. |
+| `Modules` | `ModuleState` | Laufzeit-Zustand eines Moduls für Hintergrund-Code (siehe Abschnitt „Modulzustand im Hintergrund"): `isActive()` prüft bekannt+aktiviert+kompatibel, `isEnabled()` nur den rohen Schalter. |
 
 ## Modul-Lebenszyklus und Gesundheit
 
@@ -70,6 +71,55 @@ der Kern per Container auflöst:
   `"*"` steht für alle Permissions des Moduls. Fehlt der Block, gilt das
   bisherige Verhalten (alle Permissions an `superadmin` + `admin`).
   Unbekannte Rollen führen zu einem Manifest-Fehler im Kern.
+
+## Modulzustand im Hintergrund
+
+Hintergrund-Code eines Moduls — Scheduler-Einträge, Listener auf Kern-Ereignisse,
+queued Jobs — darf nur laufen, wenn das Modul **aktiv** ist, nicht nur aktiviert,
+sondern auch kompatibel. Dafür bindet der Kern `Modules\ModuleState`, und
+Hintergrund-Code prüft ihn als Erstes:
+
+```php
+// Scheduler-Eintrag, zusätzlich zu bestehenden Bedingungen
+$schedule->job(new SyncDomainsJob)
+    ->daily()
+    ->when(fn () => app(ModuleState::class)->isActive('domainrobot'));
+
+// Listener / Job
+public function handle(): void
+{
+    if (! app(ModuleState::class)->isActive('domainrobot')) {
+        return; // beendet sich still, kein Fehler
+    }
+
+    // ...
+}
+```
+
+- `isActive()` ist die richtige Prüfung für Hintergrund-Code — sie berücksichtigt
+  Kompatibilität, nicht nur den Schalter aus der Modultabelle.
+- `isEnabled()` liefert ausschließlich diesen rohen Schalter; Hintergrund-Code
+  sollte i. d. R. `isActive()` verwenden, nicht `isEnabled()`.
+- Synchron aufgerufene Vertragsimplementierungen (`Connector`, `CustomerAssets`
+  usw.) prüfen `ModuleState` NICHT selbst — der Kern filtert seine Registries
+  bereits nach aktiven Modulen, bevor er eine Implementierung aufruft.
+- `Fakes\FakeModuleState` ist in Modul-Tests standardmäßig für JEDES Modul
+  aktiv — Tests sollen nicht unbeabsichtigt stillstehen, nur weil ein
+  Modulname nicht gesät wurde. `activate()`/`deactivate()` schalten ein
+  einzelnes Modul für die Dauer eines Tests um.
+
+## Deinstallation
+
+`php artisan module:uninstall <name>` (Kern) ruft zuerst
+`ModuleLifecycle::onUninstall()` des Moduls auf und entfernt danach die
+Kern-Buchhaltung des Moduls: die `modules`-Zeile, `module_settings` und die
+Modul-Permissions (aus allen Rollen und aus der Permission-Tabelle).
+
+**Modultabellen bleiben stehen** — GoBD/Nachvollziehbarkeit verlangen, dass
+einmal erfasste Daten (Domains, Kundenobjekte, Dokument-Referenzen, …) nicht
+durch eine Deinstallation verschwinden. `onUninstall()` darf deshalb **nur**
+technische Caches/Zustände räumen (z. B. Health-Cache, zwischengespeicherte
+Tokens) — niemals fachliche Modultabellen leeren oder droppen.
 
 ## Positions-Erweiterung
 
@@ -132,6 +182,7 @@ $this->app->instance(CustomerAssets::class, new FakeCustomerAssets);
 - `FakeArticleStatistics` — liefert eine leere Auswertung, solange nichts gesät wurde; `seedOverview()`/`seedArticle()` legen die Ergebnisse fest.
 - `FakeIncomingInvoices` — `seed()` für `find()`, `seedPaidDocument()` für `paidBetween()` (sortiert, auf den Zeitraum gefiltert).
 - `FakeVatIdChecker` — Ergebnis je USt-ID konfigurierbar (`seedResult()`), `unavailable()` schaltet auf „nicht erreichbar" (wirft `VatIdCheckUnavailableException`), `calls()` für Assertions.
+- `FakeModuleState` — standardmäßig ist jedes Modul aktiv; `activate()`/`deactivate()` schalten ein Modul für den Test um.
 
 ## Versionierung
 

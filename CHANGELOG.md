@@ -5,6 +5,25 @@ Alle nennenswerten Änderungen an diesem Paket werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.6.0] - 2026-10-07
+
+### Added
+
+- `Modules\ModuleState` (NEU) — Laufzeit-Zustand eines Moduls für
+  Hintergrund-Code: `isActive()` prüft bekannt+aktiviert+kompatibel (= die
+  Prüfung für Scheduler-Einträge/Listener/Jobs), `isEnabled()` liefert nur
+  den rohen Schalter aus der Modultabelle.
+- `Fakes\FakeModuleState` (NEU) — standardmäßig ist jedes Modul aktiv
+  (Tests sollen nicht unbeabsichtigt stillstehen); `activate()`/
+  `deactivate()` schalten ein einzelnes Modul für die Dauer eines Tests um.
+- README: neue Abschnitte „Modulzustand im Hintergrund" (Scheduler-/
+  Listener-/Job-Regel mit `ModuleState::isActive()`) und „Deinstallation"
+  (`module:uninstall` ruft `onUninstall()`, entfernt Kern-Buchhaltung;
+  Modultabellen bleiben GoBD-bedingt stehen, `onUninstall()` räumt nur
+  technische Caches/Zustände); Zeile für `ModuleState` in der
+  Verträge-Tabelle, `FakeModuleState` im Fakes-Abschnitt.
+- `Contracts::VERSION` auf `1.6.0`.
+
 ## [1.5.0] - 2026-10-07
 
 ### Added
