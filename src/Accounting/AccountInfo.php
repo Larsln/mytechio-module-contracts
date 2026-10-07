@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Accounting;
 
 /**
- * Stammdaten eines Kontos aus dem Kontenplan.
+ * Master data for an account from the chart of accounts.
  */
 final readonly class AccountInfo
 {

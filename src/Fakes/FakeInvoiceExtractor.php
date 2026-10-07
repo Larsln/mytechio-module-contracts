@@ -9,9 +9,9 @@ use MyTechIO\Contracts\Documents\ExtractionFailedException;
 use MyTechIO\Contracts\Documents\InvoiceExtractor;
 
 /**
- * Test-Double für `InvoiceExtractor`: liefert eine vorgegebene Payload (oder
- * wirft eine vorgegebene `ExtractionFailedException`), zählt jeden Aufruf
- * von `extract()`.
+ * Test double for `InvoiceExtractor`: returns a predefined payload (or
+ * throws a predefined `ExtractionFailedException`), counts every call
+ * to `extract()`.
  */
 final class FakeInvoiceExtractor implements InvoiceExtractor
 {

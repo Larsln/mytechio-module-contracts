@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Tax;
 
 /**
- * Ergebnis einer VIES-Prüfung einer USt-ID.
+ * Result of a VIES check of a VAT ID.
  *
- * `name`/`address` sind `null`, wenn der Dienst zur gültigen USt-ID keine
- * Stammdaten liefert (z. B. bei einfacher statt qualifizierter Bestätigung).
- * `requestIdentifier` ist die vom Dienst vergebene Vorgangsnummer (Nachweis
- * für die Dokumentationspflicht), `checkedAt` ein ISO-8601-Zeitstempel.
+ * `name`/`address` are `null` if the service does not return master data
+ * for the valid VAT ID (e.g. for a simple instead of a qualified
+ * confirmation). `requestIdentifier` is the transaction number assigned
+ * by the service (proof for the documentation obligation), `checkedAt` is
+ * an ISO-8601 timestamp.
  */
 final readonly class VatIdCheckResult
 {

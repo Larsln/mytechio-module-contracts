@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Documents;
 
 /**
- * Kontext für `InvoiceExtractor::extract()`: die aktiven Aufwandskonten für
- * Kontovorschläge sowie die kanonische Einheitenliste, damit das Modell
- * gedruckte Einheiten auf Standard-Codes mappt (Freitext nur als Ausnahme).
- * Bewusst OHNE Kontaktliste — das Lieferanten-Matching läuft im Kern,
- * niemals im Modell.
+ * Context for `InvoiceExtractor::extract()`: the active expense accounts for
+ * account suggestions, as well as the canonical list of units, so the model
+ * maps printed units to standard codes (free text only as a fallback).
+ * Deliberately WITHOUT a contact list — supplier matching runs in the core,
+ * never in the model.
  */
 final readonly class ExtractionContextData
 {

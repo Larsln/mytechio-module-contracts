@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Articles;
 
 /**
- * Detail-Auswertung für einen einzelnen Artikel.
+ * Detailed analytics for a single article.
  *
- * Die Array-Formen entsprechen exakt der Kern-Implementierung
- * (`ArticleAnalyticsService::articleDetail()`); `priceHistory` bündelt
- * deren getrennte EK-/VK-Preisreihen unter den Schlüsseln `purchase`
- * (Einkauf) und `sale` (Verkauf). `stock` ist `null`, wenn der Artikel
- * nicht bedarfsgeführt ist (`stock_tracked = false`).
+ * The array shapes correspond exactly to the core implementation
+ * (`ArticleAnalyticsService::articleDetail()`); `priceHistory` bundles its
+ * separate purchase/sale price series under the keys `purchase` and
+ * `sale`. `stock` is `null` if the article is not stock-tracked
+ * (`stock_tracked = false`).
  */
 final readonly class ArticleDetailStats
 {

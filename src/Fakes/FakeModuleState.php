@@ -7,9 +7,9 @@ namespace MyTechIO\Contracts\Fakes;
 use MyTechIO\Contracts\Modules\ModuleState;
 
 /**
- * Test-Double für `ModuleState`: standardmäßig ist JEDES Modul aktiv, damit
- * Modul-Tests nicht unbeabsichtigt stillstehen. `deactivate()`/`activate()`
- * schalten ein einzelnes Modul für die Dauer des Tests um.
+ * Test double for `ModuleState`: by default EVERY module is active, so
+ * module tests don't unintentionally stall. `deactivate()`/`activate()`
+ * toggle a single module for the duration of the test.
  */
 final class FakeModuleState implements ModuleState
 {

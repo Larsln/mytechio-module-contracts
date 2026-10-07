@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Accounting;
 
 /**
- * Soll oder Haben einer Buchungszeile.
+ * Debit or credit side of a journal line.
  */
 enum Side: string
 {

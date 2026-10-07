@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Documents;
 
 /**
- * Verweis auf einen Posteingang-Beleg.
+ * Reference to a document in the incoming-document inbox (Posteingang).
  *
- * `source` ist der freie Modulschlüssel bzw. `upload` für Kern-Uploads,
- * `status` der Kern-interne Lebenszyklus-Status (z. B. `extracting`,
- * `manual`, `imported`) als String, `incomingInvoiceId` ist gesetzt,
- * sobald der Beleg einer Eingangsrechnung zugeordnet wurde, sonst `null`.
+ * `source` is the module's free-form key, or `upload` for core uploads;
+ * `status` is the core-internal lifecycle status (e.g. `extracting`,
+ * `manual`, `imported`) as a string; `incomingInvoiceId` is set once the
+ * document has been matched to an incoming invoice (Eingangsrechnung),
+ * otherwise `null`.
  */
 final readonly class IncomingDocumentRef
 {

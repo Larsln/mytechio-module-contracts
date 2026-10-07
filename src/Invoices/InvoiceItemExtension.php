@@ -5,38 +5,38 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Invoices;
 
 /**
- * Positions-Erweiterung einer Rechnung durch ein Modul.
+ * A module's extension of an invoice line item.
  *
- * Der Kern sammelt Implementierungen über den Container-Tag
- * `mytechio.invoice_item_extensions` (siehe `InvoiceItemExtensionRegistry`
- * im Kern) und speichert je Rechnungsposition ein JSON-Feld `extras`, in
- * dem jede Erweiterung ihren eigenen Teil unter dem Schlüssel `key()`
- * ablegt — `key()` MUSS dabei dem Modulnamen entsprechen, damit der Kern
- * Erweiterungen deaktivierter Module herausfiltern kann.
+ * The core collects implementations via the container tag
+ * `mytechio.invoice_item_extensions` (see `InvoiceItemExtensionRegistry`
+ * in the core) and stores a JSON field `extras` per invoice line item, in
+ * which each extension stores its own part under the key `key()` —
+ * `key()` MUST match the module name so the core can filter out
+ * extensions belonging to disabled modules.
  */
 interface InvoiceItemExtension
 {
     /**
-     * Schlüssel unter `extras` einer Position, z. B. `"customer_assets"`.
-     * Entspricht dem Modulnamen.
+     * Key under a line item's `extras`, e.g. `"customer_assets"`.
+     * Matches the module name.
      */
     public function key(): string;
 
     /**
-     * @param  array<string, mixed>  $extras  Der eigene Teil (extras[key()]).
-     * @return array<string, string> Feld ⇒ Fehlertext (leer = gültig)
+     * @param  array<string, mixed>  $extras  This extension's own part (extras[key()]).
+     * @return array<string, string> Field => error message (empty = valid)
      */
     public function validate(array $extras, ?int $contactId): array;
 
     /**
-     * Nach dem Neuanlegen der Positionen (innerhalb der Kern-Transaktion).
+     * Called after the line items have been (re-)created, within the core transaction.
      *
-     * @param  list<array{id: int, extras: array<string, mixed>}>  $items  (extras = eigener Teil)
+     * @param  list<array{id: int, extras: array<string, mixed>}>  $items  (extras = this extension's own part)
      */
     public function afterItemsSynced(int $invoiceId, ?int $contactId, array $items): void;
 
     /**
-     * Zusatzzeilen unter der Positionsbeschreibung auf dem Beleg.
+     * Additional lines shown under the line item description on the document.
      *
      * @param  array<string, mixed>  $extras
      * @return list<string>
@@ -44,8 +44,8 @@ interface InvoiceItemExtension
     public function annotate(int $invoiceItemId, array $extras): array;
 
     /**
-     * Eigener Teil der extras für eine Belegkopie (Duplizieren/Storno):
-     * z. B. Verknüpfungen entfernen.
+     * This extension's own part of the extras for a document copy (duplication/cancellation
+     * (Storno)): e.g. removing links.
      *
      * @param  array<string, mixed>  $extras
      * @return array<string, mixed>

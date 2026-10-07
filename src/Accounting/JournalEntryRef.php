@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Accounting;
 
 /**
- * Verweis auf einen tatsächlich gebuchten Buchungssatz.
+ * Reference to a journal entry that has actually been posted.
  */
 final readonly class JournalEntryRef
 {

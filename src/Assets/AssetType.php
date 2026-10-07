@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Assets;
 
 /**
- * Bekannte Kundenobjekt-Typen.
+ * Known customer asset (Kundenobjekt) types.
  *
- * Reine Konstanten statt Enum, weil Module eigene Typen einführen dürfen
- * (z. B. künftig `mailbox`) — die Liste hier ist nicht abschließend,
- * sondern dokumentiert die heute vom Kern geführten Typen.
+ * Plain constants instead of an enum because modules are allowed to
+ * introduce their own types (e.g. `mailbox` in the future) — the list
+ * here is not exhaustive, it documents the types currently maintained
+ * by the core.
  */
 final class AssetType
 {
@@ -25,6 +26,6 @@ final class AssetType
 
     private function __construct()
     {
-        // Reine Konstanten-Klasse, nicht instanziierbar.
+        // Pure constants class, not instantiable.
     }
 }

@@ -11,10 +11,10 @@ use MyTechIO\Contracts\Assets\NewCustomerAsset;
 use MyTechIO\Contracts\Connectors\ConnectorStatus;
 
 /**
- * Test-Double für `CustomerAssets`: In-Memory-Speicher mit Auto-IDs.
- * `seed()` lässt Tests den Ausgangszustand vorgeben, inklusive bereits
- * belegter IDs. `findByLabel()` sortiert wie die Kern-Implementierung
- * aktive Objekte (`status === 'active'`) zuerst.
+ * Test double for `CustomerAssets`: in-memory store with auto IDs.
+ * `seed()` lets tests specify the initial state, including already
+ * occupied IDs. `findByLabel()` sorts active objects
+ * (`status === 'active'`) first, just like the core implementation.
  */
 final class FakeCustomerAssets implements CustomerAssets
 {

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Mail;
 
 /**
- * Versand von Mails aus Modulen heraus.
+ * Sending of emails from modules.
  *
- * Kern-Semantik: Die Mail wird mit dem Branding-Layout und der üblichen
- * Signatur gerendert, im Postausgang verzeichnet und als Kern-Ereignis
- * `MailSent` gefeuert. Module versenden niemals direkt über `Mail::` o. Ä.
- * — jeder Versand läuft über diesen Vertrag, damit Postausgang und Audit
- * vollständig bleiben.
+ * Core semantics: the email is rendered with the branding layout and the
+ * usual signature, recorded in the outbox (Postausgang), and fired as the
+ * core event `MailSent`. Modules never send directly via `Mail::` or
+ * similar — every send goes through this contract so that the outbox and
+ * audit trail remain complete.
  */
 interface MailOutbox
 {

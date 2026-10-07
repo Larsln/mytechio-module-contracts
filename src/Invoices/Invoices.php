@@ -5,26 +5,26 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Invoices;
 
 /**
- * Anlegen von Rechnungs-Entwürfen aus Modulen heraus.
+ * Creation of invoice drafts from modules.
  *
- * Kern-Semantik: liefert immer eine Rechnung im Status Draft zurück —
- * Finalisierung, Versand und Storno bleiben ausschließlich Sache des
- * Kern-UI und sind über diesen Vertrag nicht erreichbar.
+ * Core semantics: always returns an invoice in draft status — finalization,
+ * sending, and cancellation (Storno) remain exclusively the responsibility
+ * of the core UI and are not reachable through this contract.
  */
 interface Invoices
 {
     public function createDraft(InvoiceDraft $draft): InvoiceRef;
 
     /**
-     * Liefert den Verweis auf eine Rechnungsposition (inkl. ihrer Rechnung)
-     * anhand ihrer ID, oder `null`, wenn keine Position mit dieser ID existiert.
+     * Returns the reference to an invoice line item (including its invoice)
+     * by its ID, or `null` if no line item with this ID exists.
      */
     public function findItem(int $invoiceItemId): ?InvoiceItemRef;
 
     /**
-     * Liefert alle im Zeitraum (inklusive) bezahlten Ausgangsrechnungen,
-     * sortiert nach `paidOn`, z. B. für den Profit-Split. `type` ist bei
-     * jedem Eintrag stets `"invoice"`.
+     * Returns all outgoing invoices paid within the period (inclusive),
+     * sorted by `paidOn`, e.g. for the profit split. `type` is always
+     * `"invoice"` for every entry.
      *
      * @return list<PaidDocument>
      */

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Assets;
 
 /**
- * Ein Vorschlag eines `AssetSource`-Moduls für den künftigen
- * Objekt-Picker (Zielbild Phase 5).
+ * A suggestion from an `AssetSource` module for the upcoming asset
+ * picker (Phase 5 target design).
  *
- * `externalId` ist der Schlüssel, den das Modul selbst verwendet (z. B.
- * ein Domainname) — nicht notwendigerweise die ID eines Kundenobjekts im
- * Kern, da das Objekt unter Umständen noch nicht angelegt ist.
+ * `externalId` is the key the module itself uses (e.g. a domain name) —
+ * not necessarily the ID of a customer asset in the core, since the
+ * asset may not have been created yet.
  */
 final readonly class AssetSuggestion
 {

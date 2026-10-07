@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Accounting;
 
 /**
- * Wer eine Buchung veranlasst hat — `id` ist die User-ID im Kern (`null`
- * bei automatischen/Job-ausgelösten Buchungen), `label` ein für das
- * Audit-Log lesbarer Name.
+ * Who initiated a booking — `id` is the user ID in the core (`null`
+ * for automated/job-triggered bookings), `label` is a name readable
+ * in the audit log.
  */
 final readonly class ActorRef
 {

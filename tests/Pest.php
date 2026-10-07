@@ -2,5 +2,5 @@
 
 declare(strict_types=1);
 
-// Reines PHP-Paket ohne Framework-Abhängigkeit — keine eigene TestCase
-// nötig, Pest fällt auf \PHPUnit\Framework\TestCase zurück.
+// Pure PHP package with no framework dependency — no custom TestCase is
+// needed, Pest falls back to \PHPUnit\Framework\TestCase.

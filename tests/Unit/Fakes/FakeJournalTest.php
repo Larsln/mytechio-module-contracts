@@ -45,7 +45,7 @@ it('throws UnbalancedEntryException when debit does not equal credit', function 
 it('balances amounts with more than two decimal places without float errors', function () {
     $journal = new FakeJournal;
 
-    // 3 × 33.3334 = 100.0002, muss exakt gegen eine einzelne Gegenbuchung aufgehen.
+    // 3 × 33.3334 = 100.0002, must balance exactly against a single counter-entry.
     $ref = $journal->post(new JournalEntryDraft(
         bookedOn: '2026-10-06',
         description: 'Rundungstest',

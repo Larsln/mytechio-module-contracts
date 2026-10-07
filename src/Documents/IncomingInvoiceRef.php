@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Documents;
 
 /**
- * Lesender Verweis auf eine Eingangsrechnung, z. B. für den Profit-Split.
+ * Read-only reference to an incoming invoice (Eingangsrechnung), e.g. for
+ * the profit split.
  *
- * `url` ist die relative Kern-URL der Eingangsrechnung.
+ * `url` is the core's relative URL for the incoming invoice.
  */
 final readonly class IncomingInvoiceRef
 {

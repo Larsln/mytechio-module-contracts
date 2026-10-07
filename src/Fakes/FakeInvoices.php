@@ -11,8 +11,8 @@ use MyTechIO\Contracts\Invoices\Invoices;
 use MyTechIO\Contracts\Invoices\PaidDocument;
 
 /**
- * Test-Double für `Invoices`: merkt sich jeden Entwurf, liefert immer den
- * Status `'draft'` und keine Rechnungsnummer — wie die Kern-Semantik.
+ * Test double for `Invoices`: remembers every draft, always returns
+ * status `'draft'` and no invoice number — matching the core semantics.
  */
 final class FakeInvoices implements Invoices
 {

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Documents;
 
 /**
- * Metadaten für ein abzulegendes Dokument.
+ * Metadata for a document to be stored.
  *
- * `ownerType`/`ownerId` referenzieren das fachliche Objekt (z. B. Rechnung,
- * Kontakt), `kind` klassifiziert die Art des Dokuments (z. B. `invoice_pdf`,
- * `incoming_invoice`). `options` wird unverändert an die Implementierung
- * durchgereicht — der Kern liest hier z. B. `skip_paperless_notify`.
+ * `ownerType`/`ownerId` reference the domain object (e.g. invoice,
+ * contact), `kind` classifies the type of document (e.g. `invoice_pdf`,
+ * `incoming_invoice`). `options` is passed through to the implementation
+ * unchanged — the core reads e.g. `skip_paperless_notify` from it.
  */
 final readonly class DocumentMeta
 {

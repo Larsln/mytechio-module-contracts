@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Documents;
 
 /**
- * Ergebnis einer erfolgreichen Ablage.
+ * Result of a successful storage operation.
  *
- * `localPath` ist der Pfad auf dem GoBD-pflichtigen `local`-Disk (die
- * Quelle der Wahrheit), `sha256` der Hash des abgelegten Blobs,
- * `paperlessId` — falls vorhanden — die Dokument-ID im asynchronen
- * Paperless-Zweit-Viewer.
+ * `localPath` is the path on the GoBD-compliant `local` disk (the source
+ * of truth), `sha256` is the hash of the stored blob, `paperlessId` — if
+ * present — is the document ID in the asynchronous Paperless secondary
+ * viewer.
  */
 final readonly class StoredDocument
 {

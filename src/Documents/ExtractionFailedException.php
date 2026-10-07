@@ -7,11 +7,10 @@ namespace MyTechIO\Contracts\Documents;
 use MyTechIO\Contracts\ContractException;
 
 /**
- * Wird geworfen, wenn ein `InvoiceExtractor` keine verwertbare Payload
- * liefern kann (Transportfehler, blockierte/abgebrochene Generierung,
- * undekodierbarer Output oder ein für die Inline-Analyse zu großes
- * Dokument). Die Message ist ein kurzer deutscher Text für die
- * Posteingang-Anzeige — technische Details gehören ins Log des Moduls,
- * nicht in diese Message.
+ * Thrown when an `InvoiceExtractor` cannot deliver a usable payload
+ * (transport error, blocked/aborted generation, undecodable output, or a
+ * document too large for inline analysis). The message is a short German
+ * text for the incoming-document inbox display — technical details belong
+ * in the module's log, not in this message.
  */
 final class ExtractionFailedException extends ContractException {}

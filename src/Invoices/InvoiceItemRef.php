@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Invoices;
 
 /**
- * Verweis auf eine Rechnungsposition inklusive ihrer Rechnung.
+ * Reference to an invoice line item including its invoice.
  *
- * `invoiceNumber` ist `null`, solange die Rechnung im Status Draft ist —
- * eine Rechnungsnummer wird erst beim Finalisieren aus dem Nummernkreis
- * gezogen. `url` ist die relative Kern-URL der Rechnung (z. B. `/invoices/12`).
+ * `invoiceNumber` is `null` as long as the invoice is in draft status — an
+ * invoice number is only drawn from the number range upon finalization.
+ * `url` is the invoice's relative core URL (e.g. `/invoices/12`).
  */
 final readonly class InvoiceItemRef
 {

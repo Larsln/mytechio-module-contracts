@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Mail;
 
 /**
- * Ein Anhang einer modulinitiierten Mail.
+ * An attachment of a module-initiated email.
  *
- * `path` liegt auf dem `local`-Disk oder ist absolut — die Implementierung
- * entscheidet, wie sie ihn auflöst; der Fake legt den Anhang nur ab, ohne
- * ihn zu lesen.
+ * `path` lives on the `local` disk or is absolute — the implementation
+ * decides how it resolves it; the fake only stores the attachment without
+ * reading it.
  */
 final readonly class MailAttachment
 {

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Modules;
 
 /**
- * Leere Standard-Implementierung von `ModuleLifecycle` zum Erben — Module
- * überschreiben nur die Hooks, die sie tatsächlich benötigen.
+ * Empty default implementation of `ModuleLifecycle` to extend — modules
+ * only override the hooks they actually need.
  */
 abstract class AbstractModuleLifecycle implements ModuleLifecycle
 {

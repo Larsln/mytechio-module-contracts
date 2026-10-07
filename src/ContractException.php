@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts;
 
 /**
- * Basisklasse aller Ausnahmen des Vertragspakets.
+ * Base class for all exceptions in the contracts package.
  *
- * Module können sich wahlweise gegen die spezifischen Unterklassen (z. B.
- * `Accounting\UnbalancedEntryException`) oder pauschal gegen
- * `ContractException` absichern, wenn nur „irgendein Vertragsfehler"
- * relevant ist.
+ * Modules can catch either the specific subclasses (e.g.
+ * `Accounting\UnbalancedEntryException`) or, more broadly,
+ * `ContractException` when only "some kind of contract error"
+ * is relevant.
  */
 class ContractException extends \RuntimeException {}

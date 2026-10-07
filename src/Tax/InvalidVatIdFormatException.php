@@ -7,9 +7,9 @@ namespace MyTechIO\Contracts\Tax;
 use MyTechIO\Contracts\ContractException;
 
 /**
- * Wird geworfen, wenn `countryCode`/`vatNumber` bereits formal ungültig
- * sind (z. B. Ländercode nicht zweistellig) — ein `VatIdChecker` prüft
- * dies, bevor er überhaupt eine Anfrage an den Dienst schickt.
+ * Thrown when `countryCode`/`vatNumber` are already invalid in format
+ * (e.g. the country code is not two characters) — a `VatIdChecker` checks
+ * this before it even sends a request to the service.
  */
 final class InvalidVatIdFormatException extends ContractException
 {

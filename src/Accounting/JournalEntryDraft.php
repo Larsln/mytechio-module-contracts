@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Accounting;
 
 /**
- * Entwurf eines Buchungssatzes, den ein Modul im Journal verbuchen will.
+ * Draft of a journal entry that a module wants to post to the journal.
  *
- * `sourceType`/`sourceId` verknüpfen die Buchung mit dem auslösenden
- * Modul-Objekt (z. B. `'domainrobot.invoice'`/`'42'`) für die
- * Beleg-Nachvollziehbarkeit; `documentReference` ist der für Menschen
- * lesbare Belegbezug.
+ * `sourceType`/`sourceId` link the booking to the triggering module
+ * object (e.g. `'domainrobot.invoice'`/`'42'`) for document traceability;
+ * `documentReference` is the human-readable document reference.
  */
 final readonly class JournalEntryDraft
 {

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Connectors;
 
 /**
- * Eine Aktion, die ein Connector für ein Objekt anbietet (z. B.
- * Autorenew an/aus, Sperren/Entsperren) — der künftige Objekt-Picker
- * (Zielbild Phase 5) rendert daraus Buttons, geschützt durch `permission`.
+ * An action that a connector offers for an asset (e.g. enable/disable
+ * autorenew, lock/unlock) — the future asset picker (Phase 5 target
+ * design) renders buttons from this, protected by `permission`.
  */
 final readonly class ConnectorAction
 {

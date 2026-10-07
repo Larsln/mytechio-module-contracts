@@ -15,13 +15,13 @@ use MyTechIO\Contracts\Accounting\UnbalancedEntryException;
 use MyTechIO\Contracts\ContractException;
 
 /**
- * Test-Double für `Journal`: hält gebuchte Entwürfe in-memory,
- * prüft die Soll=Haben-Invariante wie die Kern-Implementierung und
- * erlaubt das Vorbelegen von Konten über `seedAccount()`.
+ * Test double for `Journal`: holds posted drafts in memory,
+ * checks the debit-equals-credit (Soll=Haben) invariant like the core
+ * implementation, and allows pre-seeding accounts via `seedAccount()`.
  *
- * Geldbeträge bleiben durchgehend Strings (kein Float!) — die
- * Balance-Prüfung rechnet in Minor-Units (Dezimalstring × 10.000) mit
- * reiner Integer-Arithmetik.
+ * Monetary amounts remain strings throughout (no floats!) — the
+ * balance check computes in minor units (decimal string × 10,000) using
+ * pure integer arithmetic.
  */
 final class FakeJournal implements Journal
 {
@@ -125,9 +125,9 @@ final class FakeJournal implements Journal
     }
 
     /**
-     * Wandelt einen Dezimal-String (bis zu 4 Nachkommastellen) in Minor-Units
-     * (× 10.000) um — ausschließlich mit String-/Integer-Operationen, damit
-     * keine Float-Rundungsfehler entstehen.
+     * Converts a decimal string (up to 4 decimal places) to minor units
+     * (× 10,000) — using only string/integer operations so that no
+     * float rounding errors occur.
      */
     private static function toMinorUnits(string $amount): int
     {

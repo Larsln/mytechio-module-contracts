@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Documents;
 
 /**
- * Optionen für `IncomingDocuments::ingest()`.
+ * Options for `IncomingDocuments::ingest()`.
  *
- * `metadata` geht 1:1 an die Kern-Ablage durch — ein Flag wie das frühere
- * `skip_notify` ist hier nicht mehr vorgesehen: Ob ein Modul seinen eigenen
- * Push (z. B. nach Paperless) für einen gerade selbst gezogenen Beleg
- * überspringt, entscheidet das Modul anhand seiner eigenen Daten, nicht
- * über diesen Vertrag.
+ * `metadata` is passed through 1:1 to the core storage — a flag like the
+ * former `skip_notify` is no longer provided here: whether a module skips
+ * its own push (e.g. to Paperless) for a document it just pulled itself is
+ * decided by the module based on its own data, not through this contract.
  */
 final readonly class IngestOptions
 {

@@ -8,9 +8,9 @@ use MyTechIO\Contracts\ContractException;
 use MyTechIO\Contracts\Modules\ModuleLifecycle;
 
 /**
- * Test-Double für `ModuleLifecycle`: zählt Aufrufe je Hook.
- * `failOnEnable()` lässt `onEnable()` werfen, um das Fehlerverhalten des
- * Kerns (Modul bleibt deaktiviert) in Modul-Tests nachzustellen.
+ * Test double for `ModuleLifecycle`: counts calls per hook.
+ * `failOnEnable()` makes `onEnable()` throw, to replicate the core's
+ * error behavior (module stays disabled) in module tests.
  */
 final class FakeModuleLifecycle implements ModuleLifecycle
 {

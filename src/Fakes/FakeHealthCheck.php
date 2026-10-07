@@ -8,9 +8,9 @@ use MyTechIO\Contracts\Modules\HealthCheck;
 use MyTechIO\Contracts\Modules\HealthStatus;
 
 /**
- * Test-Double für `HealthCheck`: liefert einen vorgegebenen Status,
- * standardmäßig `HealthStatus::ok()`. `withStatus()` setzt den Status für
- * den nächsten Aufruf von `health()`.
+ * Test double for `HealthCheck`: returns a predefined status,
+ * `HealthStatus::ok()` by default. `withStatus()` sets the status for
+ * the next call to `health()`.
  */
 final class FakeHealthCheck implements HealthCheck
 {

@@ -39,7 +39,7 @@ it('detects a hash duplicate and returns the existing document', function () {
         ->and($second->diskPath)->toBe($first->diskPath)
         ->and($second->url)->toBe($first->url);
 
-    // Die Dublette erzeugt keinen zweiten Beleg.
+    // The duplicate does not create a second document.
     $next = $documents->ingest('other content', 'c.pdf', 'upload', new IngestOptions);
     expect($next->id)->toBe(2);
 });
@@ -91,7 +91,7 @@ it('allows seeding a document directly for find()', function () {
 
     expect($documents->find(42))->toBe($seeded);
 
-    // Die Auto-ID springt über die gesäte ID hinaus.
+    // The auto ID jumps past the seeded ID.
     $next = $documents->ingest('content', 'a.pdf', 'upload', new IngestOptions);
     expect($next->id)->toBe(43);
 });

@@ -7,24 +7,24 @@ namespace MyTechIO\Contracts\Documents;
 use MyTechIO\Contracts\Invoices\PaidDocument;
 
 /**
- * Rein lesender Zugriff auf Eingangsrechnungen, z. B. für den
- * Profit-Split — Module legen/ändern keine Eingangsrechnungen über diesen
- * Vertrag.
+ * Read-only access to incoming invoices (Eingangsrechnungen), e.g. for the
+ * profit split — modules do not create or change incoming invoices
+ * through this contract.
  */
 interface IncomingInvoices
 {
     /**
-     * Liefert alle im Zeitraum (inklusive) bezahlten Eingangsrechnungen,
-     * sortiert nach `paidOn`. `type` ist bei jedem Eintrag stets
-     * `"incoming_invoice"`.
+     * Returns all incoming invoices paid within the period (inclusive),
+     * sorted by `paidOn`. `type` is always `"incoming_invoice"` for every
+     * entry.
      *
      * @return list<PaidDocument>
      */
     public function paidBetween(string $from, string $to): array;
 
     /**
-     * Liefert den Verweis auf eine Eingangsrechnung anhand ihrer ID, oder
-     * `null`, wenn keine Eingangsrechnung mit dieser ID existiert.
+     * Returns the reference to an incoming invoice by its ID, or `null` if
+     * no incoming invoice exists with that ID.
      */
     public function find(int $id): ?IncomingInvoiceRef;
 }

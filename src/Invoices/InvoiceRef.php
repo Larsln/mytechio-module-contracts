@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Invoices;
 
 /**
- * Verweis auf eine angelegte Rechnung.
+ * Reference to a created invoice.
  *
- * `number` ist `null`, solange die Rechnung im Status Draft ist — eine
- * Rechnungsnummer wird erst beim Finalisieren aus dem Nummernkreis gezogen.
+ * `number` is `null` as long as the invoice is in draft status — an
+ * invoice number is only drawn from the number range upon finalization.
  */
 final readonly class InvoiceRef
 {

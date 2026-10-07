@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Invoices;
 
 /**
- * Eine Position eines Rechnungs-Entwurfs.
+ * A line item of an invoice draft.
  *
- * `quantity`, `unitPriceNet` und `discountPercent` sind Strings (4
- * Nachkommastellen), nie Float. `customerAssetIds` verknüpft die Position
- * mit bestehenden Kundenobjekten (z. B. der Domain, die abgerechnet wird).
+ * `quantity`, `unitPriceNet`, and `discountPercent` are strings (4 decimal
+ * places), never float. `customerAssetIds` links the item to existing
+ * customer assets (Kundenobjekte) (e.g. the domain being billed).
  */
 final readonly class InvoiceDraftItem
 {

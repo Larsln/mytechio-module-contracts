@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Accounting;
 
 /**
- * Zugriff auf das Journal (Buchungssätze, Kontenplan) aus Modulen heraus.
+ * Access to the journal (journal entries, chart of accounts) from modules.
  *
- * Kern-Semantik: Soll=Haben wird vom Kern erzwungen
- * (`UnbalancedEntryException`), festgeschriebene Perioden lehnen neue
- * Buchungen ab (`PeriodClosedException`). Module buchen niemals direkt
- * gegen das Ledger-Paket — jede Buchung läuft über diesen Vertrag.
+ * Core semantics: debit=credit is enforced by the core
+ * (`UnbalancedEntryException`), closed periods reject new bookings
+ * (`PeriodClosedException`). Modules never book directly against the
+ * ledger package — every booking goes through this contract.
  */
 interface Journal
 {
     /**
-     * @throws UnbalancedEntryException wenn Soll ≠ Haben.
-     * @throws PeriodClosedException wenn die Periode bereits festgeschrieben ist.
+     * @throws UnbalancedEntryException if debit ≠ credit.
+     * @throws PeriodClosedException if the period is already closed.
      */
     public function post(JournalEntryDraft $draft): JournalEntryRef;
 

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Connectors;
 
 /**
- * Aktueller Status eines externen Objekts (z. B. einer Domain beim
- * Registrar) laut Connector.
+ * Current status of an external asset (e.g. a domain at the
+ * registrar) as reported by the connector.
  */
 final readonly class ConnectorStatus
 {

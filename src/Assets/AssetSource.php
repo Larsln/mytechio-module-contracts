@@ -5,20 +5,21 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Assets;
 
 /**
- * Quelle von Objekt-Vorschlägen für den künftigen Objekt-Picker
- * (Zielbild Phase 5) — Module, die externe Objekte verwalten (z. B.
- * Domains bei einem Registrar), bieten darüber eine Suche an, ohne dass
- * der Kern diese Objekte bereits als Kundenobjekt angelegt haben muss.
+ * Source of asset suggestions for the upcoming asset picker (Phase 5
+ * target design) — modules that manage external assets (e.g. domains at
+ * a registrar) offer a search through this interface, without the core
+ * needing to have already created these assets as customer assets
+ * (Kundenobjekt).
  */
 interface AssetSource
 {
     /**
-     * Eindeutiger Schlüssel des Moduls, z. B. `"domainrobot"`.
+     * Unique key of the module, e.g. `"domainrobot"`.
      */
     public function sourceKey(): string;
 
     /**
-     * @return list<string> Von dieser Quelle angebotene Kundenobjekt-Typen, z. B. `["domain"]`.
+     * @return list<string> Customer asset types offered by this source, e.g. `["domain"]`.
      */
     public function assetTypes(): array;
 

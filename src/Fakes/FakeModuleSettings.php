@@ -7,10 +7,10 @@ namespace MyTechIO\Contracts\Fakes;
 use MyTechIO\Contracts\Settings\ModuleSettings;
 
 /**
- * Test-Double für `ModuleSettings`: In-Memory-Speicher.
- * `markFromEnvironment()` simuliert einen Schlüssel, der in der echten
- * Implementierung aus der Umgebung/Config kommt und daher Vorrang vor der
- * Datenbank hat.
+ * Test double for `ModuleSettings`: in-memory store.
+ * `markFromEnvironment()` simulates a key that, in the real
+ * implementation, comes from the environment/config and therefore takes
+ * precedence over the database.
  */
 final class FakeModuleSettings implements ModuleSettings
 {

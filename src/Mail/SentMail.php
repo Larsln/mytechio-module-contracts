@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Mail;
 
 /**
- * Ergebnis eines erfolgreichen Versands.
+ * Result of a successful send.
  *
- * `outboundMailId` ist die ID des Postausgang-Eintrags im Kern.
+ * `outboundMailId` is the ID of the outbox entry in the core.
  */
 final readonly class SentMail
 {

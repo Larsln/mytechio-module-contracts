@@ -9,8 +9,8 @@ use MyTechIO\Contracts\Documents\IncomingInvoices;
 use MyTechIO\Contracts\Invoices\PaidDocument;
 
 /**
- * Test-Double für `IncomingInvoices`: `seed()` hinterlegt einen Beleg für
- * `find()`, `seedPaidDocument()` für `paidBetween()`.
+ * Test double for `IncomingInvoices`: `seed()` stores a document for
+ * `find()`, `seedPaidDocument()` for `paidBetween()`.
  */
 final class FakeIncomingInvoices implements IncomingInvoices
 {

@@ -9,10 +9,10 @@ use MyTechIO\Contracts\Tax\VatIdCheckResult;
 use MyTechIO\Contracts\Tax\VatIdCheckUnavailableException;
 
 /**
- * Test-Double für `VatIdChecker`: liefert ein je USt-ID konfigurierbares
- * Ergebnis, standardmäßig „ungültig/unbekannt". `unavailable()` schaltet
- * den Fake auf „nicht erreichbar" (wirft bei jedem Aufruf
- * `VatIdCheckUnavailableException`, wie der Kern-Null-Client ohne Modul).
+ * Test double for `VatIdChecker`: returns a result configurable per
+ * VAT ID (USt-ID), "invalid/unknown" by default. `unavailable()` switches
+ * the fake to "unreachable" (throws `VatIdCheckUnavailableException` on
+ * every call, like the core's null client without a module).
  */
 final class FakeVatIdChecker implements VatIdChecker
 {

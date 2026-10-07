@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Accounting;
 
 /**
- * Eine Zeile eines Buchungssatz-Entwurfs.
+ * A single line of a journal entry draft.
  *
- * `amount` ist immer positiv (String mit 4 Nachkommastellen, wie bei allen
- * Geldbeträgen in diesem Paket) — Soll/Haben wird ausschließlich über
- * `side` ausgedrückt, niemals über ein Vorzeichen.
+ * `amount` is always positive (a string with 4 decimal places, as for
+ * all monetary amounts in this package) — debit/credit is expressed
+ * exclusively via `side`, never via a sign.
  */
 final readonly class JournalLineDraft
 {

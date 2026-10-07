@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Modules;
 
 /**
- * Gesundheitszustand eines Moduls, wie er auf der Modulübersicht angezeigt
- * wird. Statische Konstruktoren decken die vier möglichen Zustände ab.
+ * Health state of a module, as shown on the module overview.
+ * Static constructors cover the four possible states.
  */
 final readonly class HealthStatus
 {

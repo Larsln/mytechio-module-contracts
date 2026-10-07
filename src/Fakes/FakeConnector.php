@@ -10,8 +10,8 @@ use MyTechIO\Contracts\Connectors\ConnectorStatus;
 use MyTechIO\Contracts\Connectors\SyncReport;
 
 /**
- * Test-Double für `Connector`: konfigurierbarer Schlüssel/Typen, Status
- * je `externalId` per `seedStatus()`, Sync-Ergebnis per `withSyncReport()`.
+ * Test double for `Connector`: configurable key/types, status
+ * per `externalId` via `seedStatus()`, sync result via `withSyncReport()`.
  */
 final class FakeConnector implements Connector
 {

@@ -1,19 +1,20 @@
 # mytechio/module-contracts
 
-Verträge (Interfaces, DTOs, Fakes) zwischen dem **MyTechIO-Admin-Kern** und seinen
-Modulen. Reines PHP-Paket ohne Framework- und ohne Money-Abhängigkeit: Geldbeträge
-sind Strings mit 4 Nachkommastellen, Daten `Y-m-d`, Zeitstempel ISO-8601 — genau wie
-bei den Domain-Ereignissen des Kerns.
+Contracts (interfaces, DTOs, fakes) between the **MyTechIO Admin core** and its
+modules. A pure PHP package with no framework and no money-library dependency:
+monetary amounts are strings with 4 decimal places, dates are `Y-m-d`,
+timestamps are ISO-8601 — exactly like the core's domain events.
 
-## Zweck
+## Purpose
 
-Module (z. B. [`mytechio/module-domainrobot`](https://github.com/Larsln/mytechio-module-domainrobot))
-brauchen Zugriff auf Kern-Funktionalität — Dokumentablage, Mailversand, Kundenobjekte,
-Kontakte, Buchungen, Rechnungs-Entwürfe —, ohne den Kern selbst als Composer-Abhängigkeit
-zu benötigen. Dieses Paket definiert genau diese Schnittstelle: Der Kern bindet
-Implementierungen gegen die Interfaces, Module injizieren nur die Interfaces. Zusätzlich
-liefert das Paket zu jedem Vertrag einen `Fake*` für Modul-Tests, damit Module ihre
-Suite ohne den Kern laufen lassen können.
+Modules (e.g. [`mytechio/module-domainrobot`](https://github.com/Larsln/mytechio-module-domainrobot))
+need access to core functionality — document storage, mail delivery, customer
+assets (Kundenobjekte), contacts, journal entries (Buchungen), invoice drafts —
+without requiring the core itself as a Composer dependency. This package
+defines exactly that boundary: the core binds implementations against the
+interfaces, modules only inject the interfaces. In addition, the package
+ships a `Fake*` for every contract for use in module tests, so modules can run
+their test suite without the core.
 
 ## Installation
 
@@ -21,33 +22,33 @@ Suite ohne den Kern laufen lassen können.
 composer require mytechio/module-contracts
 ```
 
-## Verträge
+## Contracts
 
-| Namespace | Interface | Kern-Semantik |
+| Namespace | Interface | Core semantics |
 |---|---|---|
-| `Documents` | `DocumentStore` | Lokale GoBD-Ablage ist Besitzer, Paperless-NGX asynchroner Zweit-Viewer; feuert `DocumentStored`. |
-| `Documents` | `IncomingDocuments` | Posteingang-Ingest für Module (z. B. ein Pull von Paperless-NGX): `ingest()` legt den Beleg in der Kern-Ablage an und feuert `DocumentStored`, eine Hash-Dublette (`sha256`) liefert den bestehenden Beleg mit `duplicate = true` zurück, statt einen neuen anzulegen; `find()` liefert den Verweis auf einen Beleg anhand seiner ID, oder `null`. |
-| `Mail` | `MailOutbox` | Versand im Branding-Layout, Eintrag im Postausgang, feuert `MailSent`. |
-| `Assets` | `CustomerAssets` | Lesen/Anlegen/Kündigen von Kundenobjekten; `create()`/`cancel()` feuern `CustomerAssetCreated`/`CustomerAssetCancelled`; `findByLabel()` liefert aktive Objekte zuerst. Ein Objekt hat entweder eine Quelle (`source`/`externalId`, z. B. `"domainrobot"`) oder einen Freitext-Anbieter (`providerName`, z. B. `"IONOS"`); `findBySource()` findet ein Objekt anhand seiner externen Kennung, `attachSource()` ordnet ein bisher manuelles Objekt nachträglich einer Quelle zu, `updateFromSource()` übernimmt eine Connector-Rückmeldung (Status, Verlängerung, Autorenew, `attributes` per Merge), `forInvoiceItem()` liefert die Objekte einer Rechnungsposition. |
-| `Assets` | `AssetSource` | Objekt-Vorschläge externer Quellen für den künftigen Objekt-Picker (Zielbild Phase 5) — kein Bezug zu bereits angelegten Kundenobjekten nötig. |
-| `Contacts` | `Contacts` | Rein lesender Kontaktzugriff — Module legen/ändern keine Kontakte. |
-| `Accounting` | `Journal` | Soll=Haben wird erzwungen (`UnbalancedEntryException`), festgeschriebene Perioden lehnen ab (`PeriodClosedException`). |
-| `Invoices` | `Invoices` | `createDraft()` liefert immer eine Rechnung im Status Draft; Defaults (Bankkonto, Zahlungsziel, Steuerkategorie) ergänzt der Kern. Finalisierung/Versand/Storno bleiben Sache des Kern-UI. `findItem()` liefert den Verweis auf eine Rechnungsposition (inkl. Rechnungsnummer/-status und Kern-URL) anhand ihrer ID, oder `null`. `paidBetween()` liefert alle im Zeitraum bezahlten Ausgangsrechnungen als `PaidDocument` (`type = "invoice"`), z. B. für den Profit-Split. |
-| `Invoices` | `InvoiceItemExtension` | Positions-Erweiterung einer Rechnung durch ein Modul (siehe Abschnitt „Positions-Erweiterung"). |
-| `Documents` | `IncomingInvoices` | Rein lesender Zugriff auf Eingangsrechnungen. `paidBetween()` liefert alle im Zeitraum bezahlten Eingangsrechnungen als `PaidDocument` (`type = "incoming_invoice"`); `find()` liefert den Verweis auf eine Eingangsrechnung anhand ihrer ID, oder `null`. |
-| `Documents` | `InvoiceExtractor` | KI-Extraktions-Provider für Eingangsrechnungen, Container-Tag `mytechio.invoice_extractors`. Der Kern wählt über eine Konfiguration genau einen Treiber aus; `extract()` liefert die rohe §7.6-Payload (Validierung macht der Kern) und wirft `ExtractionFailedException` bei Transportfehlern/blockierter Generierung. |
-| `Articles` | `ArticleStatistics` | Lesender Zugriff auf die Artikel-BI-Auswertungen (Umsatz, Wareneinsatz, Rohertrag); der Kern implementiert diesen Vertrag über die Kern-Tabellen, ein Modul zeigt die Daten nur an. Die Array-Formen in `ArticleOverview`/`ArticleDetailStats` entsprechen exakt der Kern-Implementierung. |
-| `Tax` | `VatIdChecker` | VIES-Prüfung einer USt-ID. Ohne aktives Modul bindet der Kern einen Null-Client, der stets `VatIdCheckUnavailableException` wirft (heutiger „VIES nicht erreichbar"-Pfad); `InvalidVatIdFormatException` bei formal ungültiger USt-ID. |
-| `Settings` | `ModuleSettings` | Modulspezifische Einstellungen; ENV/Config hat immer Vorrang vor der Datenbank (`isFromEnvironment()`). Implementierung erst Phase 3 — hier nur Interface + Fake. |
-| `Connectors` | `Connector` | Einheitlicher Satz an Status-Abfragen/Aktionen für externe Registrare/Lizenzserver; `sync()` darf lange laufen und gehört in eine Queue. |
-| `Modules` | `ModuleLifecycle` | Lebenszyklus-Hooks (`onInstall`/`onEnable`/`onDisable`/`onUninstall`), vom Kern über den Manifest-Schlüssel `lifecycle` aufgelöst; `onEnable()` darf werfen (Modul bleibt deaktiviert), `onDisable()` nicht. `AbstractModuleLifecycle` liefert leere Implementierungen zum Erben. |
-| `Modules` | `HealthCheck` | Gesundheitsstatus (`HealthStatus`) für die Modulübersicht; der Kern ruft `health()` nur dort und mit Timeout-Schutz auf — keine langsamen Netzaufrufe in Implementierungen. |
-| `Modules` | `ModuleState` | Laufzeit-Zustand eines Moduls für Hintergrund-Code (siehe Abschnitt „Modulzustand im Hintergrund"): `isActive()` prüft bekannt+aktiviert+kompatibel, `isEnabled()` nur den rohen Schalter. |
+| `Documents` | `DocumentStore` | The local GoBD-compliant storage is the owner, Paperless-NGX is an asynchronous secondary viewer; fires `DocumentStored`. |
+| `Documents` | `IncomingDocuments` | Inbox ingest (Posteingang) for modules (e.g. a pull from Paperless-NGX): `ingest()` stores the document in the core storage and fires `DocumentStored`; a hash duplicate (`sha256`) returns the existing document with `duplicate = true` instead of creating a new one; `find()` returns the reference to a document by its ID, or `null`. |
+| `Mail` | `MailOutbox` | Sends mail using the branding layout, records an entry in the outbox, fires `MailSent`. |
+| `Assets` | `CustomerAssets` | Read/create/cancel customer assets (Kundenobjekte); `create()`/`cancel()` fire `CustomerAssetCreated`/`CustomerAssetCancelled`; `findByLabel()` returns active assets first. An asset either has a source (`source`/`externalId`, e.g. `"domainrobot"`) or a free-text provider (`providerName`, e.g. `"IONOS"`); `findBySource()` finds an asset by its external identifier, `attachSource()` retroactively assigns a source to a previously manual asset, `updateFromSource()` applies a connector update (status, renewal, autorenew, `attributes` merged), `forInvoiceItem()` returns the assets for an invoice item. |
+| `Assets` | `AssetSource` | Asset suggestions from external sources for the future asset picker (target state, phase 5) — no relation to already-created customer assets is required. |
+| `Contacts` | `Contacts` | Read-only contact access — modules do not create or modify contacts. |
+| `Accounting` | `Journal` | Debit must equal credit (enforced via `UnbalancedEntryException`); closed periods are rejected (`PeriodClosedException`). |
+| `Invoices` | `Invoices` | `createDraft()` always returns an invoice in draft status; defaults (bank account, payment terms, tax category) are filled in by the core. Finalization/sending/cancellation remain the responsibility of the core UI. `findItem()` returns the reference to an invoice item (including invoice number/status and core URL) by its ID, or `null`. `paidBetween()` returns all outgoing invoices paid within the period as `PaidDocument` (`type = "invoice"`), e.g. for the profit split. |
+| `Invoices` | `InvoiceItemExtension` | A module's extension of an invoice item (see section "Invoice item extensions"). |
+| `Documents` | `IncomingInvoices` | Read-only access to incoming invoices (Eingangsrechnungen). `paidBetween()` returns all incoming invoices paid within the period as `PaidDocument` (`type = "incoming_invoice"`); `find()` returns the reference to an incoming invoice by its ID, or `null`. |
+| `Documents` | `InvoiceExtractor` | AI extraction provider for incoming invoices, container tag `mytechio.invoice_extractors`. The core selects exactly one driver via configuration; `extract()` returns the raw §7.6 payload (validation is done by the core) and throws `ExtractionFailedException` on transport errors or blocked generation. |
+| `Articles` | `ArticleStatistics` | Read-only access to article BI analytics (revenue, cost of goods, gross profit); the core implements this contract via the core tables, a module merely displays the data. The array shapes in `ArticleOverview`/`ArticleDetailStats` match the core implementation exactly. |
+| `Tax` | `VatIdChecker` | VIES check of a VAT ID. Without an active module, the core binds a null client that always throws `VatIdCheckUnavailableException` (today's "VIES unavailable" path); `InvalidVatIdFormatException` on a formally invalid VAT ID. |
+| `Settings` | `ModuleSettings` | Module-specific settings; ENV/config always takes precedence over the database (`isFromEnvironment()`). Implementation not until phase 3 — only the interface and fake exist so far. |
+| `Connectors` | `Connector` | A uniform set of status queries/actions for external registrars/license servers; `sync()` may run for a long time and belongs on a queue. |
+| `Modules` | `ModuleLifecycle` | Lifecycle hooks (`onInstall`/`onEnable`/`onDisable`/`onUninstall`), resolved by the core via the manifest key `lifecycle`; `onEnable()` may throw (the module stays disabled), `onDisable()` must not. `AbstractModuleLifecycle` provides empty implementations to extend. |
+| `Modules` | `HealthCheck` | Health status (`HealthStatus`) for the module overview; the core calls `health()` only there, and with timeout protection — implementations must not perform slow network calls. |
+| `Modules` | `ModuleState` | Runtime state of a module for background code (see section "Module state in background code"): `isActive()` checks known+enabled+compatible, `isEnabled()` checks only the raw toggle. |
 
-## Modul-Lebenszyklus und Gesundheit
+## Module lifecycle and health
 
-Module können im Manifest zusätzlich eine `lifecycle`-Klasse angeben, die
-der Kern per Container auflöst:
+In addition, modules can declare a `lifecycle` class in the manifest, which
+the core resolves via the container:
 
 ```json
 {
@@ -60,141 +61,144 @@ der Kern per Container auflöst:
 }
 ```
 
-- `lifecycle` (optional): FQCN einer Klasse, die `Modules\ModuleLifecycle`
-  und/oder `Modules\HealthCheck` implementiert. Der Kern ruft die
-  Lebenszyklus-Hooks beim Aktivieren/Deaktivieren auf (Reihenfolge beim
-  ersten Aktivieren: Migrationen → `onInstall()` → `onEnable()`) und
-  `health()` ausschließlich auf der Modulübersicht, mit Timeout-Schutz
-  (Fehler ⇒ `HealthStatus::error()`).
-- `roles` (optional): Standardzuordnung der Modul-Permissions zu
-  Kern-Rollen (`superadmin`, `admin`, `accountant`, `sales`, `viewer`);
-  `"*"` steht für alle Permissions des Moduls. Fehlt der Block, gilt das
-  bisherige Verhalten (alle Permissions an `superadmin` + `admin`).
-  Unbekannte Rollen führen zu einem Manifest-Fehler im Kern.
+- `lifecycle` (optional): FQCN of a class that implements
+  `Modules\ModuleLifecycle` and/or `Modules\HealthCheck`. The core calls the
+  lifecycle hooks when enabling/disabling (order on first activation:
+  migrations → `onInstall()` → `onEnable()`) and calls `health()` exclusively
+  on the module overview page, with timeout protection (error ⇒
+  `HealthStatus::error()`).
+- `roles` (optional): default assignment of module permissions to core roles
+  (`superadmin`, `admin`, `accountant`, `sales`, `viewer`); `"*"` stands for
+  all of the module's permissions. If this block is absent, the previous
+  behavior applies (all permissions go to `superadmin` + `admin`). Unknown
+  roles result in a manifest error in the core.
 
-## Modulzustand im Hintergrund
+## Module state in background code
 
-Hintergrund-Code eines Moduls — Scheduler-Einträge, Listener auf Kern-Ereignisse,
-queued Jobs — darf nur laufen, wenn das Modul **aktiv** ist, nicht nur aktiviert,
-sondern auch kompatibel. Dafür bindet der Kern `Modules\ModuleState`, und
-Hintergrund-Code prüft ihn als Erstes:
+A module's background code — scheduler entries, listeners on core events,
+queued jobs — must only run while the module is **active**, meaning not just
+enabled, but also compatible. For this, the core binds `Modules\ModuleState`,
+and background code checks it first:
 
 ```php
-// Scheduler-Eintrag, zusätzlich zu bestehenden Bedingungen
+// Scheduler entry, in addition to existing conditions
 $schedule->job(new SyncDomainsJob)
     ->daily()
     ->when(fn () => app(ModuleState::class)->isActive('domainrobot'));
 
-// Listener / Job
+// Listener / job
 public function handle(): void
 {
     if (! app(ModuleState::class)->isActive('domainrobot')) {
-        return; // beendet sich still, kein Fehler
+        return; // exits silently, no error
     }
 
     // ...
 }
 ```
 
-- `isActive()` ist die richtige Prüfung für Hintergrund-Code — sie berücksichtigt
-  Kompatibilität, nicht nur den Schalter aus der Modultabelle.
-- `isEnabled()` liefert ausschließlich diesen rohen Schalter; Hintergrund-Code
-  sollte i. d. R. `isActive()` verwenden, nicht `isEnabled()`.
-- Synchron aufgerufene Vertragsimplementierungen (`Connector`, `CustomerAssets`
-  usw.) prüfen `ModuleState` NICHT selbst — der Kern filtert seine Registries
-  bereits nach aktiven Modulen, bevor er eine Implementierung aufruft.
-- `Fakes\FakeModuleState` ist in Modul-Tests standardmäßig für JEDES Modul
-  aktiv — Tests sollen nicht unbeabsichtigt stillstehen, nur weil ein
-  Modulname nicht gesät wurde. `activate()`/`deactivate()` schalten ein
-  einzelnes Modul für die Dauer eines Tests um.
+- `isActive()` is the correct check for background code — it takes
+  compatibility into account, not just the toggle from the modules table.
+- `isEnabled()` returns only that raw toggle; background code should
+  generally use `isActive()`, not `isEnabled()`.
+- Synchronously invoked contract implementations (`Connector`,
+  `CustomerAssets`, etc.) do NOT check `ModuleState` themselves — the core
+  already filters its registries by active modules before calling an
+  implementation.
+- `Fakes\FakeModuleState` treats EVERY module as active by default in module
+  tests — tests should not unintentionally stall just because a module name
+  was not seeded. `activate()`/`deactivate()` toggle a single module for the
+  duration of a test.
 
-## Deinstallation
+## Uninstallation
 
-`php artisan module:uninstall <name>` (Kern) ruft zuerst
-`ModuleLifecycle::onUninstall()` des Moduls auf und entfernt danach die
-Kern-Buchhaltung des Moduls: die `modules`-Zeile, `module_settings` und die
-Modul-Permissions (aus allen Rollen und aus der Permission-Tabelle).
+`php artisan module:uninstall <name>` (core) first calls the module's
+`ModuleLifecycle::onUninstall()`, then removes the core's bookkeeping for the
+module: the `modules` row, `module_settings`, and the module's permissions
+(from all roles and from the permissions table).
 
-**Modultabellen bleiben stehen** — GoBD/Nachvollziehbarkeit verlangen, dass
-einmal erfasste Daten (Domains, Kundenobjekte, Dokument-Referenzen, …) nicht
-durch eine Deinstallation verschwinden. `onUninstall()` darf deshalb **nur**
-technische Caches/Zustände räumen (z. B. Health-Cache, zwischengespeicherte
-Tokens) — niemals fachliche Modultabellen leeren oder droppen.
+**Module tables remain in place** — GoBD compliance and traceability require
+that data once recorded (domains, customer assets, document references, …)
+does not disappear through an uninstall. `onUninstall()` may therefore
+**only** clean up technical caches/state (e.g. the health cache, cached
+tokens) — it must never clear or drop domain module tables.
 
-## Positions-Erweiterung
+## Invoice item extensions
 
-Module können eine Rechnungsposition um eigene Daten ergänzen, ohne dass der Kern
-den fachlichen Inhalt kennen muss: `Invoices\InvoiceItemExtension` legt seinen
-Teil unter `extras[key()]` einer Position ab. Implementierungen werden über den
-Container-Tag `mytechio.invoice_item_extensions` gesammelt (analog zu
-`ConnectorRegistry`):
+Modules can augment an invoice item with their own data without the core
+needing to understand the domain content: `Invoices\InvoiceItemExtension`
+stores its part under `extras[key()]` of an item. Implementations are
+collected via the container tag `mytechio.invoice_item_extensions` (analogous
+to `ConnectorRegistry`):
 
 ```php
 app()->tag(InvoiceItemAssetsExtension::class, 'mytechio.invoice_item_extensions');
 ```
 
-- `key()` **muss** dem Modulnamen entsprechen — der Kern filtert Erweiterungen
-  deaktivierter Module über diesen Schlüssel heraus.
-- `validate()` prüft den eigenen Teil der `extras` (z. B. ob verknüpfte IDs
-  existieren und zum Kontakt gehören); Fehler landen im Kern unter
-  `items.{i}.extras.{key}.{feld}`.
-- `afterItemsSynced()` läuft nach dem Neuanlegen aller Positionen einer
-  Rechnung, innerhalb der Kern-Transaktion — hier löst/erzeugt ein Modul z. B.
-  seine eigenen Verknüpfungen.
-- `annotate()` liefert Zusatzzeilen für den Beleg (PDF), die der Kern unter der
-  Positionsbeschreibung einfügt.
-- `duplicate()` liefert den eigenen Teil der `extras` für eine Belegkopie
-  (Duplizieren/Storno) — i. d. R. ohne Verknüpfungen zum Original.
+- `key()` **must** match the module name — the core filters out extensions
+  from disabled modules using this key.
+- `validate()` validates the extension's own part of `extras` (e.g. whether
+  linked IDs exist and belong to the contact); errors end up in the core
+  under `items.{i}.extras.{key}.{field}`.
+- `afterItemsSynced()` runs after all items of an invoice have been
+  recreated, inside the core transaction — this is where a module resolves
+  or creates its own links, for example.
+- `annotate()` returns extra lines for the document (PDF), which the core
+  inserts below the item description.
+- `duplicate()` returns the extension's own part of `extras` for a document
+  copy (duplication/cancellation) — typically without links to the original.
 
-Jedes Interface ist im Quellcode mit deutschem PHPDoc dokumentiert, das Verhalten und
-Kern-Semantik im Detail beschreibt — das ist die primäre Doku für Modulautoren.
+Every interface is documented in the source code with English PHPDoc that
+describes the behavior and core semantics in detail — that is the primary
+documentation for module authors.
 
-Alle DTOs sind `final readonly` mit Konstruktor-Promotion und einer `toArray()`-Methode
-(snake_case-Schlüssel). `MyTechIO\Contracts\ContractException` ist die gemeinsame
-Basisklasse aller Vertrags-Ausnahmen.
+All DTOs are `final readonly` with constructor promotion and a `toArray()`
+method (snake_case keys). `MyTechIO\Contracts\ContractException` is the
+common base class for all contract exceptions.
 
-## Fakes in Modul-Tests
+## Fakes for module tests
 
-Jeder Vertrag hat unter `MyTechIO\Contracts\Fakes\*` ein In-Memory-Test-Double, das
-Module in ihrer eigenen Testbench binden, ohne den Kern zu benötigen:
+Every contract has an in-memory test double under `MyTechIO\Contracts\Fakes\*`
+that modules bind in their own test bench, without needing the core:
 
 ```php
 use MyTechIO\Contracts\Assets\CustomerAssets;
 use MyTechIO\Contracts\Fakes\FakeCustomerAssets;
 
-// z. B. in der TestCase::setUp() eines Moduls
+// e.g. in a module's TestCase::setUp()
 $this->app->instance(CustomerAssets::class, new FakeCustomerAssets);
 ```
 
-- `FakeDocumentStore` — liefert deterministische Pfade/Hashes, `stored()` für Assertions.
-- `FakeMailOutbox` — `sent()`/`sentTo(email)` ohne PHPUnit-Abhängigkeit.
-- `FakeCustomerAssets` — In-Memory mit Auto-IDs, `seed()` für den Ausgangszustand.
+- `FakeDocumentStore` — returns deterministic paths/hashes, `stored()` for assertions.
+- `FakeMailOutbox` — `sent()`/`sentTo(email)` with no PHPUnit dependency.
+- `FakeCustomerAssets` — in-memory with auto IDs, `seed()` for the initial state.
 - `FakeContacts` — `seed()`, `setCountries()`.
-- `FakeJournal` — prüft Soll=Haben exakt über Integer-Arithmetik (keine Floats),
-  `seedAccount()` für den Kontenplan.
-- `FakeInvoices` — merkt sich Entwürfe, liefert immer Status `draft`; `seedItem()` für `findItem()`, `seedPaidDocument()` für `paidBetween()` (sortiert, auf den Zeitraum gefiltert).
-- `FakeModuleSettings` — `markFromEnvironment()` simuliert ENV-Vorrang.
-- `FakeConnector` — konfigurierbarer Schlüssel/Typen/Status/Aktionen/Ereignisse.
-- `FakeModuleLifecycle` — zählt Aufrufe je Hook, `failOnEnable()` simuliert einen fehlschlagenden `onEnable()`.
-- `FakeHealthCheck` — liefert einen vorgegebenen `HealthStatus`, `withStatus()` zum Umkonfigurieren.
-- `FakeInvoiceItemExtension` — zeichnet jeden Aufruf auf (`validateCalls`, `afterItemsSyncedCalls`, `annotateCalls`, `duplicateCalls`), `withValidationErrors()`/`withAnnotationLines()` zum Umkonfigurieren.
-- `FakeInvoiceExtractor` — liefert eine vorgegebene Payload (`returns()`) oder wirft eine vorgegebene `ExtractionFailedException` (`throws()`), zählt jeden Aufruf (`calls()`), `withConfigured()` zum Umschalten.
-- `FakeArticleStatistics` — liefert eine leere Auswertung, solange nichts gesät wurde; `seedOverview()`/`seedArticle()` legen die Ergebnisse fest.
-- `FakeIncomingInvoices` — `seed()` für `find()`, `seedPaidDocument()` für `paidBetween()` (sortiert, auf den Zeitraum gefiltert).
-- `FakeVatIdChecker` — Ergebnis je USt-ID konfigurierbar (`seedResult()`), `unavailable()` schaltet auf „nicht erreichbar" (wirft `VatIdCheckUnavailableException`), `calls()` für Assertions.
-- `FakeModuleState` — standardmäßig ist jedes Modul aktiv; `activate()`/`deactivate()` schalten ein Modul für den Test um.
+- `FakeJournal` — checks debit = credit exactly using integer arithmetic (no floats),
+  `seedAccount()` for the chart of accounts.
+- `FakeInvoices` — remembers drafts, always returns status `draft`; `seedItem()` for `findItem()`, `seedPaidDocument()` for `paidBetween()` (sorted, filtered by period).
+- `FakeModuleSettings` — `markFromEnvironment()` simulates ENV precedence.
+- `FakeConnector` — configurable key/types/status/actions/events.
+- `FakeModuleLifecycle` — counts calls per hook, `failOnEnable()` simulates a failing `onEnable()`.
+- `FakeHealthCheck` — returns a preconfigured `HealthStatus`, `withStatus()` to reconfigure.
+- `FakeInvoiceItemExtension` — records every call (`validateCalls`, `afterItemsSyncedCalls`, `annotateCalls`, `duplicateCalls`), `withValidationErrors()`/`withAnnotationLines()` to reconfigure.
+- `FakeInvoiceExtractor` — returns a preconfigured payload (`returns()`) or throws a preconfigured `ExtractionFailedException` (`throws()`), counts every call (`calls()`), `withConfigured()` to toggle.
+- `FakeArticleStatistics` — returns an empty result as long as nothing has been seeded; `seedOverview()`/`seedArticle()` set the results.
+- `FakeIncomingInvoices` — `seed()` for `find()`, `seedPaidDocument()` for `paidBetween()` (sorted, filtered by period).
+- `FakeVatIdChecker` — result configurable per VAT ID (`seedResult()`), `unavailable()` switches to "unavailable" (throws `VatIdCheckUnavailableException`), `calls()` for assertions.
+- `FakeModuleState` — every module is active by default; `activate()`/`deactivate()` toggle a module for the test.
 
-## Versionierung
+## Versioning
 
-Semver: additive Änderungen (neue Methoden mit Default-Verhalten in den Fakes, neue
-DTO-Felder mit Default) sind Minor-Releases; Signaturänderungen sind Major-Releases.
-Kern und Module vergleichen sich über `MyTechIO\Contracts\Contracts::VERSION` gegen die
-installierte Paketversion.
+Semver: additive changes (new methods with default behavior in the fakes,
+new DTO fields with a default) are minor releases; signature changes are
+major releases. The core and modules compare themselves against
+`MyTechIO\Contracts\Contracts::VERSION` relative to the installed package
+version.
 
-## Entwicklung
+## Development
 
 ```bash
 composer install
-vendor/bin/pest --compact   # Tests
-vendor/bin/pint             # Formatierung
+vendor/bin/pest --compact   # tests
+vendor/bin/pint             # formatting
 ```

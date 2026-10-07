@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Connectors;
 
 /**
- * Objekt-Connector für externe Registrare/Lizenzserver.
+ * Asset connector for external registrars/license servers.
  *
- * Der Kern sammelt Implementierungen über Container-Tags (`connectors()`,
- * `forAssetType()`, siehe `ConnectorRegistry`) und bietet darüber einen
- * einheitlichen Satz an Aktionen und Status-Abfragen für Kundenobjekte an,
- * ohne die jeweilige externe API selbst zu kennen. `sync()` darf lange
- * laufen (vollständiger Abgleich) und gehört in eine Queue, niemals in
- * einen synchronen Request.
+ * The core collects implementations via container tags (`connectors()`,
+ * `forAssetType()`, see `ConnectorRegistry`) and exposes through them a
+ * unified set of actions and status queries for customer assets
+ * (Kundenobjekte), without knowing the respective external API itself.
+ * `sync()` may run for a long time (a full reconciliation) and belongs
+ * in a queue, never in a synchronous request.
  */
 interface Connector
 {
     /**
-     * Eindeutiger Schlüssel des Moduls, z. B. `"domainrobot"`.
+     * Unique key of the module, e.g. `"domainrobot"`.
      */
     public function connectorKey(): string;
 
@@ -27,19 +27,19 @@ interface Connector
     public function assetTypes(): array;
 
     /**
-     * Vollständiger Abgleich mit der externen Quelle.
+     * Full reconciliation with the external source.
      */
     public function sync(): SyncReport;
 
     public function status(string $externalId): ?ConnectorStatus;
 
     /**
-     * @return list<ConnectorAction> Aktionen, die dieser Connector für ein Objekt anbietet.
+     * @return list<ConnectorAction> Actions that this connector offers for an asset.
      */
     public function actions(): array;
 
     /**
-     * @return list<string> Ereignisnamen, die der Connector dispatcht (FQCN).
+     * @return list<string> Event names that the connector dispatches (FQCN).
      */
     public function events(): array;
 }

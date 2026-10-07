@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts;
 
 /**
- * Versionsinformation des Vertragspakets.
+ * Version information for the contracts package.
  *
- * Kern und Module vergleichen sich bei der Modul-Registrierung gegen
- * `VERSION`, um Kompatibilität nach Semver zu prüfen: additive Änderungen
- * (neue Methoden mit Default-Verhalten in den Fakes, neue DTO-Felder mit
- * Default) erhöhen die Minor-Version, Signaturänderungen die Major-Version.
+ * The core and modules compare themselves against `VERSION` during module
+ * registration to check compatibility according to Semver: additive changes
+ * (new methods with default behavior in the fakes, new DTO fields with a
+ * default) bump the minor version, signature changes bump the major version.
  */
 final class Contracts
 {
-    public const string VERSION = '1.6.0';
+    public const string VERSION = '1.6.1';
 }

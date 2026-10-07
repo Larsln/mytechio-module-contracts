@@ -9,9 +9,9 @@ use MyTechIO\Contracts\Articles\ArticleOverview;
 use MyTechIO\Contracts\Articles\ArticleStatistics;
 
 /**
- * Test-Double für `ArticleStatistics`: liefert eine leere Auswertung,
- * solange nichts gesät wurde. `seedOverview()` legt das Ergebnis von
- * `overview()` fest, `seedArticle()` das von `forArticle()` je Artikel-ID.
+ * Test double for `ArticleStatistics`: returns an empty evaluation
+ * as long as nothing has been seeded. `seedOverview()` sets the result of
+ * `overview()`, `seedArticle()` sets the result of `forArticle()` per article ID.
  */
 final class FakeArticleStatistics implements ArticleStatistics
 {

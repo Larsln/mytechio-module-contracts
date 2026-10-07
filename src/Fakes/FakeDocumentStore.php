@@ -9,9 +9,9 @@ use MyTechIO\Contracts\Documents\DocumentStore;
 use MyTechIO\Contracts\Documents\StoredDocument;
 
 /**
- * Test-Double für `DocumentStore`: legt nichts wirklich ab, liefert aber
- * deterministische Pfade/Hashes und merkt sich jeden Aufruf für Assertions
- * in Modul-Tests.
+ * Test double for `DocumentStore`: doesn't actually store anything, but
+ * returns deterministic paths/hashes and remembers every call for assertions
+ * in module tests.
  */
 final class FakeDocumentStore implements DocumentStore
 {

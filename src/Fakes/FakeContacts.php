@@ -8,10 +8,10 @@ use MyTechIO\Contracts\Contacts\ContactData;
 use MyTechIO\Contracts\Contacts\Contacts;
 
 /**
- * Test-Double für `Contacts`: In-Memory-Speicher, `seed()` legt den
- * Ausgangszustand fest. `search()` filtert einfach per Teilstring
- * (case-insensitiv) über `displayName` — ausreichend für Modul-Tests,
- * keine Relevanz-Sortierung wie im Kern.
+ * Test double for `Contacts`: in-memory store, `seed()` sets the
+ * initial state. `search()` filters simply by substring
+ * (case-insensitive) over `displayName` — sufficient for module tests,
+ * no relevance ranking like in the core.
  */
 final class FakeContacts implements Contacts
 {
@@ -57,7 +57,7 @@ final class FakeContacts implements Contacts
     }
 
     /**
-     * @param  array<string, string>  $countries  ISO-2 ⇒ Landesname (deutsch)
+     * @param  array<string, string>  $countries  ISO-2 ⇒ country name (German)
      */
     public function setCountries(array $countries): void
     {

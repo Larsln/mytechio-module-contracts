@@ -7,9 +7,9 @@ namespace MyTechIO\Contracts\Accounting;
 use MyTechIO\Contracts\ContractException;
 
 /**
- * Wird geworfen, wenn ein Buchungssatz-Entwurf nicht ausgeglichen ist
- * (Summe Soll ≠ Summe Haben). Sowohl der Kern als auch der `FakeJournal`
- * erzwingen diese Invariante.
+ * Thrown when a journal entry draft is not balanced
+ * (sum of debits ≠ sum of credits). Both the core and the `FakeJournal`
+ * enforce this invariant.
  */
 final class UnbalancedEntryException extends ContractException
 {

@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Settings;
 
 /**
- * Modulspezifische Einstellungen, persistiert im Kern.
+ * Module-specific settings, persisted in the core.
  *
- * Werte werden pro Modul (`$module`, z. B. `'domainrobot'`) und Schlüssel
- * (`$key`) gehalten. `isFromEnvironment()` meldet, ob ein Wert aus der
- * Umgebung/Config kommt und daher Vorrang vor der Datenbank hat — die
- * Implementierung lässt `set()` auf solche Schlüssel dann wirkungslos
- * verlaufen bzw. die UI sperrt das Feld. `encrypted` markiert sensible
- * Werte (z. B. Passwörter) zur verschlüsselten Ablage.
+ * Values are kept per module (`$module`, e.g. `'domainrobot'`) and key
+ * (`$key`). `isFromEnvironment()` reports whether a value comes from the
+ * environment/config and therefore takes precedence over the database —
+ * the implementation then makes `set()` a no-op for such keys, or the UI
+ * locks the field. `encrypted` marks sensitive values (e.g. passwords)
+ * for encrypted storage.
  *
- * Implementierung erst Phase 3 — hier nur Interface + Fake.
+ * Implementation not until phase 3 — only the interface and fake exist so far.
  */
 interface ModuleSettings
 {

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Mail;
 
 /**
- * Ein Empfänger einer modulinitiierten Mail.
+ * A recipient of a module-initiated email.
  *
- * `role` unterscheidet To/Cc/Bcc (`'to'|'cc'|'bcc'`, Default `'to'`);
- * `contactId` verknüpft den Empfänger — falls bekannt — mit einem Kontakt
- * des Kerns, rein informativ für den Postausgang.
+ * `role` distinguishes To/Cc/Bcc (`'to'|'cc'|'bcc'`, default `'to'`);
+ * `contactId` links the recipient — if known — to a contact in the core,
+ * purely informational for the outbox.
  */
 final readonly class MailRecipient
 {

@@ -5,31 +5,30 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Documents;
 
 /**
- * Posteingang-Ingest für Module.
+ * Incoming-document inbox ingest (Posteingang) for modules.
  *
- * Kern-Semantik: Die lokale GoBD-Ablage und der Posteingang gehören dem
- * Kern — Module liefern über diesen Vertrag lediglich den Rohinhalt eines
- * Belegs ein (z. B. aus einem Pull von Paperless-NGX). Erfolgreiches
- * `ingest()` legt den Beleg in der Kern-Ablage an und feuert das
- * Kern-Ereignis `DocumentStored`.
+ * Core semantics: the local GoBD-compliant storage and the inbox belong to
+ * the core — modules only submit the raw content of a document through
+ * this contract (e.g. from a pull from Paperless-NGX). A successful
+ * `ingest()` creates the document in the core storage and fires the core
+ * event `DocumentStored`.
  */
 interface IncomingDocuments
 {
     /**
-     * Legt einen Beleg im Posteingang an. Eine Hash-Dublette (gleicher
-     * `sha256` des Blobs wie ein bereits lebender Beleg) legt keinen neuen
-     * Beleg an, sondern liefert den bestehenden mit `duplicate = true`
-     * zurück — so kann ein Modul einen Pull wiederholt ausführen, ohne
-     * Dubletten zu erzeugen.
+     * Creates a document in the inbox. A hash duplicate (same `sha256` of
+     * the blob as an already existing document) does not create a new
+     * document, but returns the existing one with `duplicate = true` —
+     * this allows a module to repeat a pull without creating duplicates.
      *
-     * @param  string  $blob  Rohinhalt der Datei (binär).
-     * @param  string  $source  Freier Modulschlüssel der Quelle (z. B. `paperless`); `upload` ist dem Kern vorbehalten.
+     * @param  string  $blob  Raw file content (binary).
+     * @param  string  $source  Free-form module key for the source (e.g. `paperless`); `upload` is reserved for the core.
      */
     public function ingest(string $blob, string $filename, string $source, IngestOptions $options): IngestedDocument;
 
     /**
-     * Liefert den Verweis auf einen Posteingang-Beleg anhand seiner ID, oder
-     * `null`, wenn keiner mit dieser ID existiert.
+     * Returns the reference to a document in the inbox by its ID, or
+     * `null` if none exists with that ID.
      */
     public function find(int $id): ?IncomingDocumentRef;
 }

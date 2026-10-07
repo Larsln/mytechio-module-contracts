@@ -5,38 +5,38 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Modules;
 
 /**
- * Lebenszyklus-Hooks eines Moduls, vom Kern über den `lifecycle`-Schlüssel
- * im Modul-Manifest aufgelöst (per Container).
+ * Lifecycle hooks of a module, resolved by the core via the `lifecycle`
+ * key in the module manifest (through the container).
  *
- * Reihenfolge beim ersten Aktivieren: Modul-Migrationen → `onInstall()` →
- * `onEnable()`. Bei jedem weiteren Aktivieren nur `onEnable()`.
- * `Modules\AbstractModuleLifecycle` liefert leere Implementierungen zum
- * Erben, wenn ein Modul nicht alle Hooks braucht.
+ * Order on first activation: module migrations → `onInstall()` →
+ * `onEnable()`. On every subsequent activation, only `onEnable()`.
+ * `Modules\AbstractModuleLifecycle` provides empty implementations to
+ * extend when a module does not need all hooks.
  */
 interface ModuleLifecycle
 {
     /**
-     * Vom Kern beim Aktivieren aufgerufen — nach den Modul-Migrationen.
-     * Darf werfen: dann bleibt das Modul deaktiviert und der Fehler
-     * erscheint in der Modulkarte.
+     * Called by the core on activation — after the module migrations.
+     * May throw: the module then stays disabled and the error
+     * appears on the module card.
      */
     public function onEnable(): void;
 
     /**
-     * Vom Kern beim Deaktivieren aufgerufen (Scheduler-/Queue-Aufräumen,
-     * Caches). Darf nicht werfen.
+     * Called by the core on deactivation (scheduler/queue cleanup,
+     * caches). Must not throw.
      */
     public function onDisable(): void;
 
     /**
-     * Einmalig, wenn das Modul zum ersten Mal in der Installation aktiviert
-     * wird (vor `onEnable()`).
+     * Called once, when the module is activated for the first time in
+     * this installation (before `onEnable()`).
      */
     public function onInstall(): void;
 
     /**
-     * Nur über `php artisan module:uninstall <name>` (Phase 4) — Daten des
-     * Moduls entfernen.
+     * Only via `php artisan module:uninstall <name>` (phase 4) — removes
+     * the module's data.
      */
     public function onUninstall(): void;
 }

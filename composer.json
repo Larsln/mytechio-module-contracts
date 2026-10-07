@@ -1,6 +1,6 @@
 {
     "name": "mytechio/module-contracts",
-    "description": "Verträge (Interfaces, DTOs, Fakes) zwischen dem MyTechIO-Admin-Kern und seinen Modulen",
+    "description": "Contracts (interfaces, DTOs, fakes) between the MyTechIO Admin core and its modules",
     "type": "library",
     "license": "proprietary",
     "keywords": ["mytechio", "contracts", "interfaces", "dto"],

@@ -7,8 +7,7 @@ namespace MyTechIO\Contracts\Assets;
 use MyTechIO\Contracts\ContractException;
 
 /**
- * Wird geworfen, wenn `CustomerAssets::cancel()` mit einer unbekannten ID
- * aufgerufen wird.
+ * Thrown when `CustomerAssets::cancel()` is called with an unknown ID.
  */
 final class AssetNotFoundException extends ContractException
 {

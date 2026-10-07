@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Contacts;
 
 /**
- * Rein lesender Zugriff auf Kontakte des Kerns.
+ * Read-only access to core contacts.
  *
- * Module dürfen Kontakte über diesen Vertrag nachschlagen und durchsuchen,
- * aber nicht anlegen oder ändern — Kontaktstammdaten bleiben ausschließlich
- * Sache des Kerns.
+ * Modules may look up and search contacts via this contract, but not
+ * create or modify them — contact master data remains exclusively the
+ * core's responsibility.
  */
 interface Contacts
 {
@@ -21,7 +21,7 @@ interface Contacts
     public function search(string $query, int $limit = 20): array;
 
     /**
-     * @return array<string, string> ISO-2 ⇒ Landesname (deutsch)
+     * @return array<string, string> ISO-2 ⇒ country name (German)
      */
     public function countries(): array;
 }

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Documents;
 
 /**
- * Ergebnis eines `IncomingDocuments::ingest()`-Aufrufs.
+ * Result of an `IncomingDocuments::ingest()` call.
  *
- * `duplicate` ist `true`, wenn bereits ein lebender Posteingang-Beleg mit
- * demselben `sha256` existiert — in diesem Fall sind `id`/`diskPath`/`url`
- * die des bestehenden Belegs, es wird kein neuer angelegt.
+ * `duplicate` is `true` when a live incoming-document already exists with
+ * the same `sha256` — in that case `id`/`diskPath`/`url` refer to the
+ * existing document, and no new one is created.
  */
 final readonly class IngestedDocument
 {

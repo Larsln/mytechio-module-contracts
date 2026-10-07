@@ -9,10 +9,10 @@ use MyTechIO\Contracts\Mail\OutgoingMail;
 use MyTechIO\Contracts\Mail\SentMail;
 
 /**
- * Test-Double für `MailOutbox`: versendet nichts wirklich, merkt sich aber
- * jede Mail. `sent()`/`sentTo()` sind bewusst einfache Methoden ohne
- * PHPUnit-Abhängigkeit, damit sie auch außerhalb von Pest-Assertions
- * nutzbar sind.
+ * Test double for `MailOutbox`: doesn't actually send anything, but
+ * remembers every mail. `sent()`/`sentTo()` are deliberately simple methods
+ * without a PHPUnit dependency, so they can also be used outside of
+ * Pest assertions.
  */
 final class FakeMailOutbox implements MailOutbox
 {

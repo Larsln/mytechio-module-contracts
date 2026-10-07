@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Contacts;
 
 /**
- * Schreibgeschützte Sicht auf einen Kontakt des Kerns.
+ * Read-only view of a core contact.
  *
- * `type` unterscheidet z. B. `'company'`/`'person'`, `direction`
- * `'customer'`/`'supplier'`/`'both'` — die Implementierung legt die genaue
- * Wertemenge fest, Module behandeln beide Felder als Freitext.
+ * `type` distinguishes e.g. `'company'`/`'person'`, `direction`
+ * `'customer'`/`'supplier'`/`'both'` — the implementation defines the exact
+ * set of values; modules treat both fields as free text.
  */
 final readonly class ContactData
 {
@@ -30,7 +30,7 @@ final readonly class ContactData
         public ?string $city,
         public ?string $countryCode,
         public ?string $vatId,
-        /** Seit 1.3.0 (Nextcloud-Modul): Mobilnummer, Website, letzte Änderung (ISO-8601). */
+        /** Since 1.3.0 (Nextcloud module): mobile number, website, last changed (ISO-8601). */
         public ?string $mobile = null,
         public ?string $website = null,
         public ?string $updatedAt = null,

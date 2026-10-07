@@ -7,16 +7,16 @@ namespace MyTechIO\Contracts\Assets;
 use MyTechIO\Contracts\Connectors\ConnectorStatus;
 
 /**
- * Lesender und schreibender Zugriff auf Kundenobjekte (Domains, Lizenzen,
- * Hosting-Verträge, Zertifikate, …) aus Modulen heraus.
+ * Read and write access to customer assets (Kundenobjekte) (domains,
+ * licenses, hosting contracts, certificates, …) from modules.
  *
- * Kern-Semantik: `create()`/`cancel()` feuern die Kern-Ereignisse
- * `CustomerAssetCreated`/`CustomerAssetCancelled`. `findByLabel()` ist die
- * bevorzugte Suche für Module, die ein Objekt anhand seines fachlichen
- * Namens (z. B. eines Domainnamens) wiederfinden wollen — aktive Objekte
- * werden zuerst zurückgegeben, danach nach `id` sortiert. `findBySource()`
- * ist die bevorzugte Suche für Connector-Module, die ein Objekt anhand
- * seiner externen Kennung wiederfinden wollen.
+ * Core semantics: `create()`/`cancel()` fire the core events
+ * `CustomerAssetCreated`/`CustomerAssetCancelled`. `findByLabel()` is the
+ * preferred lookup for modules that want to find an asset by its
+ * business-domain name (e.g. a domain name) — active assets are returned
+ * first, then sorted by `id`. `findBySource()` is the preferred lookup
+ * for connector modules that want to find an asset by its external
+ * identifier.
  */
 interface CustomerAssets
 {
@@ -28,7 +28,7 @@ interface CustomerAssets
     public function forContact(int $contactId, ?string $type = null): array;
 
     /**
-     * Aktive zuerst, danach nach id.
+     * Active first, then by id.
      *
      * @return list<CustomerAssetData>
      */
@@ -39,30 +39,30 @@ interface CustomerAssets
     public function create(NewCustomerAsset $asset): CustomerAssetData;
 
     /**
-     * Setzt Quelle + externe Kennung an einem bisher manuellen Objekt
-     * (Altbestand), z. B. wenn ein Connector eine zuvor frei angelegte
-     * Domain nachträglich einer Quelle zuordnet.
+     * Sets the source + external identifier on a previously manual asset
+     * (legacy data), e.g. when a connector subsequently assigns a source
+     * to a domain that was previously created freely.
      *
-     * @throws AssetNotFoundException wenn `$id` unbekannt ist.
+     * @throws AssetNotFoundException if `$id` is unknown.
      */
     public function attachSource(int $id, string $source, string $externalId): CustomerAssetData;
 
     /**
-     * Übernimmt die Rückmeldung eines Connectors (Status, Verlängerung,
-     * Autorenew, Attribute) in das Kundenobjekt. `attributes` werden mit
-     * den bestehenden zusammengeführt (merge), nicht ersetzt.
+     * Applies a connector's report (status, renewal, autorenew,
+     * attributes) to the customer asset. `attributes` are merged with
+     * the existing ones, not replaced.
      *
-     * @throws AssetNotFoundException wenn `$id` unbekannt ist.
+     * @throws AssetNotFoundException if `$id` is unknown.
      */
     public function updateFromSource(int $id, ConnectorStatus $status): CustomerAssetData;
 
     /**
-     * @return list<CustomerAssetData> Objekte, die an dieser Rechnungsposition hängen.
+     * @return list<CustomerAssetData> Assets attached to this invoice item.
      */
     public function forInvoiceItem(int $invoiceItemId): array;
 
     /**
-     * @throws AssetNotFoundException wenn `$id` unbekannt ist.
+     * @throws AssetNotFoundException if `$id` is unknown.
      */
     public function cancel(int $id, ?string $cancelledAt = null): CustomerAssetData;
 }

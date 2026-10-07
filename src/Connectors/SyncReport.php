@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Connectors;
 
 /**
- * Ergebnis eines vollständigen Abgleichs (`Connector::sync()`).
+ * Result of a full reconciliation (`Connector::sync()`).
  */
 final readonly class SyncReport
 {

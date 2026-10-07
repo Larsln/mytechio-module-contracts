@@ -7,12 +7,12 @@ namespace MyTechIO\Contracts\Fakes;
 use MyTechIO\Contracts\Invoices\InvoiceItemExtension;
 
 /**
- * Test-Double für `InvoiceItemExtension`: zeichnet jeden Aufruf auf
+ * Test double for `InvoiceItemExtension`: records every call
  * (`validateCalls`, `afterItemsSyncedCalls`, `annotateCalls`,
- * `duplicateCalls`), damit Modul-Tests prüfen können, was der Kern
- * übergeben hat. `withValidationErrors()` und `withAnnotationLines()`
- * konfigurieren die Rückgabewerte, `duplicate()` liefert standardmäßig
- * die übergebenen extras unverändert zurück.
+ * `duplicateCalls`), so module tests can verify what the core
+ * passed in. `withValidationErrors()` and `withAnnotationLines()`
+ * configure the return values; `duplicate()` returns the passed-in
+ * extras unchanged by default.
  */
 final class FakeInvoiceItemExtension implements InvoiceItemExtension
 {

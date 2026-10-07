@@ -7,9 +7,9 @@ namespace MyTechIO\Contracts\Accounting;
 use MyTechIO\Contracts\ContractException;
 
 /**
- * Wird geworfen, wenn für `bookedOn` bereits eine festgeschriebene Periode
- * existiert (Monatsabschluss/Freigabe) — Korrekturen sind dann nur per
- * Gegenbuchung (`Journal::reverse()`) in einer offenen Periode möglich.
+ * Thrown when a closed period already exists for `bookedOn`
+ * (month-end close/approval) — corrections are then only possible via
+ * a reversing entry (`Journal::reverse()`) in an open period.
  */
 final class PeriodClosedException extends ContractException
 {

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Invoices;
 
 /**
- * Entwurf einer Rechnung, die ein Modul anlegen will.
+ * Draft of an invoice that a module wants to create.
  *
- * Kern-Semantik: Die Rechnung entsteht im Status Draft; Defaults
- * (Bankkonto, Zahlungsziel, Steuerkategorie aus Artikel bzw.
- * Organisations-Standard) ergänzt der Kern, wenn sie hier `null` bleiben.
- * Dieser Vertrag finalisiert niemals — das bleibt dem Kern-UI vorbehalten.
+ * Core semantics: the invoice is created in draft status; defaults (bank
+ * account, payment terms, tax category derived from the article or the
+ * organization default) are filled in by the core when left `null` here.
+ * This contract never finalizes an invoice — that remains the sole
+ * responsibility of the core UI.
  */
 final readonly class InvoiceDraft
 {

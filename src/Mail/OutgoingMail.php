@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Mail;
 
 /**
- * Eine von einem Modul angeforderte Mail.
+ * An email requested by a module.
  *
- * `ownerType`/`ownerId` referenzieren das fachliche Objekt, zu dem die Mail
- * gehört (für den Postausgang); `template` ist ein optionaler Hinweis an
- * die Implementierung, welches Branding-Layout/Template verwendet werden
- * soll (ohne Template rendert der Kern ein generisches Layout).
+ * `ownerType`/`ownerId` reference the business object the email belongs to
+ * (for the outbox); `template` is an optional hint to the implementation
+ * about which branding layout/template to use (without a template, the
+ * core renders a generic layout).
  */
 final readonly class OutgoingMail
 {

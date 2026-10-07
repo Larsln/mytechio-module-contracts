@@ -7,11 +7,10 @@ namespace MyTechIO\Contracts\Tax;
 use MyTechIO\Contracts\ContractException;
 
 /**
- * Wird geworfen, wenn eine VIES-Prüfung nicht durchgeführt werden kann
- * (Dienst nicht erreichbar, Zeitüberschreitung, oder kein Modul mit einem
- * `VatIdChecker` aktiv). Der Kern behandelt dies als „VIES-Prüfung derzeit
- * nicht verfügbar" — die Steuerfindung läuft ohne das Prüfergebnis weiter
- * (Karenzregelung).
+ * Thrown when a VIES check cannot be performed (service unreachable,
+ * timeout, or no module with a `VatIdChecker` active). The core treats
+ * this as "VIES check currently unavailable" — tax determination
+ * continues without the check result (grace period rule).
  */
 final class VatIdCheckUnavailableException extends ContractException
 {

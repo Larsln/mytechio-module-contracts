@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Assets;
 
 /**
- * Schreibgeschützte Sicht auf ein Kundenobjekt (z. B. eine Domain, eine
- * Lizenz) des Kerns.
+ * Read-only view of a customer asset (Kundenobjekt) (e.g. a domain, a
+ * license) in the core.
  *
- * `status` ist Freitext der Implementierung (z. B. `'active'`,
- * `'cancelled'`); `findByLabel()` sortiert aktive Objekte zuerst.
- * `invoiceItemId` verweist — falls das Objekt aus einer Rechnungsposition
- * entstanden ist — auf diese Position.
+ * `status` is free text defined by the implementation (e.g. `'active'`,
+ * `'cancelled'`); `findByLabel()` sorts active assets first.
+ * `invoiceItemId` references the invoice item the asset originated from,
+ * if any.
  *
- * `source` ist der Modulname einer externen Quelle (z. B. `"domainrobot"`)
- * oder `null` bei einem manuell angelegten Objekt; `externalId` die
- * Kennung dort (z. B. der Domainname). `providerName` ist der Freitext-
- * Anbieter manuell angelegter Objekte (z. B. `"IONOS"`). `renewsAt`,
- * `autorenew` und `externalStatus` stammen — wenn gesetzt — vom Connector
- * der Quelle (`updateFromSource()`). `attributes` sind typspezifische
- * Felder, deren Schema das jeweilige Modul definiert.
+ * `source` is the module name of an external source (e.g.
+ * `"domainrobot"`), or `null` for a manually created asset; `externalId`
+ * is the identifier there (e.g. the domain name). `providerName` is the
+ * free-text provider of manually created assets (e.g. `"IONOS"`).
+ * `renewsAt`, `autorenew`, and `externalStatus` come from the source's
+ * connector (`updateFromSource()`) when set. `attributes` are
+ * type-specific fields whose schema is defined by the respective module.
  */
 final readonly class CustomerAssetData
 {

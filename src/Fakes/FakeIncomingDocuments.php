@@ -10,9 +10,9 @@ use MyTechIO\Contracts\Documents\IngestedDocument;
 use MyTechIO\Contracts\Documents\IngestOptions;
 
 /**
- * Test-Double für `IncomingDocuments`: legt nichts wirklich ab, erkennt aber
- * Dubletten per `sha256` des Blobs wie die Kern-Implementierung, vergibt
- * Auto-IDs und liefert deterministische Pfade/URLs.
+ * Test double for `IncomingDocuments`: doesn't actually store anything, but
+ * detects duplicates via the blob's `sha256` like the core implementation,
+ * assigns auto IDs, and returns deterministic paths/URLs.
  */
 final class FakeIncomingDocuments implements IncomingDocuments
 {
@@ -83,9 +83,9 @@ final class FakeIncomingDocuments implements IncomingDocuments
     }
 
     /**
-     * Hinterlegt einen Posteingang-Beleg direkt im In-Memory-Double, z. B.
-     * um einen bereits einer Eingangsrechnung zugeordneten oder importierten
-     * Beleg für `find()` vorzubereiten, ohne den Umweg über `ingest()`.
+     * Stores an incoming document (Posteingang) directly in the in-memory double, e.g.
+     * to prepare a document already linked to or imported as an incoming invoice
+     * for `find()`, without going through `ingest()`.
      */
     public function seed(IncomingDocumentRef $document): void
     {

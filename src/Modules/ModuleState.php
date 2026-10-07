@@ -5,25 +5,25 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Modules;
 
 /**
- * Laufzeit-Zustand eines Moduls, den Hintergrund-Code (Scheduler-Einträge,
- * Listener, Jobs) vor jeder Ausführung prüft.
+ * Runtime state of a module, checked by background code (scheduler
+ * entries, listeners, jobs) before every execution.
  *
- * `isActive()` ist die Prüfung, die Hintergrund-Code verwenden muss: nur ein
- * bekanntes, aktiviertes UND kompatibles Modul darf Routen/Slots/
- * Hintergrund-Code laufen lassen. `isEnabled()` liefert ausschließlich den
- * Schalter aus der Modultabelle, ohne Kompatibilitätsprüfung — das ist
- * i. d. R. NICHT die richtige Prüfung für Hintergrund-Code.
+ * `isActive()` is the check that background code must use: only a
+ * known, enabled AND compatible module may run routes/slots/
+ * background code. `isEnabled()` returns only the switch from the
+ * module table, without a compatibility check — this is usually
+ * NOT the right check for background code.
  */
 interface ModuleState
 {
     /**
-     * Modul bekannt, aktiviert UND kompatibel (= Routen/Slots/Hintergrund
-     * dürfen laufen).
+     * Module is known, enabled AND compatible (= routes/slots/background
+     * code may run).
      */
     public function isActive(string $module): bool;
 
     /**
-     * Nur der Schalter aus der Modultabelle, ohne Kompatibilitätsprüfung.
+     * Only the switch from the module table, without a compatibility check.
      */
     public function isEnabled(string $module): bool;
 }

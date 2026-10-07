@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Invoices;
 
 /**
- * Lesender Verweis auf einen im Zeitraum bezahlten Beleg (Ausgangs- oder
- * Eingangsrechnung) für den Profit-Split.
+ * Read-only reference to a document (outgoing or incoming invoice) paid
+ * within the period, for the profit split.
  *
- * `type` ist `"invoice"` (aus `Invoices::paidBetween()`) oder
- * `"incoming_invoice"` (aus `Documents\IncomingInvoices::paidBetween()`);
- * `netAmount` ist der Netto-Betrag mit 4 Nachkommastellen, `url` die
- * relative Kern-URL des Belegs.
+ * `type` is `"invoice"` (from `Invoices::paidBetween()`) or
+ * `"incoming_invoice"` (from `Documents\IncomingInvoices::paidBetween()`);
+ * `netAmount` is the net amount with 4 decimal places, `url` is the
+ * document's relative core URL.
  */
 final readonly class PaidDocument
 {

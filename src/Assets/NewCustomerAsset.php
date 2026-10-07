@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Assets;
 
 /**
- * Daten zum Anlegen eines neuen Kundenobjekts.
+ * Data for creating a new customer asset (Kundenobjekt).
  *
- * `source`/`externalId` setzen eine externe Quelle direkt beim Anlegen
- * (z. B. durch einen Connector-Import); `providerName` ist der
- * Freitext-Anbieter manuell angelegter Objekte. `attributes` sind
- * typspezifische Felder, deren Schema das jeweilige Modul definiert.
+ * `source`/`externalId` set an external source directly at creation time
+ * (e.g. via a connector import); `providerName` is the free-text
+ * provider of manually created assets. `attributes` are type-specific
+ * fields whose schema is defined by the respective module.
  */
 final readonly class NewCustomerAsset
 {
