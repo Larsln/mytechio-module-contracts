@@ -39,3 +39,22 @@ it('allows toggling the configured state', function () {
 
     expect($extractor->configured())->toBeFalse();
 });
+
+it('provides a sample payload with normalised source boxes on two fields', function () {
+    $payload = FakeInvoiceExtractor::samplePayload();
+    $boxes = [$payload['supplier']['name']['source_box'], $payload['invoice']['number']['source_box']];
+
+    foreach ($boxes as $box) {
+        expect(array_keys($box))->toBe(['x0', 'y0', 'x1', 'y1'])
+            ->and($box['x0'])->toBeGreaterThanOrEqual(0.0)
+            ->and($box['x1'])->toBeLessThanOrEqual(1.0)
+            ->and($box['x0'])->toBeLessThan($box['x1'])
+            ->and($box['y0'])->toBeLessThan($box['y1']);
+    }
+
+    expect($payload['invoice']['date'])->not->toHaveKey('source_box');
+
+    $extractor = (new FakeInvoiceExtractor)->returns($payload);
+
+    expect($extractor->extract('blob', new ExtractionContextData(expenseAccounts: [], units: [])))->toBe($payload);
+});

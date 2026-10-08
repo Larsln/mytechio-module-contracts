@@ -5,6 +5,18 @@ All notable changes to this package are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.7.0] - 2026-10-09
+
+### Added
+
+- Extraction payload: every leaf (head fields and line-item fields) may carry
+  an optional `source_box` (`x0`, `y0`, `x1`, `y1`; normalised page
+  coordinates in `[0, 1]`, origin top left, relative to the leaf's `page`).
+  Documented on `Documents\InvoiceExtractor` and in the README; no signature
+  change.
+- `Fakes\FakeInvoiceExtractor::samplePayload()` — sample payload including
+  `source_box` on two fields.
+
 ## [1.6.2] - 2026-10-07
 
 ### Fixed

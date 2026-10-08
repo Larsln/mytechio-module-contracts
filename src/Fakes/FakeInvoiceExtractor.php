@@ -58,6 +58,40 @@ final class FakeInvoiceExtractor implements InvoiceExtractor
     }
 
     /**
+     * Sample payload with `source_box` on two fields (supplier name and
+     * invoice number); all other leaves omit it.
+     *
+     * @return array<string, mixed>
+     */
+    public static function samplePayload(): array
+    {
+        return [
+            'supplier' => [
+                'name' => [
+                    'value' => 'ACME GmbH',
+                    'source_text' => 'ACME GmbH',
+                    'page' => 1,
+                    'source_box' => ['x0' => 0.08, 'y0' => 0.05, 'x1' => 0.31, 'y1' => 0.07],
+                ],
+            ],
+            'invoice' => [
+                'number' => [
+                    'value' => 'RE-2026-0042',
+                    'source_text' => 'RE-2026-0042',
+                    'page' => 1,
+                    'source_box' => ['x0' => 0.62, 'y0' => 0.41, 'x1' => 0.83, 'y1' => 0.43],
+                ],
+                'date' => [
+                    'value' => '2026-10-01',
+                    'source_text' => '01.10.2026',
+                    'page' => 1,
+                ],
+            ],
+            'meta' => ['model' => 'fake-model'],
+        ];
+    }
+
+    /**
      * @param  array<string, mixed>  $payload
      */
     public function returns(array $payload): self

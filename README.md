@@ -156,6 +156,22 @@ All DTOs are `final readonly` with constructor promotion and a `toArray()`
 method (snake_case keys). `MyTechIO\Contracts\ContractException` is the
 common base class for all contract exceptions.
 
+## Extraction payload
+
+`InvoiceExtractor::extract()` returns the raw §7.6 payload. Every extracted
+leaf (head fields and per-line-item fields) carries `value` and may carry
+`source_text`, `page` (1-based) and `source_box`:
+
+```json
+"source_box": {"x0": 0.62, "y0": 0.41, "x1": 0.83, "y1": 0.43}
+```
+
+`source_box` holds normalised page coordinates in `[0, 1]` with the origin at
+the top left, relative to the page that `page` refers to; `x0 < x1` and
+`y0 < y1`. It is optional and best-effort: drivers omit it when unsure, and
+the core cross-checks it against the PDF text layer. Absent or invalid boxes
+are treated as `null`.
+
 ## Fakes for module tests
 
 Every contract has an in-memory test double under `MyTechIO\Contracts\Fakes\*`
@@ -181,7 +197,7 @@ $this->app->instance(CustomerAssets::class, new FakeCustomerAssets);
 - `FakeModuleLifecycle` — counts calls per hook, `failOnEnable()` simulates a failing `onEnable()`.
 - `FakeHealthCheck` — returns a preconfigured `HealthStatus`, `withStatus()` to reconfigure.
 - `FakeInvoiceItemExtension` — records every call (`validateCalls`, `afterItemsSyncedCalls`, `annotateCalls`, `duplicateCalls`), `withValidationErrors()`/`withAnnotationLines()` to reconfigure.
-- `FakeInvoiceExtractor` — returns a preconfigured payload (`returns()`) or throws a preconfigured `ExtractionFailedException` (`throws()`), counts every call (`calls()`), `withConfigured()` to toggle.
+- `FakeInvoiceExtractor` — returns a preconfigured payload (`returns()`) or throws a preconfigured `ExtractionFailedException` (`throws()`), counts every call (`calls()`), `withConfigured()` to toggle, `samplePayload()` provides a sample payload including `source_box`.
 - `FakeArticleStatistics` — returns an empty result as long as nothing has been seeded; `seedOverview()`/`seedArticle()` set the results.
 - `FakeIncomingInvoices` — `seed()` for `find()`, `seedPaidDocument()` for `paidBetween()` (sorted, filtered by period).
 - `FakeVatIdChecker` — result configurable per VAT ID (`seedResult()`), `unavailable()` switches to "unavailable" (throws `VatIdCheckUnavailableException`), `calls()` for assertions.

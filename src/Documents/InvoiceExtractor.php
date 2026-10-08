@@ -33,6 +33,15 @@ interface InvoiceExtractor
     public function configured(): bool;
 
     /**
+     * Every extracted leaf (head fields and per-line-item fields) carries
+     * `value`, optionally `source_text` and `page` (1-based) and optionally
+     * `source_box`: the smallest rectangle enclosing the source text on that
+     * page, as normalised page coordinates in `[0, 1]` with the origin at
+     * the top left (`{"x0": 0.62, "y0": 0.41, "x1": 0.83, "y1": 0.43}`,
+     * `x0 < x1`, `y0 < y1`). The box is best-effort: drivers omit it when
+     * unsure, and the core cross-checks it against the PDF text layer and
+     * ignores absent or invalid boxes.
+     *
      * @return array<string, mixed> raw payload (leaves supplier/invoice/items/totals plus meta.model) — validation is done by the core.
      *
      * @throws ExtractionFailedException
