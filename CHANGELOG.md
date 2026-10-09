@@ -5,6 +5,21 @@ All notable changes to this package are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.8.0] - 2026-10-09
+
+### Added
+
+- `Invoices\RecurringInvoices` with `RecurringInvoiceDraft`, `RecurringItemDraft`,
+  `RecurringInvoiceSummary`, `RecurringItemSummary`, `RecurringInvoiceRef` and
+  `RecurringBillingStatus` — manage recurring-invoice templates and read their
+  billing/payment state; item `extras` follow the invoice-item extension
+  convention.
+- `Assets\AssetSource` actions: `capabilities()`, `setAutorenew()`,
+  `transferToCompany()`, `releaseTransfer()`, result DTO `AssetActionRef`, and
+  the `AssetSourceDefaults` trait (no capabilities, actions throw
+  `ContractException`). Existing sources add `use AssetSourceDefaults;`.
+- Fakes `FakeRecurringInvoices` and `FakeAssetSource`.
+
 ## [1.7.0] - 2026-10-09
 
 ### Added

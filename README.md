@@ -31,6 +31,8 @@ composer require mytechio/module-contracts
 | `Mail` | `MailOutbox` | Sends mail using the branding layout, records an entry in the outbox, fires `MailSent`. |
 | `Assets` | `CustomerAssets` | Read/create/cancel customer assets (Kundenobjekte); `create()`/`cancel()` fire `CustomerAssetCreated`/`CustomerAssetCancelled`; `findByLabel()` returns active assets first. An asset either has a source (`source`/`externalId`, e.g. `"domainrobot"`) or a free-text provider (`providerName`, e.g. `"IONOS"`); `findBySource()` finds an asset by its external identifier, `attachSource()` retroactively assigns a source to a previously manual asset, `updateFromSource()` applies a connector update (status, renewal, autorenew, `attributes` merged), `forInvoiceItem()` returns the assets for an invoice item. |
 | `Assets` | `AssetSource` | Asset suggestions from external sources for the future asset picker (target state, phase 5) — no relation to already-created customer assets is required. |
+| `Assets` | `AssetSource` (actions) | See section "Asset source actions". |
+| `Invoices` | `RecurringInvoices` | Recurring-invoice templates (Abo-Rechnungen); see section "Recurring invoices". |
 | `Contacts` | `Contacts` | Read-only contact access — modules do not create or modify contacts. |
 | `Accounting` | `Journal` | Debit must equal credit (enforced via `UnbalancedEntryException`); closed periods are rejected (`PeriodClosedException`). |
 | `Invoices` | `Invoices` | `createDraft()` always returns an invoice in draft status; defaults (bank account, payment terms, tax category) are filled in by the core. Finalization/sending/cancellation remain the responsibility of the core UI. `findItem()` returns the reference to an invoice item (including invoice number/status and core URL) by its ID, or `null`. `paidBetween()` returns all outgoing invoices paid within the period as `PaidDocument` (`type = "invoice"`), e.g. for the profit split. |
@@ -156,6 +158,38 @@ All DTOs are `final readonly` with constructor promotion and a `toArray()`
 method (snake_case keys). `MyTechIO\Contracts\ContractException` is the
 common base class for all contract exceptions.
 
+## Recurring invoices
+
+`Invoices\RecurringInvoices` lets modules manage recurring-invoice templates
+(Abo-Rechnungen) without generating invoices — the core's scheduled generator
+does that. Amounts are 4-decimal strings, dates `YYYY-MM-DD`; DTO constructors
+reject malformed values with a `ContractException`.
+
+- `create(RecurringInvoiceDraft)` — creates a template (`intervalUnit` is
+  `"month"` or `"year"`); the contact must exist, tax category and revenue
+  account are resolved by code/number.
+- `addItems($id, list<RecurringItemDraft>)` — appends items to an existing
+  template of the same contact.
+- `endAt($id, $endsOn, ActorRef)` — no runs after `$endsOn`.
+- `forContact()` / `find()` — read models (`RecurringInvoiceSummary`).
+- `billingStatus($id)` — `RecurringBillingStatus`: last invoiced period end,
+  next run, number of generated invoices, open (unpaid, finalized) invoices
+  with gross sum and how many days the oldest is past due.
+- `RecurringItemDraft::$extras` is the invoice-item extension payload keyed by
+  module name (like `Invoices\InvoiceItemRef` / `InvoiceItemExtension`); the
+  core copies it onto every generated invoice item.
+
+## Asset source actions
+
+`Assets\AssetSource` additionally declares `capabilities()` (any of
+`"autorenew"`, `"owner_change"`, `"transfer_out"`) and the actions
+`setAutorenew()`, `transferToCompany()` (owner becomes the operating company)
+and `releaseTransfer()` (auth code / transfer-out). Each returns an
+`AssetActionRef` whose `state` is `"queued"`, `"done"` or `"unsupported"`. Use
+the `AssetSourceDefaults` trait to get no capabilities and actions that throw
+`ContractException('Aktion wird von dieser Quelle nicht unterstützt.')`, and
+override only what the source supports.
+
 ## Extraction payload
 
 `InvoiceExtractor::extract()` returns the raw §7.6 payload. Every extracted
@@ -201,6 +235,8 @@ $this->app->instance(CustomerAssets::class, new FakeCustomerAssets);
 - `FakeArticleStatistics` — returns an empty result as long as nothing has been seeded; `seedOverview()`/`seedArticle()` set the results.
 - `FakeIncomingInvoices` — `seed()` for `find()`, `seedPaidDocument()` for `paidBetween()` (sorted, filtered by period).
 - `FakeVatIdChecker` — result configurable per VAT ID (`seedResult()`), `unavailable()` switches to "unavailable" (throws `VatIdCheckUnavailableException`), `calls()` for assertions.
+- `FakeRecurringInvoices` — in-memory templates, `seed()`, `seedBillingStatus()`, `drafts()`/`endings()` record what was created and ended.
+- `FakeAssetSource` — configurable key/types/capabilities/suggestions, `actionState()`, actions recorded in `calls()`.
 - `FakeModuleState` — every module is active by default; `activate()`/`deactivate()` toggle a module for the test.
 
 ## Versioning
