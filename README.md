@@ -39,6 +39,7 @@ composer require mytechio/module-contracts
 | `Invoices` | `InvoiceItemExtension` | A module's extension of an invoice item (see section "Invoice item extensions"). |
 | `Documents` | `IncomingInvoices` | Read-only access to incoming invoices (Eingangsrechnungen). `paidBetween()` returns all incoming invoices paid within the period as `PaidDocument` (`type = "incoming_invoice"`); `find()` returns the reference to an incoming invoice by its ID, or `null`. |
 | `Documents` | `InvoiceExtractor` | AI extraction provider for incoming invoices, container tag `mytechio.invoice_extractors`. The core selects exactly one driver via configuration; `extract()` returns the raw §7.6 payload (validation is done by the core) and throws `ExtractionFailedException` on transport errors or blocked generation. |
+| `Articles` | `Articles` | Read-only access to the core article catalog — modules do not create or change articles. `find()` returns active and inactive articles (`null` when deleted), `findByNumber()` looks up by article number, `search()` matches at least article number and name (the core may match further fields such as the manufacturer) and skips inactive articles unless `$includeInactive` is set. `ArticleData` carries the `ArticleKind` (goods, service, electronic service), the `TaxClassification` (pre-filled from the kind, overridable per article; the core derives the tax scenario of a document line from it plus the customer), the unit (core unit code, display name and, if it has one, the UN/ECE Rec. 20 code), and the default net prices as decimal strings. |
 | `Articles` | `ArticleStatistics` | Read-only access to article BI analytics (revenue, cost of goods, gross profit); the core implements this contract via the core tables, a module merely displays the data. The array shapes in `ArticleOverview`/`ArticleDetailStats` match the core implementation exactly. |
 | `Tax` | `VatIdChecker` | VIES check of a VAT ID. Without an active module, the core binds a null client that always throws `VatIdCheckUnavailableException` (today's "VIES unavailable" path); `InvalidVatIdFormatException` on a formally invalid VAT ID. |
 | `Settings` | `ModuleSettings` | Module-specific settings; ENV/config always takes precedence over the database (`isFromEnvironment()`). Implementation not until phase 3 — only the interface and fake exist so far. |
@@ -223,6 +224,7 @@ $this->app->instance(CustomerAssets::class, new FakeCustomerAssets);
 - `FakeMailOutbox` — `sent()`/`sentTo(email)` with no PHPUnit dependency.
 - `FakeCustomerAssets` — in-memory with auto IDs, `seed()` for the initial state.
 - `FakeContacts` — `seed()`, `setCountries()`.
+- `FakeArticles` — `seed()`; `search()` filters by case-insensitive substring over article number and name in insertion order and skips inactive articles unless `$includeInactive`.
 - `FakeJournal` — checks debit = credit exactly using integer arithmetic (no floats),
   `seedAccount()` for the chart of accounts.
 - `FakeInvoices` — remembers drafts, always returns status `draft`; `seedItem()` for `findItem()`, `seedPaidDocument()` for `paidBetween()` (sorted, filtered by period).
