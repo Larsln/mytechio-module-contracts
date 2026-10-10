@@ -32,6 +32,9 @@ composer require mytechio/module-contracts
 | `Assets` | `CustomerAssets` | Read/create/cancel customer assets (Kundenobjekte); `create()`/`cancel()` fire `CustomerAssetCreated`/`CustomerAssetCancelled`; `findByLabel()` returns active assets first. An asset either has a source (`source`/`externalId`, e.g. `"domainrobot"`) or a free-text provider (`providerName`, e.g. `"IONOS"`); `findBySource()` finds an asset by its external identifier, `attachSource()` retroactively assigns a source to a previously manual asset, `updateFromSource()` applies a connector update (status, renewal, autorenew, `attributes` merged), `forInvoiceItem()` returns the assets for an invoice item. |
 | `Assets` | `AssetSource` | Asset suggestions from external sources for the future asset picker (target state, phase 5) — no relation to already-created customer assets is required. |
 | `Assets` | `AssetSource` (actions) | See section "Asset source actions". |
+| `Subscriptions` | `Subscriptions` | Subscriptions (Leistungen) of contacts, implemented by the core; see section "Subscriptions". `cancel()` ends a subscription on the earliest date allowed by minimum term and notice period, or on an explicit later date. |
+| `Subscriptions` | `SubscriptionType` | Subscription type provided by a plugin module (field schema plus lifecycle hooks), container tag `mytechio.subscription_types`; see section "Subscriptions". |
+| `Subscriptions` | `SubscriptionSource` | Subscription suggestions and actions of an external source (e.g. a registrar), container tag `mytechio.subscription_sources`; see section "Subscriptions". |
 | `Invoices` | `RecurringInvoices` | Recurring-invoice templates (Abo-Rechnungen); see section "Recurring invoices". |
 | `Contacts` | `Contacts` | Read-only contact access — modules do not create or modify contacts. |
 | `Accounting` | `Journal` | Debit must equal credit (enforced via `UnbalancedEntryException`); closed periods are rejected (`PeriodClosedException`). |
@@ -191,6 +194,75 @@ the `AssetSourceDefaults` trait to get no capabilities and actions that throw
 `ContractException('Aktion wird von dieser Quelle nicht unterstützt.')`, and
 override only what the source supports.
 
+## Subscriptions
+
+A subscription (German UI: "Leistung") is a service or product a contact
+receives per period; the core creates it from a period price option of an
+article. `Subscriptions\Subscriptions` is implemented by the core — modules
+read subscriptions, create them, bind them to an external source and report
+source state, but never own money, tax or booking logic. The core ships only
+the type `generic`; all other types and all sources come from plugin modules.
+
+- Reading: `find()`, `forContact()`, `findByLabel()` (active first, then by
+  id), `findBySource()` and `forInvoiceItem()` return `SubscriptionData`.
+  `billedUntil` is the last day covered by an invoice; `attributes` hold the
+  type-specific fields, with secret fields decrypted — modules are trusted
+  code and must never log them.
+- Writing: `create(NewSubscription, ActorRef)` (`startsOn = null` means today;
+  a `priceOptionId` requires an `articleId`), `attachSource()`,
+  `updateFromSource(ConnectorStatus)` (`renewsAt` becomes `renewsOn`,
+  `status` becomes `externalStatus`, `attributes` are merged, not replaced) and
+  `cancel($id, $endsOn, ActorRef)`. `cancel()` throws `ContractException` when
+  `$endsOn` is before the earliest allowed date or the subscription already
+  ended; unknown IDs throw `SubscriptionNotFoundException`.
+- `source` and `externalId` are always set together; a subscription without a
+  source can carry a free-text `providerName`.
+
+### Subscription types
+
+A type implements `Subscriptions\SubscriptionType` and is registered with the
+container tag:
+
+```php
+app()->tag(DomainSubscriptionType::class, 'mytechio.subscription_types');
+```
+
+- `key()` is unique across modules (e.g. `"domain"`), `label()` is the German UI
+  label.
+- `fields()` returns a list of `SubscriptionField`: key, label, kind
+  (`SubscriptionFieldKind`: `text`, `number`, `date`, `bool`, `select`,
+  `secret`), `required`, `options` (select), `maxLength` (text/secret),
+  `pattern` (text, PCRE), `min`/`max` (number, decimal strings), `listColumn`
+  and `help`. The core renders the form from this schema and validates it
+  server-side; the DTO rejects inconsistent definitions with a
+  `ContractException`. A `secret` field is stored encrypted and masked in the UI.
+- `schemaVersion()` is bumped when the fields change. The core keeps old
+  values; new required fields only apply to new or edited subscriptions.
+- `inputComponent()` optionally names a module frontend component that replaces
+  the generated form.
+- `created()`, `cancelled()` and `ended()` run after the core committed the
+  change. If the plugin is removed, its subscriptions stay billable and become
+  read-only.
+- `use SubscriptionTypeDefaults;` provides no input component and no-op hooks.
+
+### Subscription sources
+
+A source implements `Subscriptions\SubscriptionSource` — the counterpart of
+`Assets\AssetSource` for subscriptions — and is registered with the container
+tag:
+
+```php
+app()->tag(DomainrobotSubscriptionSource::class, 'mytechio.subscription_sources');
+```
+
+`sourceKey()`, `subscriptionTypes()` and `suggest()` (returning
+`SubscriptionSuggestion`) feed the subscription picker; `capabilities()` (any of
+`"autorenew"`, `"owner_change"`, `"transfer_out"`) and the actions
+`setAutorenew()`, `transferToCompany()` and `releaseTransfer()` return a
+`SubscriptionActionRef` (`state`: `"queued"`, `"done"` or `"unsupported"`).
+`use SubscriptionSourceDefaults;` provides no capabilities and actions that
+throw `ContractException('Aktion wird von dieser Quelle nicht unterstützt.')`.
+
 ## Extraction payload
 
 `InvoiceExtractor::extract()` returns the raw §7.6 payload. Every extracted
@@ -239,6 +311,9 @@ $this->app->instance(CustomerAssets::class, new FakeCustomerAssets);
 - `FakeVatIdChecker` — result configurable per VAT ID (`seedResult()`), `unavailable()` switches to "unavailable" (throws `VatIdCheckUnavailableException`), `calls()` for assertions.
 - `FakeRecurringInvoices` — in-memory templates, `seed()`, `seedBillingStatus()`, `drafts()`/`endings()` record what was created and ended.
 - `FakeAssetSource` — configurable key/types/capabilities/suggestions, `actionState()`, actions recorded in `calls()`.
+- `FakeSubscriptions` — in-memory with auto IDs, `seed()` for the initial state, `linkInvoiceItem()` for `forInvoiceItem()`, `actors()` records who created and cancelled.
+- `FakeSubscriptionSource` — like `FakeAssetSource` for `SubscriptionSource`: configurable key/types/capabilities/suggestions, `actionState()`, actions recorded in `calls()`.
+- `FakeSubscriptionType` — configurable key/label/fields/schema version/input component, hook calls recorded in `calls()`.
 - `FakeModuleState` — every module is active by default; `activate()`/`deactivate()` toggle a module for the test.
 
 ## Versioning

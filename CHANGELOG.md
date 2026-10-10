@@ -5,6 +5,28 @@ All notable changes to this package are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- `Subscriptions\Subscriptions` contract (implemented by the core) for
+  subscriptions (German UI: "Leistungen") with `SubscriptionData`,
+  `NewSubscription`, `SubscriptionStatus` (active, paused, cancelled, ended)
+  and `SubscriptionNotFoundException`: lookup by contact, label, source and
+  invoice item, `create()`, `attachSource()`, `updateFromSource()` and
+  `cancel()`.
+- `Subscriptions\SubscriptionType` (container tag
+  `mytechio.subscription_types`) for plugin-provided subscription types, with
+  the declarative field schema `SubscriptionField` / `SubscriptionFieldKind`
+  (text, number, date, bool, select, secret), the lifecycle hooks `created()`,
+  `cancelled()` and `ended()`, and the `SubscriptionTypeDefaults` trait.
+- `Subscriptions\SubscriptionSource` (container tag
+  `mytechio.subscription_sources`) for registrar-style connectors, with
+  `SubscriptionSuggestion`, `SubscriptionActionRef` and the
+  `SubscriptionSourceDefaults` trait — the counterpart of `Assets\AssetSource`.
+- Fakes `FakeSubscriptions`, `FakeSubscriptionSource` and
+  `FakeSubscriptionType`.
+
 ## [1.9.0] - 2026-10-10
 
 ### Added
