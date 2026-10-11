@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `Units\Units` read contract (`all()`, `find()`, `default()`) with
+  `UnitData` (code, name, English name, UN/ECE Rec. 20 code, default flag):
+  modules show the core's units of measure and store the unit code, never
+  change units. Fake `FakeUnits`.
 - `Subscriptions\Subscriptions` contract (implemented by the core) for
   subscriptions (German UI: "Leistungen") with `SubscriptionData`,
   `NewSubscription`, `SubscriptionStatus` (active, paused, cancelled, ended)
