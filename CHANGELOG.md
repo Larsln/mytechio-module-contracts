@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   with `ArticleData`, `ArticleKind` (goods, service, electronic service) and
   `TaxClassification` (supply of goods, other service, electronic service) —
   modules read the core article catalog but never change it.
+- Price options on `ArticleData`: `priceOptions` (list of `PriceOptionData`) and
+  `defaultPriceOptionId`; `priceB2cNet`/`priceB2bNet` stay the prices of the
+  default option. `PriceOptionData` carries label, `PriceForm` (one-off or per
+  period), the billing interval of a per-period option, both net prices and the
+  default flag; derived options arrive with their computed prices.
 - Fake `FakeArticles`.
 
 ## [1.8.0] - 2026-10-09

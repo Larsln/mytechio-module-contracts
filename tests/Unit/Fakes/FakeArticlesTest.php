@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 use MyTechIO\Contracts\Articles\ArticleData;
 use MyTechIO\Contracts\Articles\ArticleKind;
+use MyTechIO\Contracts\Articles\PriceForm;
+use MyTechIO\Contracts\Articles\PriceOptionData;
 use MyTechIO\Contracts\Articles\TaxClassification;
 use MyTechIO\Contracts\Fakes\FakeArticles;
 
 function makeArticle(int $id, string $number, string $name, bool $isActive = true): ArticleData
 {
-    return new ArticleData($id, $number, $name, null, ArticleKind::Goods, TaxClassification::SupplyOfGoods, 'Stk', 'Stück', 'H87', '10.0000', '8.0000', true, $isActive);
+    return new ArticleData($id, $number, $name, null, ArticleKind::Goods, TaxClassification::SupplyOfGoods, 'Stk', 'Stück', 'H87', '10.0000', '8.0000', true, $isActive, $id, [new PriceOptionData($id, 'Einzelpreis', PriceForm::OneOff, null, null, '10.0000', '8.0000', true)]);
 }
 
 it('finds a seeded article by id, active or inactive', function () {
