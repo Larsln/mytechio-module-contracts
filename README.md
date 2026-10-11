@@ -208,6 +208,9 @@ the type `generic`; all other types and all sources come from plugin modules.
   `billedUntil` is the last day covered by an invoice; `attributes` hold the
   type-specific fields, with secret fields decrypted — modules are trusted
   code and must never log them.
+  The terms (`intervalUnit`/`intervalCount`, `minimumTermUntil`,
+  `noticePeriodCount`/`noticePeriodUnit`, `unitPriceNetOverride`) are copied
+  from the price option at creation and never follow later edits of it.
 - Writing: `create(NewSubscription, ActorRef)` (`startsOn = null` means today;
   a `priceOptionId` requires an `articleId`), `attachSource()`,
   `updateFromSource(ConnectorStatus)` (`renewsAt` becomes `renewsOn`,

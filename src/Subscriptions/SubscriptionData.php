@@ -25,6 +25,14 @@ use MyTechIO\Contracts\Invoices\Validate;
  * `externalStatus` come from the source's connector (`updateFromSource()`)
  * when set.
  *
+ * The terms are copied from the price option when the subscription is created
+ * and never follow later edits of the option: `intervalUnit` (`"day"`, `"week"`,
+ * `"month"` or `"year"`) with `intervalCount` is the billing period,
+ * `minimumTermUntil` the last day of the minimum term (the earliest permitted `endsOn`),
+ * `noticePeriodCount` with `noticePeriodUnit` the notice period.
+ * `unitPriceNetOverride` is a decimal string that replaces the net unit price
+ * of the price option; `null` means the option's price applies.
+ *
  * `attributes` are the type-specific fields according to the schema of the
  * subscription's `SubscriptionType`. Secret fields are delivered decrypted:
  * modules are trusted code and must never log them.
@@ -54,13 +62,29 @@ final readonly class SubscriptionData
         public ?bool $autorenew = null,
         public ?string $externalStatus = null,
         public array $attributes = [],
+        public ?string $intervalUnit = null,
+        public ?int $intervalCount = null,
+        public ?string $unitPriceNetOverride = null,
+        public ?string $minimumTermUntil = null,
+        public ?int $noticePeriodCount = null,
+        public ?string $noticePeriodUnit = null,
     ) {
         Validate::decimal($quantity, 'quantity');
         Validate::date($startsOn, 'startsOn');
 
-        foreach (['endsOn' => $endsOn, 'cancelledOn' => $cancelledOn, 'billedUntil' => $billedUntil, 'renewsOn' => $renewsOn] as $field => $date) {
+        foreach (['endsOn' => $endsOn, 'cancelledOn' => $cancelledOn, 'billedUntil' => $billedUntil, 'renewsOn' => $renewsOn, 'minimumTermUntil' => $minimumTermUntil] as $field => $date) {
             if ($date !== null) {
                 Validate::date($date, $field);
+            }
+        }
+
+        if ($unitPriceNetOverride !== null) {
+            Validate::decimal($unitPriceNetOverride, 'unitPriceNetOverride');
+        }
+
+        foreach (['intervalUnit' => $intervalUnit, 'noticePeriodUnit' => $noticePeriodUnit] as $field => $unit) {
+            if ($unit !== null && ! in_array($unit, ['day', 'week', 'month', 'year'], true)) {
+                throw new ContractException("{$field} must be 'day', 'week', 'month' or 'year', got \"{$unit}\".");
             }
         }
 
@@ -94,6 +118,12 @@ final readonly class SubscriptionData
             'autorenew' => $this->autorenew,
             'external_status' => $this->externalStatus,
             'attributes' => $this->attributes,
+            'interval_unit' => $this->intervalUnit,
+            'interval_count' => $this->intervalCount,
+            'unit_price_net_override' => $this->unitPriceNetOverride,
+            'minimum_term_until' => $this->minimumTermUntil,
+            'notice_period_count' => $this->noticePeriodCount,
+            'notice_period_unit' => $this->noticePeriodUnit,
         ];
     }
 }

@@ -63,7 +63,38 @@ it('converts to an array with snake_case keys and the status value', function ()
         'autorenew' => null,
         'external_status' => null,
         'attributes' => [],
+        'interval_unit' => null,
+        'interval_count' => null,
+        'unit_price_net_override' => null,
+        'minimum_term_until' => null,
+        'notice_period_count' => null,
+        'notice_period_unit' => null,
     ]);
+});
+
+it('carries the subscription terms and rejects malformed ones', function () {
+    $subscription = subscriptionData([
+        'intervalUnit' => 'month',
+        'intervalCount' => 3,
+        'unitPriceNetOverride' => '9.9000',
+        'minimumTermUntil' => '2026-12-31',
+        'noticePeriodCount' => 1,
+        'noticePeriodUnit' => 'month',
+    ]);
+
+    expect($subscription->toArray())->toMatchArray([
+        'interval_unit' => 'month',
+        'interval_count' => 3,
+        'unit_price_net_override' => '9.9000',
+        'minimum_term_until' => '2026-12-31',
+        'notice_period_count' => 1,
+        'notice_period_unit' => 'month',
+    ]);
+
+    expect(fn () => subscriptionData(['intervalUnit' => 'decade']))->toThrow(ContractException::class)
+        ->and(fn () => subscriptionData(['noticePeriodUnit' => 'hour']))->toThrow(ContractException::class)
+        ->and(fn () => subscriptionData(['unitPriceNetOverride' => 'abc']))->toThrow(ContractException::class)
+        ->and(fn () => subscriptionData(['minimumTermUntil' => '2026-13-01']))->toThrow(ContractException::class);
 });
 
 it('converts a cancelled, sourced subscription with attributes to an array', function () {
@@ -103,6 +134,12 @@ it('converts a cancelled, sourced subscription with attributes to an array', fun
         'autorenew' => false,
         'external_status' => 'active',
         'attributes' => ['auth_code' => 'secret'],
+        'interval_unit' => null,
+        'interval_count' => null,
+        'unit_price_net_override' => null,
+        'minimum_term_until' => null,
+        'notice_period_count' => null,
+        'notice_period_unit' => null,
     ]);
 });
 

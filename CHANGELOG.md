@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `SubscriptionSourceDefaults` trait — the counterpart of `Assets\AssetSource`.
 - Fakes `FakeSubscriptions`, `FakeSubscriptionSource` and
   `FakeSubscriptionType`.
+- Subscription terms on `SubscriptionData` (all optional, appended): the billing
+  period `intervalUnit`/`intervalCount`, `unitPriceNetOverride`,
+  `minimumTermUntil` and the notice period `noticePeriodCount`/
+  `noticePeriodUnit`.
 
 ## [1.9.0] - 2026-10-10
 
