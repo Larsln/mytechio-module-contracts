@@ -15,6 +15,8 @@ use MyTechIO\Contracts\ContractException;
  * capabilities. Actions for a capability the fake does not list throw a
  * `ContractException` like the trait defaults; supported actions are recorded
  * in `calls()` and answer with `actionState()` (default `"done"`).
+ *
+ * @deprecated Use {@see FakeSubscriptionSource}; the Assets namespace will be removed in a future major release.
  */
 final class FakeAssetSource implements AssetSource
 {

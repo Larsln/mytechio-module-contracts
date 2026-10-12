@@ -10,6 +10,8 @@ use MyTechIO\Contracts\ContractException;
 /**
  * Default implementations of the `AssetSource` actions: no capabilities, every
  * action throws. Sources `use` this trait and override what they support.
+ *
+ * @deprecated Use `Subscriptions\SubscriptionSourceDefaults`; the Assets namespace will be removed in a future major release.
  */
 trait AssetSourceDefaults
 {

@@ -35,6 +35,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `minimumTermUntil` and the notice period `noticePeriodCount`/
   `noticePeriodUnit`.
 
+### Deprecated
+
+- The `Assets` namespace (`AssetSource`, `AssetSourceDefaults`, `AssetType`,
+  `CustomerAssets` and their data classes) and its fakes `FakeAssetSource` and
+  `FakeCustomerAssets` are superseded by `Subscriptions` (`SubscriptionSource`,
+  `SubscriptionType`, `Subscriptions`) now that the customer-assets module is
+  retired. Nothing is removed in this release.
+
 ## [1.9.0] - 2026-10-10
 
 ### Added

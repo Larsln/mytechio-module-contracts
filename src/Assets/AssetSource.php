@@ -17,6 +17,8 @@ use MyTechIO\Contracts\Accounting\ActorRef;
  * are only called for keys listed in `capabilities()`. Sources that support no
  * actions `use AssetSourceDefaults`, whose implementations throw a
  * `ContractException`.
+ *
+ * @deprecated Use `Subscriptions\SubscriptionSource`; the Assets namespace is superseded by Subscriptions and will be removed in a future major release.
  */
 interface AssetSource
 {

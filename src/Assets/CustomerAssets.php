@@ -17,6 +17,8 @@ use MyTechIO\Contracts\Connectors\ConnectorStatus;
  * first, then sorted by `id`. `findBySource()` is the preferred lookup
  * for connector modules that want to find an asset by its external
  * identifier.
+ *
+ * @deprecated Use `Subscriptions\Subscriptions`; the Assets namespace is superseded by Subscriptions and will be removed in a future major release.
  */
 interface CustomerAssets
 {

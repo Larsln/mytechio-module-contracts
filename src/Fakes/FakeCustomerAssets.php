@@ -15,6 +15,8 @@ use MyTechIO\Contracts\Connectors\ConnectorStatus;
  * `seed()` lets tests specify the initial state, including already
  * occupied IDs. `findByLabel()` sorts active objects
  * (`status === 'active'`) first, just like the core implementation.
+ *
+ * @deprecated Use {@see FakeSubscriptions}; the Assets namespace will be removed in a future major release.
  */
 final class FakeCustomerAssets implements CustomerAssets
 {

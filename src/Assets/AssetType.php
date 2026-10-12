@@ -11,6 +11,8 @@ namespace MyTechIO\Contracts\Assets;
  * introduce their own types (e.g. `mailbox` in the future) — the list
  * here is not exhaustive, it documents the types currently maintained
  * by the core.
+ *
+ * @deprecated Subscription types are declared by `Subscriptions\SubscriptionType` plugins; the Assets namespace will be removed in a future major release.
  */
 final class AssetType
 {
