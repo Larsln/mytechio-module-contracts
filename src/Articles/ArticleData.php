@@ -18,7 +18,9 @@ use MyTechIO\Contracts\Invoices\Validate;
  * lines (e.g. `"Stk"`, `"Std"`), `unitName` its display name (e.g. `"Stück"`)
  * and `unitUneceCode` the UN/ECE Recommendation 20 code (e.g. `"H87"`,
  * `"HUR"`), or `null` when the unit has none. `stockTracked` tells whether the
- * core tracks the stock of the article.
+ * stock of the article is tracked: the value comes from the stock
+ * implementation (`Stock::level()`), so it is `false` while no module provides
+ * stock keeping — the core itself no longer stores such a flag.
  */
 final readonly class ArticleData
 {

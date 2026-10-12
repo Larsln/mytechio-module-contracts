@@ -54,7 +54,7 @@ final class FakeJournal implements Journal
         $id = (string) $this->nextEntryId++;
         $entryNumber = sprintf('F-%04d', (int) $id);
 
-        $ref = new JournalEntryRef($id, $entryNumber, $draft->bookedOn);
+        $ref = new JournalEntryRef($id, $entryNumber, $draft->bookedOn, $draft->sourceType, $draft->sourceId, $draft->documentReference);
 
         $this->draftsByEntryId[$id] = $draft;
         $this->posted[] = $ref;

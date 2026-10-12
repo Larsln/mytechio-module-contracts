@@ -52,6 +52,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   recording runs at `-100`), and `Documents\IncomingInvoiceArticleLinkHook` lets a
   guard book the receipt when a booked line is linked to an article afterwards.
 
+- `Accounting\JournalSourceResolver` (container tag `mytechio.journal_source_resolvers`):
+  a module explains the journal entries it posted — `sourceTypes()` (the
+  `JournalEntryDraft::$sourceType` values it answers for), `link()` (a
+  `JournalSourceLink` with label and core-relative URL, or null) and
+  `reversalHint()` (a German text forbids the manual reversal and names the
+  workflow to use). The core asks the resolvers of enabled modules after its own
+  cases. `Accounting\JournalEntryRef` gains the appended optional fields
+  `sourceType`, `sourceId` and `documentReference`, filled from the booking.
+  Fake `FakeJournalSourceResolver`; `FakeJournal` passes the source through.
+- `Articles\ArticleData::$stockTracked` is documented as coming from the stock
+  implementation: `false` while no module provides stock keeping.
+
 - `Units\Units` read contract (`all()`, `find()`, `default()`) with
   `UnitData` (code, name, English name, UN/ECE Rec. 20 code, default flag):
   modules show the core's units of measure and store the unit code, never

@@ -6,6 +6,10 @@ namespace MyTechIO\Contracts\Accounting;
 
 /**
  * Reference to a journal entry that has actually been posted.
+ *
+ * `sourceType`, `sourceId` and `documentReference` repeat what the booking
+ * carried (see `JournalEntryDraft`), so a `JournalSourceResolver` can link the
+ * entry back to the object that caused it.
  */
 final readonly class JournalEntryRef
 {
@@ -13,6 +17,9 @@ final readonly class JournalEntryRef
         public string $id,
         public string $entryNumber,
         public string $bookedOn,
+        public ?string $sourceType = null,
+        public ?string $sourceId = null,
+        public ?string $documentReference = null,
     ) {}
 
     /**
@@ -24,6 +31,9 @@ final readonly class JournalEntryRef
             'id' => $this->id,
             'entry_number' => $this->entryNumber,
             'booked_on' => $this->bookedOn,
+            'source_type' => $this->sourceType,
+            'source_id' => $this->sourceId,
+            'document_reference' => $this->documentReference,
         ];
     }
 }
