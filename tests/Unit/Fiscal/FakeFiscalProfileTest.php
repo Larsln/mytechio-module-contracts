@@ -82,6 +82,18 @@ it('maps account roles and reports unmapped ones', function () {
     $accounts->number(AccountRole::Transit);
 })->throws(AccountNotMappedException::class, 'Kein Konto gemappt für die Rolle „transit“.');
 
+it('answers a seeded account for one rate and scenario and the role default otherwise', function () {
+    $accounts = (new FakeFiscalProfile)->accounts()->seed(AccountRole::OutputVatDue, '3806', '19', 'de_domestic');
+
+    expect($accounts->number(AccountRole::OutputVatDue, '19', 'de_domestic'))->toBe('3806')
+        ->and($accounts->number(AccountRole::OutputVatDue, '7', 'de_domestic'))->toBe('1776')
+        ->and($accounts->has(AccountRole::OutputVatDue, '19', 'de_domestic'))->toBeTrue();
+
+    $accounts->unmap(AccountRole::OutputVatDue);
+
+    expect($accounts->has(AccountRole::OutputVatDue, '19', 'de_domestic'))->toBeFalse();
+});
+
 it('reports the scenario and rate of an unmapped role in the message', function () {
     $accounts = (new FakeFiscalProfile)->accounts()->unmap(AccountRole::InputVat);
 

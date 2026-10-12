@@ -36,7 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `ServiceType`. Fakes `FakeFiscalProfile` (country `XX`, two outgoing and two
   incoming scenarios, 10 % domestic VAT; `withUnsupportedExport()`),
   `FakeFiscalProfiles`, `FakeTaxRules`, `FakeAccountMap` and
-  `FakeChartOfAccounts`.
+  `FakeChartOfAccounts`; `FakeAccountMap::seed()` sets the account of a role for
+  one rate and scenario.
 - `Stock\Stock` contract for stock keeping (the core implements it until the
   stock module takes over), complete for its domain: reads `level()`, `levels()`,
   `lowStock()`, `movements()` with `StockMovementFilter` and `StockMovementPage`,

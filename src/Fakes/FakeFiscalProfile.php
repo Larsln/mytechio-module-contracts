@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MyTechIO\Contracts\Fakes;
 
-use MyTechIO\Contracts\Fiscal\AccountMap;
 use MyTechIO\Contracts\Fiscal\ChartOfAccounts;
 use MyTechIO\Contracts\Fiscal\ClosingProfile;
 use MyTechIO\Contracts\Fiscal\Exports;
@@ -109,7 +108,7 @@ final class FakeFiscalProfile implements FiscalProfile
         return $this->taxRules;
     }
 
-    public function accounts(): AccountMap
+    public function accounts(): FakeAccountMap
     {
         return $this->accounts;
     }

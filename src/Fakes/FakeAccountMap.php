@@ -12,8 +12,9 @@ use MyTechIO\Contracts\Fiscal\AccountRole;
 
 /**
  * Test double for `AccountMap` of `FakeFiscalProfile`: fixed account numbers per
- * role. VAT roles answer one account per role for every rate and scenario;
- * `unmap()` removes a role to test the not-mapped path.
+ * role. VAT roles answer one account per role for every rate and scenario unless
+ * `seed()` set an account for a specific rate and scenario; `unmap()` removes a
+ * role (with its seeded accounts) to test the not-mapped path.
  */
 final class FakeAccountMap implements AccountMap
 {
@@ -33,14 +34,21 @@ final class FakeAccountMap implements AccountMap
         'reverse_charge_vat' => '1787',
     ];
 
+    /**
+     * @var array<string, string>
+     */
+    private array $seeded = [];
+
     public function number(AccountRole $role, ?string $rateKey = null, ?string $scenario = null): string
     {
-        return $this->numbers[$role->value] ?? throw new AccountNotMappedException($role, $rateKey, $scenario);
+        return $this->seeded[$this->key($role, $rateKey, $scenario)]
+            ?? $this->numbers[$role->value]
+            ?? throw new AccountNotMappedException($role, $rateKey, $scenario);
     }
 
     public function has(AccountRole $role, ?string $rateKey = null, ?string $scenario = null): bool
     {
-        return isset($this->numbers[$role->value]);
+        return isset($this->seeded[$this->key($role, $rateKey, $scenario)]) || isset($this->numbers[$role->value]);
     }
 
     public function vatAccounts(): array
@@ -83,12 +91,33 @@ final class FakeAccountMap implements AccountMap
     }
 
     /**
-     * Removes a role from the map.
+     * Sets the account of a role for one rate key and scenario.
+     */
+    public function seed(AccountRole $role, string $number, ?string $rateKey = null, ?string $scenario = null): self
+    {
+        $this->seeded[$this->key($role, $rateKey, $scenario)] = $number;
+
+        return $this;
+    }
+
+    /**
+     * Removes a role, including its seeded accounts, from the map.
      */
     public function unmap(AccountRole $role): self
     {
         unset($this->numbers[$role->value]);
 
+        foreach (array_keys($this->seeded) as $key) {
+            if (str_starts_with($key, $role->value.'|')) {
+                unset($this->seeded[$key]);
+            }
+        }
+
         return $this;
+    }
+
+    private function key(AccountRole $role, ?string $rateKey, ?string $scenario): string
+    {
+        return sprintf('%s|%s|%s', $role->value, $rateKey ?? '', $scenario ?? '');
     }
 }
