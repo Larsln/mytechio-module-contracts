@@ -14,11 +14,11 @@ use MyTechIO\Contracts\Audit\MaintenanceLog;
 final class FakeMaintenanceLog implements MaintenanceLog
 {
     /**
-     * @var list<array{actor: ActorRef, action: string, subject_type: ?string, subject_id: int|string|null, context: array<string, mixed>}>
+     * @var list<array{actor: ActorRef, action: string, subject_type: ?string, subject_id: ?int, context: array<string, mixed>}>
      */
     private array $entries = [];
 
-    public function record(ActorRef $actor, string $action, ?string $subjectType = null, int|string|null $subjectId = null, array $context = []): void
+    public function record(ActorRef $actor, string $action, ?string $subjectType = null, ?int $subjectId = null, array $context = []): void
     {
         $this->entries[] = [
             'actor' => $actor,
@@ -30,7 +30,7 @@ final class FakeMaintenanceLog implements MaintenanceLog
     }
 
     /**
-     * @return list<array{actor: ActorRef, action: string, subject_type: ?string, subject_id: int|string|null, context: array<string, mixed>}>
+     * @return list<array{actor: ActorRef, action: string, subject_type: ?string, subject_id: ?int, context: array<string, mixed>}>
      */
     public function entries(): array
     {

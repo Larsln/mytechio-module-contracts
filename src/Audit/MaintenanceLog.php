@@ -22,5 +22,5 @@ interface MaintenanceLog
      * @param  string|null  $subjectType  What the action touched (the stored class name or a type key), null for none.
      * @param  array<string, mixed>  $context  JSON scalars and arrays only, no floats (money and quantities as strings).
      */
-    public function record(ActorRef $actor, string $action, ?string $subjectType = null, int|string|null $subjectId = null, array $context = []): void;
+    public function record(ActorRef $actor, string $action, ?string $subjectType = null, ?int $subjectId = null, array $context = []): void;
 }
