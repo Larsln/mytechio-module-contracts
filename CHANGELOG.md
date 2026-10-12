@@ -9,6 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `Fiscal\FiscalProfile` contract for everything country-specific about
+  bookkeeping and taxes, complete for scenarios, tax rules, accounts and chart:
+  `code()`, `name()`, `country()`, `currency()`, `scenarios()` / `scenario()` and
+  `incomingScenarios()` / `incomingScenario()` (the `TaxScenarioInfo` texts and
+  flags per scenario code: label, description, chip label, abbreviation,
+  invoice note, notes per reason, zero-rate note, editor warnings, export-proof
+  flag, `supported`), `taxRules()`, `accounts()`, `chart()` and the parts
+  `returns()`, `closing()`, `invoiceFormats()` and `exports()` (declared as
+  `ReturnsProfile`, `ClosingProfile`, `InvoiceFormats`, `Exports` that only name
+  their kinds for now). `Fiscal\TaxRules`: `regionOf()`, `decideScenario()`
+  (the place-of-supply rule table over `CustomerTaxContext` and `LineTaxContext`,
+  answering a `ScenarioDecision`), `describeCustomer()`, `rate()`, `ratesFor()`,
+  `revenueAccount()`, `expenseAccount()`, `restrictedExpenseAccounts()`,
+  `exclusiveExpenseAccounts()` and the seed data `taxCategories()`
+  (`TaxCategoryInfo`) and `taxRateTable()` (`TaxRateRow`). `Fiscal\AccountMap`:
+  `number()` per `AccountRole` (receivable, payable, discount, transit,
+  retained earnings, acquisition cost, output VAT due / not yet due, input VAT,
+  reverse-charge VAT) with rate key and scenario, `has()`, `vatAccounts()`,
+  `ranges()` / `range()` (`AccountRange` per `AccountRangeKind`) and
+  `coreAccounts()`; `AccountNotMappedException`. `Fiscal\ChartOfAccounts`:
+  `all()` (`ChartAccount`), `find()`, `autoBookingLinks()` and
+  `taxCategoryLinks()`. `Fiscal\FiscalProfiles` (container-bound registry):
+  `current()`, `find()`, `all()`; `UnknownFiscalProfileException`,
+  `UnknownScenarioException`. Enums `CustomerRegion`, `CustomerStatus`,
+  `ServiceType`. Fakes `FakeFiscalProfile` (country `XX`, two outgoing and two
+  incoming scenarios, 10 % domestic VAT; `withUnsupportedExport()`),
+  `FakeFiscalProfiles`, `FakeTaxRules`, `FakeAccountMap` and
+  `FakeChartOfAccounts`.
 - `Stock\Stock` contract for stock keeping (the core implements it until the
   stock module takes over), complete for its domain: reads `level()`, `levels()`,
   `lowStock()`, `movements()` with `StockMovementFilter` and `StockMovementPage`,
