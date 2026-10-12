@@ -9,8 +9,9 @@ use MyTechIO\Contracts\Invoices\Validate;
 /**
  * Cost of goods sold of one article in one month, from the cost snapshots on
  * the outgoing sales movements. `month` is `YYYY-MM`, `quantity` the units
- * sold (positive, net of reversals) and `cogs` their cost (base + incidental
- * share) with 4 decimal places.
+ * sold (positive) and `cogs` their cost (base + incidental share) with 4
+ * decimal places. Only the sales movements count: the counter-movement of a
+ * cancelled direct invoice is not netted against them.
  */
 final readonly class CogsRow
 {

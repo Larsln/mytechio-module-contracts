@@ -40,6 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `Articles\ArticleGuard` (container tag `mytechio.article_guards`): a module's
   veto over deleting an article (`beforeDelete()` with the `forced` flag of a user
   who may override protections) with `Articles\ArticleRef`. Fake `FakeArticleGuard`.
+- `Articles\ArticleOverview` and `Articles\ArticleDetailStats` document `cogs`,
+  `margin` (and `margin_percent`) as nullable: without a stock implementation the
+  core reports revenue only.
 - `Documents\IncomingInvoiceItemRef` gains the appended acquisition fields
   `receivedQuantity`, `unitCostBase`, `unitIncidentalCost` and `economicDate`
   (set for a line linked to a stock-tracked article): the core computes the unit
