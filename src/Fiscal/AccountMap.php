@@ -46,7 +46,7 @@ interface AccountMap
     public function ranges(): array;
 
     /**
-     * @throws AccountNotMappedException
+     * @throws AccountRangeNotMappedException when the organization has not set the block
      */
     public function range(AccountRangeKind $kind): AccountRange;
 

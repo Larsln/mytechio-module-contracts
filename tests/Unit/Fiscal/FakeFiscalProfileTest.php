@@ -7,6 +7,7 @@ use MyTechIO\Contracts\Fakes\FakeFiscalProfile;
 use MyTechIO\Contracts\Fakes\FakeFiscalProfiles;
 use MyTechIO\Contracts\Fiscal\AccountNotMappedException;
 use MyTechIO\Contracts\Fiscal\AccountRangeKind;
+use MyTechIO\Contracts\Fiscal\AccountRangeNotMappedException;
 use MyTechIO\Contracts\Fiscal\AccountRole;
 use MyTechIO\Contracts\Fiscal\CustomerRegion;
 use MyTechIO\Contracts\Fiscal\CustomerStatus;
@@ -103,7 +104,8 @@ it('reports the scenario and rate of an unmapped role in the message', function 
 it('serves the chart with its links', function () {
     $chart = (new FakeFiscalProfile)->chart();
 
-    expect(count($chart->all()))->toBe(4)
+    expect($chart->name())->toBe('Fake chart')
+        ->and(count($chart->all()))->toBe(4)
         ->and($chart->find('8000')?->name)->toBe('Domestic revenue')
         ->and($chart->find('9999'))->toBeNull()
         ->and($chart->autoBookingLinks()[1]->taxCategoryCode)->toBeNull()
@@ -150,3 +152,7 @@ it('fixes the registry to another profile and fails for an unknown one', functio
 
     $registry->fix('missing')->current();
 })->throws(UnknownFiscalProfileException::class, 'Das Steuerprofil „missing“ ist nicht verfügbar');
+
+it('names the kind of a block of account numbers that is not mapped', function () {
+    throw new AccountRangeNotMappedException(AccountRangeKind::BankLedger);
+})->throws(AccountRangeNotMappedException::class, 'Kein Kontenbereich festgelegt für „bank_ledger“.');

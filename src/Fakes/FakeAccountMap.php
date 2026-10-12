@@ -8,6 +8,7 @@ use MyTechIO\Contracts\Fiscal\AccountMap;
 use MyTechIO\Contracts\Fiscal\AccountNotMappedException;
 use MyTechIO\Contracts\Fiscal\AccountRange;
 use MyTechIO\Contracts\Fiscal\AccountRangeKind;
+use MyTechIO\Contracts\Fiscal\AccountRangeNotMappedException;
 use MyTechIO\Contracts\Fiscal\AccountRole;
 
 /**
@@ -83,7 +84,7 @@ final class FakeAccountMap implements AccountMap
             }
         }
 
-        throw new AccountNotMappedException(AccountRole::Receivable);
+        throw new AccountRangeNotMappedException($kind);
     }
 
     public function coreAccounts(): array

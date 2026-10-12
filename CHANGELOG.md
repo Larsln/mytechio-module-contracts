@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `Fiscal\ChartOfAccounts::roles()` and `ranges()`: the reference mapping and the reference account blocks of the chart. The core seeds them into the organization's own data at setup; every mapping the chart declares is mandatory for the organization.
 - `Fiscal\AutoBookingLink` may bind an expense account to an INCOMING scenario code (the account is then usable for that scenario only, the scenario proposes it, a set tax category fixes its rate). `FakeChartOfAccounts` serves one incoming link, the reference roles and ranges.
 
+- `Fiscal\ChartOfAccounts::name()`: the human label of the reference chart; `FakeChartOfAccounts` answers "Fake chart".
+- `Fiscal\AccountRangeNotMappedException` (kind): `AccountMap::range()` throws it for a block the organization has not set (instead of `AccountNotMappedException`, which carries a role).
+
 ### Changed
 
 - `Fiscal\AccountMap` is container-bound by the core: `app(AccountMap::class)` is the organization's mapping (seeded from the chart, maintained by the organization). `coreAccounts()` are the organization's protected (seeded) numbers; `number()` throws `AccountNotMappedException` for a role the organization has not mapped.

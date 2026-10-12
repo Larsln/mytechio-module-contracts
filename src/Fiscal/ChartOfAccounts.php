@@ -14,6 +14,12 @@ namespace MyTechIO\Contracts\Fiscal;
 interface ChartOfAccounts
 {
     /**
+     * Human label of this reference chart (for example the name of the chart
+     * standard), shown where the organization chooses to take it over.
+     */
+    public function name(): string;
+
+    /**
      * Every account of the chart; core accounts first-class (`isCore`), the
      * optional extended chart (not protected) after them.
      *

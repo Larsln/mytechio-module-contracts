@@ -22,6 +22,11 @@ use MyTechIO\Contracts\Fiscal\TaxCategoryLinkKind;
  */
 final class FakeChartOfAccounts implements ChartOfAccounts
 {
+    public function name(): string
+    {
+        return 'Fake chart';
+    }
+
     public function all(): array
     {
         return [
