@@ -27,6 +27,24 @@ it('converts to an array with the module extras', function () {
         'expense_account_number' => '0650',
         'article_id' => null,
         'extras' => ['fixed-assets' => ['kind' => 'depreciable', 'useful_life_years' => 3]],
+        'received_quantity' => null,
+        'unit_cost_base' => null,
+        'unit_incidental_cost' => null,
+        'economic_date' => null,
+    ]);
+});
+
+it('carries the acquisition figures of a purchased-goods line', function () {
+    $item = new IncomingInvoiceItemRef(
+        1, 9, 1, 'Cable', '1.000', '20.0000', '5400', 5, [],
+        receivedQuantity: '2.0000', unitCostBase: '10.0000', unitIncidentalCost: '0.5000', economicDate: '2026-02-01',
+    );
+
+    expect($item->toArray())->toMatchArray([
+        'received_quantity' => '2.0000',
+        'unit_cost_base' => '10.0000',
+        'unit_incidental_cost' => '0.5000',
+        'economic_date' => '2026-02-01',
     ]);
 });
 

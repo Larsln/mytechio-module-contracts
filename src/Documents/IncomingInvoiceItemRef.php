@@ -13,6 +13,15 @@ namespace MyTechIO\Contracts\Documents;
  * line is booked on. `extras` holds the line's module data keyed by module
  * name (`IncomingInvoiceItemExtension::key()`), e.g. the fixed-asset
  * classification under `extras['fixed-assets']`; the core stores it unchanged.
+ *
+ * The acquisition fields describe what the line contributes as purchased
+ * goods and are set for a line linked to a stock-tracked article with a
+ * positive quantity (all `null` otherwise): `receivedQuantity` is the number of
+ * units received (the line quantity unless the capture form named another
+ * number of units, e.g. "1 two-pack" = 2), `unitCostBase` the net goods price per
+ * unit, `unitIncidentalCost` the apportioned incidental acquisition cost per
+ * unit (`null` when the invoice has none) and `economicDate` the date of the
+ * receipt (`Y-m-d`: the service date, else the invoice date).
  */
 final readonly class IncomingInvoiceItemRef
 {
@@ -29,6 +38,10 @@ final readonly class IncomingInvoiceItemRef
         public ?string $expenseAccountNumber,
         public ?int $articleId,
         public array $extras = [],
+        public ?string $receivedQuantity = null,
+        public ?string $unitCostBase = null,
+        public ?string $unitIncidentalCost = null,
+        public ?string $economicDate = null,
     ) {}
 
     /**
@@ -46,6 +59,10 @@ final readonly class IncomingInvoiceItemRef
             'expense_account_number' => $this->expenseAccountNumber,
             'article_id' => $this->articleId,
             'extras' => $this->extras,
+            'received_quantity' => $this->receivedQuantity,
+            'unit_cost_base' => $this->unitCostBase,
+            'unit_incidental_cost' => $this->unitIncidentalCost,
+            'economic_date' => $this->economicDate,
         ];
     }
 }

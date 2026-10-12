@@ -9,6 +9,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `Stock\Stock` contract for stock keeping (the core implements it until the
+  stock module takes over), complete for its domain: reads `level()`, `levels()`,
+  `lowStock()`, `movements()` with `StockMovementFilter` and `StockMovementPage`,
+  `receipts()`, `vouchers()` with `StockVoucherFilter` and `StockVoucherPage`,
+  `findVoucher()` and `costOfGoodsSold()` (`CogsRow` per article and month);
+  writes `recordReceipt()`, `recordIssue()` (sale or customer return),
+  `reserve()`, `release()`, `writeOff()` and `inventoryCount()` (both on a
+  stock voucher), `reverseVoucher()` and `updateSettings()`. Data:
+  `StockLevel`, `StockMovementData`, `StockVoucherData`, `StockReference`,
+  `StockSettings`, `NewStockReceipt`, `NewStockIssue`, `NewWriteOff`,
+  `NewInventoryCount`, the enums `StockMovementType`, `StockVoucherType` and
+  `StockIssueType`; `StockArticleNotFoundException` and
+  `StockVoucherNotFoundException`. Quantities and amounts are strings, dates
+  ISO. Fake `FakeStock` (in-memory ledger with the core's rules and a recorded
+  event list).
+- `Orders\OrderHook` (container tag `mytechio.order_hooks`): a module's hook into
+  the order lifecycle, called synchronously inside the core's transaction —
+  `afterConfirmed()` (reserve), `afterCompleted()` (goods leave; returns a list of
+  `HookWarning`) and `afterCancelled()` with a `CancellationRef` that resolves the
+  outcome per line. New `Orders\OrderRef`, `Orders\OrderItemRef`,
+  `Orders\CancellationRef` and the shared `HookWarning`. Fake `FakeOrderHook`.
+- `Invoices\InvoiceHook` (container tag `mytechio.invoice_hooks`):
+  `afterFinalized()` (returns `HookWarning`s) and `afterCancelled()` for outgoing
+  invoices, also inside the core's transaction. `Invoices\InvoiceRef` gains the
+  appended optional fields `type`, `contactId`, `invoiceDate`, `deliveryDate`,
+  `orderId` (set on an invoice generated from an order), `cancelsInvoiceId` and
+  `items`; `Invoices\InvoiceItemRef` gains `position`, `articleId`, `quantity`,
+  `unit` and `netAmount`. Fake `FakeInvoiceHook`.
+- `Articles\ArticleGuard` (container tag `mytechio.article_guards`): a module's
+  veto over deleting an article (`beforeDelete()` with the `forced` flag of a user
+  who may override protections) with `Articles\ArticleRef`. Fake `FakeArticleGuard`.
+- `Documents\IncomingInvoiceItemRef` gains the appended acquisition fields
+  `receivedQuantity`, `unitCostBase`, `unitIncidentalCost` and `economicDate`
+  (set for a line linked to a stock-tracked article): the core computes the unit
+  cost including the apportioned incidental acquisition cost, a receiving module
+  books it. `Documents\PrioritizedGuard` lets an `IncomingInvoiceGuard` run before
+  or after others (ascending `priority()`, default `0`; the core's purchase-price
+  recording runs at `-100`), and `Documents\IncomingInvoiceArticleLinkHook` lets a
+  guard book the receipt when a booked line is linked to an article afterwards.
+
 - `Units\Units` read contract (`all()`, `find()`, `default()`) with
   `UnitData` (code, name, English name, UN/ECE Rec. 20 code, default flag):
   modules show the core's units of measure and store the unit code, never

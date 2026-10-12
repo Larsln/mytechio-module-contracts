@@ -21,5 +21,10 @@ it('allows a null invoice number for drafts', function () {
         'invoice_status' => 'draft',
         'description' => 'Domain example.com',
         'url' => '/invoices/12',
+        'position' => null,
+        'article_id' => null,
+        'quantity' => null,
+        'unit' => null,
+        'net_amount' => null,
     ]);
 });
