@@ -7,7 +7,13 @@ namespace MyTechIO\Contracts\Fiscal;
 /**
  * Maps the booking roles of the core (`AccountRole`) to ledger account
  * numbers, and names the account blocks and the protected core accounts of the
- * profile's chart.
+ * chart.
+ *
+ * The core binds this contract: `app(AccountMap::class)` is the
+ * organization's own mapping, seeded from the reference mapping of the fiscal
+ * profile's chart (`ChartOfAccounts::roles()`) and maintained by the
+ * organization afterwards. Modules ask the container-bound `AccountMap`, never
+ * `FiscalProfile::accounts()`.
  *
  * Rate keys are normalized decimal strings without trailing zeros (`19`, `7`,
  * `20.5`); a profile may answer a role for any rate with one account.
@@ -17,7 +23,7 @@ interface AccountMap
     /**
      * The account number for a role.
      *
-     * @throws AccountNotMappedException when the profile maps nothing for the role, rate and scenario
+     * @throws AccountNotMappedException when the organization maps nothing for the role, rate and scenario
      */
     public function number(AccountRole $role, ?string $rateKey = null, ?string $scenario = null): string;
 
@@ -45,7 +51,8 @@ interface AccountMap
     public function range(AccountRangeKind $kind): AccountRange;
 
     /**
-     * Numbers of the accounts the chart protects: they keep number and type forever.
+     * Numbers of the organization's protected accounts (the seeded ones): they
+     * keep number and type forever.
      *
      * @return list<string>
      */

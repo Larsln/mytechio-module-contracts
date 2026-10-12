@@ -65,6 +65,13 @@ interface FiscalProfile
 
     public function taxRules(): TaxRules;
 
+    /**
+     * The reference mapping of the profile.
+     *
+     * @deprecated since 1.11.0 The organization's mapping is the container-bound
+     *             `AccountMap` (`app(AccountMap::class)`); the profile only provides
+     *             the template through `ChartOfAccounts::roles()` and `ranges()`.
+     */
     public function accounts(): AccountMap;
 
     public function chart(): ChartOfAccounts;

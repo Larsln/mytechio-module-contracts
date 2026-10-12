@@ -5,12 +5,14 @@ declare(strict_types=1);
 use MyTechIO\Contracts\Articles\TaxClassification;
 use MyTechIO\Contracts\Fiscal\AccountRange;
 use MyTechIO\Contracts\Fiscal\AccountRangeKind;
+use MyTechIO\Contracts\Fiscal\AccountRole;
 use MyTechIO\Contracts\Fiscal\AutoBookingLink;
 use MyTechIO\Contracts\Fiscal\ChartAccount;
 use MyTechIO\Contracts\Fiscal\CustomerRegion;
 use MyTechIO\Contracts\Fiscal\CustomerStatus;
 use MyTechIO\Contracts\Fiscal\CustomerTaxContext;
 use MyTechIO\Contracts\Fiscal\LineTaxContext;
+use MyTechIO\Contracts\Fiscal\RoleMapping;
 use MyTechIO\Contracts\Fiscal\ScenarioDecision;
 use MyTechIO\Contracts\Fiscal\ServiceType;
 use MyTechIO\Contracts\Fiscal\TaxCategoryInfo;
@@ -61,4 +63,16 @@ it('converts the seed data DTOs to arrays', function () {
         ->and((new AutoBookingLink('4125', 'eu_b2b_igl'))->toArray())->toBe(['account_number' => '4125', 'scenario' => 'eu_b2b_igl', 'tax_category_code' => null])
         ->and((new TaxCategoryLink('standard', '4400', TaxCategoryLinkKind::CategoryRevenue))->toArray())->toBe(['tax_category_code' => 'standard', 'account_number' => '4400', 'kind' => 'category_revenue'])
         ->and((new AccountRange(AccountRangeKind::CashLedger, '1600', '1699'))->toArray())->toBe(['kind' => 'cash_ledger', 'from' => '1600', 'to' => '1699']);
+});
+
+it('identifies a role mapping by role, rate key and scenario', function () {
+    $mapping = new RoleMapping(AccountRole::InputVat, '19', 'ig_erwerb', '1404');
+    $wildcard = new RoleMapping(AccountRole::ReverseChargeVat, null, 'rc_13b', '3837');
+    $plain = new RoleMapping(AccountRole::Receivable, null, null, '1200');
+
+    expect($mapping->key())->toBe('input_vat|19|ig_erwerb')
+        ->and($wildcard->key())->toBe('reverse_charge_vat||rc_13b')
+        ->and($plain->key())->toBe('receivable||')
+        ->and($mapping->toArray())->toBe(['role' => 'input_vat', 'rate_key' => '19', 'scenario' => 'ig_erwerb', 'account_number' => '1404'])
+        ->and($plain->toArray())->toBe(['role' => 'receivable', 'rate_key' => null, 'scenario' => null, 'account_number' => '1200']);
 });

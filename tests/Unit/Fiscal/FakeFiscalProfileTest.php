@@ -103,11 +103,34 @@ it('reports the scenario and rate of an unmapped role in the message', function 
 it('serves the chart with its links', function () {
     $chart = (new FakeFiscalProfile)->chart();
 
-    expect(count($chart->all()))->toBe(3)
+    expect(count($chart->all()))->toBe(4)
         ->and($chart->find('8000')?->name)->toBe('Domestic revenue')
         ->and($chart->find('9999'))->toBeNull()
         ->and($chart->autoBookingLinks()[1]->taxCategoryCode)->toBeNull()
         ->and($chart->taxCategoryLinks()[0]->taxCategoryCode)->toBe('standard');
+});
+
+it('binds an expense account to an incoming scenario in the fake chart', function () {
+    $links = (new FakeFiscalProfile)->chart()->autoBookingLinks();
+
+    expect($links)->toHaveCount(3)
+        ->and($links[2]->scenario)->toBe('rc_13b')
+        ->and($links[2]->accountNumber)->toBe('4000')
+        ->and($links[2]->taxCategoryCode)->toBeNull();
+});
+
+it('serves the reference roles and ranges of the fake chart like the fake account map', function () {
+    $chart = (new FakeFiscalProfile)->chart();
+    $accounts = (new FakeFiscalProfile)->accounts();
+
+    expect($chart->roles())->toHaveCount(count(AccountRole::cases()));
+
+    foreach ($chart->roles() as $mapping) {
+        expect($mapping->accountNumber)->toBe($accounts->number($mapping->role));
+    }
+
+    expect(array_map(fn ($range) => $range->toArray(), $chart->ranges()))
+        ->toBe(array_map(fn ($range) => $range->toArray(), $accounts->ranges()));
 });
 
 it('resolves the current profile from the fake registry', function () {

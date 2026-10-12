@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `Fiscal\RoleMapping` (role, rate key, scenario, account number; `key()`, `toArray()`): one entry of the reference mapping of a chart.
+- `Fiscal\ChartOfAccounts::roles()` and `ranges()`: the reference mapping and the reference account blocks of the chart. The core seeds them into the organization's own data at setup; every mapping the chart declares is mandatory for the organization.
+- `Fiscal\AutoBookingLink` may bind an expense account to an INCOMING scenario code (the account is then usable for that scenario only, the scenario proposes it, a set tax category fixes its rate). `FakeChartOfAccounts` serves one incoming link, the reference roles and ranges.
+
+### Changed
+
+- `Fiscal\AccountMap` is container-bound by the core: `app(AccountMap::class)` is the organization's mapping (seeded from the chart, maintained by the organization). `coreAccounts()` are the organization's protected (seeded) numbers; `number()` throws `AccountNotMappedException` for a role the organization has not mapped.
+
+### Deprecated
+
+- `Fiscal\FiscalProfile::accounts()`: the reference mapping of the profile; ask the container-bound `AccountMap`. The method stays in the interface.
+- `Fiscal\TaxRules::restrictedExpenseAccounts()`, `exclusiveExpenseAccounts()` and `expenseAccount()`: the core ignores them, bindings on the accounts replace them. They stay in the interface.
+
 ## [1.10.0] - 2026-10-12
 
 ### Added
