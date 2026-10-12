@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-10-12
+
 ### Added
 
 - `Fiscal\RoleMapping` (role, rate key, scenario, account number; `key()`, `toArray()`): one entry of the reference mapping of a chart.
