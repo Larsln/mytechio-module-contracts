@@ -57,6 +57,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   schedule/plan/preview shapes; `FixedAssetNotFoundException`. Amounts are strings
   with 4 decimal places, dates ISO. Fake `FakeFixedAssets`.
 
+- `Accounting\NumberRanges` contract (implemented by the core) for the number
+  ranges: `list()`, `find()`, `preview()`, the gapless draw `next()` (call it
+  inside the transaction that stores the numbered document), the scheduled
+  format change `update()` with `NumberRangeSettings` and `discardScheduled()`;
+  data `NumberRangeData` and `NumberRangeVersion`, `NumberRangeNotFoundException`.
+  Fake `FakeNumberRanges`.
+- `Accounting\Accounts` contract for the chart of accounts: `find()`,
+  `findById()`, `list()` with `AccountFilter` (type, active, number range,
+  search, commonly used, custom) and `AccountPage`, `create()` with `NewAccount`,
+  `update()` with `AccountChanges`, `deactivate()` and `activate()`;
+  `AccountNotFoundException`. `AccountInfo` gains (appended, with defaults) `id`,
+  `isActive`, `isCore`, `nameLong`, `category`, `parentId`,
+  `defaultTaxCategoryId`, `taxScenario` and `isCommonlyUsed`. Fake `FakeAccounts`.
+- `Accounting\FiscalYears` contract for the fiscal-year calendar: `list()`,
+  `find()`, `current()`, `boundaries()`, `status()` (the year with its 13
+  periods and their locks), `isPeriodOpen()` and the year-end `close()`; data
+  `FiscalYearData`, `FiscalYearBoundaries`, `FiscalPeriodData`,
+  `FiscalYearStatusData`, `FiscalYearStatus`. Fake `FakeFiscalYears`.
+- `Documents\IncomingInvoiceItemExtension` (container tag
+  `mytechio.incoming_invoice_item_extensions`): a module's own data on an
+  incoming-invoice line, stored under the module name in the line's `extras`
+  (validated by `validate()`, reported by `afterItemsSynced()`, shown by
+  `annotate()`), drawn on the capture form through the slot
+  `incoming_invoice.item.editor`. `IncomingInvoiceItemRef` carries the line's
+  `extras`. Fake `FakeIncomingInvoiceItemExtension`.
+
 ### Deprecated
 
 - The `Assets` namespace (`AssetSource`, `AssetSourceDefaults`, `AssetType`,

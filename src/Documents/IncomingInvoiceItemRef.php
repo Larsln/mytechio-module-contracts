@@ -10,12 +10,15 @@ namespace MyTechIO\Contracts\Documents;
  * `quantity` is `null` for lines without a quantity; `netAmount` is the
  * line's net amount as a string with 4 decimal places (negative on
  * cancellation documents). `expenseAccountNumber` is the account number the
- * line is booked on. `assetKind` and `assetUsefulLifeYears` carry the
- * fixed-asset classification chosen on the capture form (`null` for ordinary
- * expense lines); the core stores them, the fixed-asset module acts on them.
+ * line is booked on. `extras` holds the line's module data keyed by module
+ * name (`IncomingInvoiceItemExtension::key()`), e.g. the fixed-asset
+ * classification under `extras['fixed-assets']`; the core stores it unchanged.
  */
 final readonly class IncomingInvoiceItemRef
 {
+    /**
+     * @param  array<string, mixed>  $extras
+     */
     public function __construct(
         public int $id,
         public int $incomingInvoiceId,
@@ -25,8 +28,7 @@ final readonly class IncomingInvoiceItemRef
         public string $netAmount,
         public ?string $expenseAccountNumber,
         public ?int $articleId,
-        public ?string $assetKind = null,
-        public ?int $assetUsefulLifeYears = null,
+        public array $extras = [],
     ) {}
 
     /**
@@ -43,8 +45,7 @@ final readonly class IncomingInvoiceItemRef
             'net_amount' => $this->netAmount,
             'expense_account_number' => $this->expenseAccountNumber,
             'article_id' => $this->articleId,
-            'asset_kind' => $this->assetKind,
-            'asset_useful_life_years' => $this->assetUsefulLifeYears,
+            'extras' => $this->extras,
         ];
     }
 }

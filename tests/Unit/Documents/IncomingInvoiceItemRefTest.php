@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use MyTechIO\Contracts\Documents\IncomingInvoiceItemRef;
 
-it('converts to an array with the fixed-asset classification', function () {
+it('converts to an array with the module extras', function () {
     $item = new IncomingInvoiceItemRef(
         id: 31,
         incomingInvoiceId: 9,
@@ -14,8 +14,7 @@ it('converts to an array with the fixed-asset classification', function () {
         netAmount: '2500.0000',
         expenseAccountNumber: '0650',
         articleId: null,
-        assetKind: 'depreciable',
-        assetUsefulLifeYears: 3,
+        extras: ['fixed-assets' => ['kind' => 'depreciable', 'useful_life_years' => 3]],
     );
 
     expect($item->toArray())->toBe([
@@ -27,15 +26,13 @@ it('converts to an array with the fixed-asset classification', function () {
         'net_amount' => '2500.0000',
         'expense_account_number' => '0650',
         'article_id' => null,
-        'asset_kind' => 'depreciable',
-        'asset_useful_life_years' => 3,
+        'extras' => ['fixed-assets' => ['kind' => 'depreciable', 'useful_life_years' => 3]],
     ]);
 });
 
-it('defaults to an ordinary expense line without an asset classification', function () {
+it('defaults to an ordinary expense line without extras', function () {
     $item = new IncomingInvoiceItemRef(1, 9, 1, 'Paper', null, '10.0000', null, 5);
 
-    expect($item->assetKind)->toBeNull()
-        ->and($item->assetUsefulLifeYears)->toBeNull()
+    expect($item->extras)->toBe([])
         ->and($item->toArray()['quantity'])->toBeNull();
 });
