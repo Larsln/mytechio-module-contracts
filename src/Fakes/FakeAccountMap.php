@@ -28,6 +28,7 @@ final class FakeAccountMap implements AccountMap
         'transit' => '1360',
         'retained_earnings' => '0860',
         'acquisition_cost' => '3800',
+        'goods_expense' => '3000',
         'output_vat_due' => '1776',
         'output_vat_not_yet_due' => '1775',
         'input_vat' => '1576',

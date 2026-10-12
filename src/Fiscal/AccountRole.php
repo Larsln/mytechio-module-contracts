@@ -30,6 +30,9 @@ enum AccountRole: string
     /** Account of the incidental acquisition costs of an incoming invoice. */
     case AcquisitionCost = 'acquisition_cost';
 
+    /** Default expense account of goods articles (the purchase of goods), preselected when an article is created. */
+    case GoodsExpense = 'goods_expense';
+
     /** Output VAT that is already due (accrual basis), by scenario and rate. */
     case OutputVatDue = 'output_vat_due';
 

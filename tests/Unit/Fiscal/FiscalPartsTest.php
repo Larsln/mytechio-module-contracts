@@ -126,3 +126,7 @@ it('maps the fake scenarios to invoice format categories and exemption reasons',
 it('offers no export kinds in the fake profile', function () {
     expect((new FakeFiscalProfile)->exports()->kinds())->toBe([]);
 });
+
+it('maps the goods expense role in the fake account map', function () {
+    expect((new FakeFiscalProfile)->accounts()->number(AccountRole::GoodsExpense))->toBe('3000');
+});

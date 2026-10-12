@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `exclusiveExpenseAccounts()` and the seed data `taxCategories()`
   (`TaxCategoryInfo`) and `taxRateTable()` (`TaxRateRow`). `Fiscal\AccountMap`:
   `number()` per `AccountRole` (receivable, payable, discount, transit,
-  retained earnings, acquisition cost, output VAT due / not yet due, input VAT,
+  retained earnings, acquisition cost, goods expense, output VAT due / not yet due, input VAT,
   reverse-charge VAT) with rate key and scenario, `has()`, `vatAccounts()`,
   `ranges()` / `range()` (`AccountRange` per `AccountRangeKind`) and
   `coreAccounts()`; `AccountNotMappedException`. `Fiscal\ChartOfAccounts`:
