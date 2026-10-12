@@ -210,7 +210,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `StatementSide`, `StatementPosition`, `AccountSpan`), `closingEntries()`
   (`ClosingRule`) and `fiscalYearRules()` (`FiscalYearRules`); `InvoiceFormats`
   — `formats()` (`DocumentFormatInfo`), `lineTaxCategory()`,
-  `breakdownTaxCategory()`, `exemptionReason()` (`ExemptionReason`),
+  `breakdownTaxCategory()`, `incomingScenario()`, `exemptionReason()` (`ExemptionReason`),
   `mandatoryFields()` and `rounding()` (`RoundingRule`); `Exports` — `kinds()`
   (`ExportKind`, none for the German profile until its DATEV export exists).
   Fakes `FakeReturnsProfile`, `FakeClosingProfile`, `FakeInvoiceFormats` and

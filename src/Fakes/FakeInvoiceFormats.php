@@ -31,6 +31,11 @@ final class FakeInvoiceFormats implements InvoiceFormats
         return $this->category($scenario, $rate);
     }
 
+    public function incomingScenario(array $taxCategories): string
+    {
+        return in_array('AE', $taxCategories, true) ? 'rc_13b' : 'de_domestic';
+    }
+
     public function exemptionReason(string $taxCategory): ?ExemptionReason
     {
         return $taxCategory === 'E' ? new ExemptionReason('Exempt export', 'FAKE-EXEMPT') : null;

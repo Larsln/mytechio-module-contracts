@@ -31,6 +31,16 @@ interface InvoiceFormats
     public function breakdownTaxCategory(string $scenario, string $rate, ?string $taxCategoryCode): string;
 
     /**
+     * The incoming tax scenario code of a received e-invoice, derived from the tax category codes of
+     * its lines and breakdown (the inverse of `lineTaxCategory()`): where the categories point to
+     * a reverse charge, an intra-Community acquisition, a domestic purchase or only untaxed
+     * turnover. The profile's domestic scenario answers for an empty list.
+     *
+     * @param  list<string>  $taxCategories
+     */
+    public function incomingScenario(array $taxCategories): string;
+
+    /**
      * The exemption reason an untaxed tax category must state, or null when it needs none.
      */
     public function exemptionReason(string $taxCategory): ?ExemptionReason;

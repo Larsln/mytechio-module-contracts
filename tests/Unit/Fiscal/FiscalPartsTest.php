@@ -115,6 +115,8 @@ it('maps the fake scenarios to invoice format categories and exemption reasons',
         ->and($formats->lineTaxCategory('de_domestic', '10.00', 'standard'))->toBe('S')
         ->and($formats->breakdownTaxCategory('de_domestic', '0.00', 'zero'))->toBe('Z')
         ->and($formats->lineTaxCategory('third_country_export', '0.00', null))->toBe('E')
+        ->and($formats->incomingScenario(['S', 'AE']))->toBe('rc_13b')
+        ->and($formats->incomingScenario([]))->toBe('de_domestic')
         ->and($formats->exemptionReason('E')?->toArray())->toBe(['text' => 'Exempt export', 'code' => 'FAKE-EXEMPT'])
         ->and($formats->exemptionReason('S'))->toBeNull()
         ->and($formats->mandatoryFields('pdf'))->toBe([])
