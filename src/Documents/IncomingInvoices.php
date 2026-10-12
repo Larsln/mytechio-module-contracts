@@ -27,4 +27,10 @@ interface IncomingInvoices
      * no incoming invoice exists with that ID.
      */
     public function find(int $id): ?IncomingInvoiceRef;
+
+    /**
+     * Returns one line item of an incoming invoice by its ID, or `null` if no
+     * such line exists.
+     */
+    public function findItem(int $itemId): ?IncomingInvoiceItemRef;
 }

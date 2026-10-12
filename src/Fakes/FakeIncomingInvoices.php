@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace MyTechIO\Contracts\Fakes;
 
+use MyTechIO\Contracts\Documents\IncomingInvoiceItemRef;
 use MyTechIO\Contracts\Documents\IncomingInvoiceRef;
 use MyTechIO\Contracts\Documents\IncomingInvoices;
 use MyTechIO\Contracts\Invoices\PaidDocument;
 
 /**
  * Test double for `IncomingInvoices`: `seed()` stores a document for
- * `find()`, `seedPaidDocument()` for `paidBetween()`.
+ * `find()` (its `items` also answer `findItem()`), `seedPaidDocument()` for
+ * `paidBetween()`.
  */
 final class FakeIncomingInvoices implements IncomingInvoices
 {
@@ -42,6 +44,19 @@ final class FakeIncomingInvoices implements IncomingInvoices
     public function find(int $id): ?IncomingInvoiceRef
     {
         return $this->refs[$id] ?? null;
+    }
+
+    public function findItem(int $itemId): ?IncomingInvoiceItemRef
+    {
+        foreach ($this->refs as $ref) {
+            foreach ($ref->items as $item) {
+                if ($item->id === $itemId) {
+                    return $item;
+                }
+            }
+        }
+
+        return null;
     }
 
     public function seed(IncomingInvoiceRef $ref): void

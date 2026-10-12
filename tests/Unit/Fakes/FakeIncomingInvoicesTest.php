@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use MyTechIO\Contracts\Documents\IncomingInvoiceItemRef;
 use MyTechIO\Contracts\Documents\IncomingInvoiceRef;
 use MyTechIO\Contracts\Fakes\FakeIncomingInvoices;
 use MyTechIO\Contracts\Invoices\PaidDocument;
@@ -32,4 +33,19 @@ it('returns paid documents within the range, sorted by paidOn', function () {
         ->and($result[0]->id)->toBe(1)
         ->and($result[1]->id)->toBe(2)
         ->and($result[0]->type)->toBe('incoming_invoice');
+});
+
+it('finds a line item of a seeded incoming invoice, or null when unknown', function () {
+    $invoices = new FakeIncomingInvoices;
+    $invoices->seed(new IncomingInvoiceRef(
+        id: 9,
+        number: 'ER-2026-0003',
+        status: 'booked',
+        contactId: 4,
+        url: '/incoming-invoices/9',
+        items: [new IncomingInvoiceItemRef(31, 9, 1, 'Workstation', '1.000', '2500.0000', '0650', null)],
+    ));
+
+    expect($invoices->findItem(31)?->description)->toBe('Workstation')
+        ->and($invoices->findItem(999))->toBeNull();
 });

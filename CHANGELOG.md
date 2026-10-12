@@ -34,6 +34,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   period `intervalUnit`/`intervalCount`, `unitPriceNetOverride`,
   `minimumTermUntil` and the notice period `noticePeriodCount`/
   `noticePeriodUnit`.
+- `Documents\IncomingInvoiceGuard` (container tag
+  `mytechio.incoming_invoice_guards`): a module's hook into the incoming-invoice
+  lifecycle — `beforeBook()` and `beforeCancel()` veto with a `ContractException`,
+  `afterBooked()` and `afterCancelled()` run inside the core's transaction,
+  `lockedItemIds()` names the lines the module owns (the core refuses expense
+  account changes and article links on them). Fake `FakeIncomingInvoiceGuard`.
+- `Documents\IncomingInvoiceItemRef` and appended optional fields on
+  `IncomingInvoiceRef` (`items`, `invoiceDate`, `serviceDate`, `supplierName`,
+  `cancelsIncomingInvoiceId`) so a guard sees the lines, dates and supplier of the
+  invoice; `IncomingInvoices::findItem()` returns one line (`FakeIncomingInvoices`
+  answers it from the seeded `items`).
+- `FixedAssets\FixedAssets` contract for the company's fixed-asset register (the
+  core implements it until the fixed-assets module takes over): reads `find()`,
+  `list()` with `FixedAssetFilter` (kind, status, year, account, search) and
+  `FixedAssetPage`, `forIncomingInvoice()`, `scheduleForYear()` (the Anlagespiegel
+  as `FixedAssetSchedule`), `depreciationPlan()` and `depreciationPreview()`;
+  writes `create()` (adds a booked incoming-invoice line to the inventory list),
+  `activate()`, `update()`, `runDepreciation()`, `dispose()` and `delete()`. Data:
+  `FixedAssetData`, `FixedAssetKind`, `FixedAssetStatus`, `NewFixedAsset`,
+  `FixedAssetUpdate`, `DepreciationEntryData`, `DepreciationRun` and the
+  schedule/plan/preview shapes; `FixedAssetNotFoundException`. Amounts are strings
+  with 4 decimal places, dates ISO. Fake `FakeFixedAssets`.
 
 ### Deprecated
 
