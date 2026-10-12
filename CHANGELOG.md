@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-10-12
+
 ### Added
 
 - `Fiscal\FiscalProfile` contract for everything country-specific about
