@@ -68,6 +68,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `Orders\Orders` read contract (`find()` returns the `OrderRef` with its lines)
   and the appended `OrderRef::$url`: a module resolves an order reference to its
   number, page and lines. Fake `FakeOrders`.
+- `Orders\Orders` is complete for the order domain: reads `findByNumber()`,
+  `list()` with `OrderFilter` (status, contact, order date range, search over
+  number/project title/contact name, open items) and `OrderPage`, `findItem()`;
+  writes `create()` (a standalone draft from `NewOrder`/`NewOrderItem`),
+  `createFromQuote()`, `update()` (a draft as a whole, `OrderChanges`),
+  `confirm()` (with the tax-review confirmation), `complete()` and `cancel()`
+  (`OrderCancellation`: mode, reason, outcome per line). Rule violations are
+  `ContractException`s with a German message, an unknown ID is an
+  `OrderNotFoundException`; the actions run through the core's order service, so
+  `OrderHook`s fire. The core fires `OrderUpdated`, `OrderConfirmed` and
+  `OrderCompleted` next to `OrderCreated` and `OrderCancelled`. `OrderRef`
+  gains the appended optional fields contact name, requested delivery date,
+  project title, texts, internal notes, all totals and the order discount, VAT
+  mode, tax scenario and calculation method, payment terms, skonto, bank account,
+  billing snapshot, invoice IDs, the cancellation (mode, reason, user, time),
+  creator, creation time and the hook `warnings` of `complete()`; `OrderItemRef`
+  gains the appended optional fields article number and price option, unit
+  price, discount, list price, tax category/rate/scenario/override/
+  classification, service type, tax and gross amount, revenue account,
+  delivered/returned/consumed quantities, per-line cancellation mode, group,
+  quote line and subscription. `FakeOrders` is an in-memory implementation of
+  the lifecycle (numbers, status rules, cancellation, recorded events and actors).
 - `Audit\MaintenanceLog` (`record()`): a module appends a superadmin break-glass
   action to the core's hash-chained maintenance log inside its own transaction.
   Fake `FakeMaintenanceLog`.
