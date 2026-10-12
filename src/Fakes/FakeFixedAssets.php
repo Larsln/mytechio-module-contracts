@@ -234,6 +234,10 @@ final class FakeFixedAssets implements FixedAssets
             throw new ContractException('„Nur Inventarliste“-Güter werden nicht aktiviert.');
         }
 
+        if ($asset->kind === FixedAssetKind::LowValue) {
+            throw new ContractException('Geringwertige Wirtschaftsgüter werden sofort abgeschrieben und nicht aktiviert.');
+        }
+
         if ($asset->isActivated) {
             throw new ContractException('Das Anlagegut ist bereits aktiviert.');
         }

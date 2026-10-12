@@ -174,6 +174,13 @@ it('activates an accounting asset once, on a 0xxx account', function () {
         ->and(fn () => $assets->activate(99, '0650', fakeActor()))->toThrow(FixedAssetNotFoundException::class);
 });
 
+it('never activates a low-value asset', function () {
+    $assets = new FakeFixedAssets;
+    $assets->seed(seededAsset(1, ['kind' => FixedAssetKind::LowValue, 'isActivated' => false, 'ledgerAccountNumber' => null, 'isJournalLinked' => false]));
+
+    $assets->activate(1, '0650', fakeActor());
+})->throws(ContractException::class, 'sofort abgeschrieben');
+
 it('rejects activating on a non asset account', function () {
     $assets = new FakeFixedAssets;
     $assets->seed(seededAsset(1, ['isActivated' => false, 'ledgerAccountNumber' => null, 'isJournalLinked' => false]));

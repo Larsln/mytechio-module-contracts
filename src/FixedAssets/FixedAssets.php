@@ -74,11 +74,12 @@ interface FixedAssets
      * Marks a not yet activated accounting asset as capitalized on a 0xxx
      * account. The capitalization posting itself is NOT made here — it is the
      * incoming invoice's booking; this call records that the cost sits on the
-     * account so that the depreciation run takes the asset over.
+     * account so that the depreciation run takes the asset over. Low-value
+     * assets are written off immediately and never activated.
      *
      * @throws FixedAssetNotFoundException
-     * @throws ContractException if the asset is disposed, has no accounting effect, is already activated, or the
-     *                           account is not an active 0xxx asset account.
+     * @throws ContractException if the asset is disposed, has no accounting effect, is a low-value asset, is
+     *                           already activated, or the account is not an active 0xxx asset account.
      */
     public function activate(int $id, string $ledgerAccountNumber, ActorRef $actor): FixedAssetData;
 
