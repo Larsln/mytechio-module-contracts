@@ -6,9 +6,9 @@ namespace MyTechIO\Contracts\Fiscal;
 
 /**
  * Everything country-specific about bookkeeping and taxes: the tax scenarios
- * with their texts, the tax rules, the account map and the chart of accounts
- * (plus, extended in later contract versions, returns, closing, document
- * formats and exports). The core ships the German profile (`de`); a module can
+ * with their texts, the tax rules, the account map and the chart of accounts,
+ * the returns, the closing, the electronic invoice formats and the exports.
+ * The core ships the German profile (`de`); a module can
  * bring another one by tagging its implementation `mytechio.fiscal_profiles`.
  *
  * The tenant chooses exactly one profile when it is set up and the choice is

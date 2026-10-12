@@ -120,45 +120,21 @@ final class FakeFiscalProfile implements FiscalProfile
 
     public function returns(): ReturnsProfile
     {
-        return new class implements ReturnsProfile
-        {
-            public function kinds(): array
-            {
-                return ['vat_return'];
-            }
-        };
+        return new FakeReturnsProfile;
     }
 
     public function closing(): ClosingProfile
     {
-        return new class implements ClosingProfile
-        {
-            public function statements(): array
-            {
-                return ['balance_sheet'];
-            }
-        };
+        return new FakeClosingProfile;
     }
 
     public function invoiceFormats(): InvoiceFormats
     {
-        return new class implements InvoiceFormats
-        {
-            public function formats(): array
-            {
-                return ['pdf'];
-            }
-        };
+        return new FakeInvoiceFormats;
     }
 
     public function exports(): Exports
     {
-        return new class implements Exports
-        {
-            public function formats(): array
-            {
-                return [];
-            }
-        };
+        return new FakeExports;
     }
 }

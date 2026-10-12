@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace MyTechIO\Contracts\Fiscal;
 
 /**
- * The hand-over exports of the profile (accountant formats). The first contract
- * version only names them; the details follow in a later version.
+ * The hand-over exports of the profile (accountant formats). A profile lists
+ * the kinds it can produce; the German profile lists none until its DATEV
+ * export exists.
  */
 interface Exports
 {
     /**
-     * Identifiers of the exports, e.g. `datev`.
-     *
-     * @return list<string>
+     * @return list<ExportKind>
      */
-    public function formats(): array;
+    public function kinds(): array;
 }

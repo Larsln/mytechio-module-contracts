@@ -17,8 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   invoice note, notes per reason, zero-rate note, editor warnings, export-proof
   flag, `supported`), `taxRules()`, `accounts()`, `chart()` and the parts
   `returns()`, `closing()`, `invoiceFormats()` and `exports()` (declared as
-  `ReturnsProfile`, `ClosingProfile`, `InvoiceFormats`, `Exports` that only name
-  their kinds for now). `Fiscal\TaxRules`: `regionOf()`, `decideScenario()`
+  `ReturnsProfile`, `ClosingProfile`, `InvoiceFormats`, `Exports`, see the fiscal
+  profile parts below). `Fiscal\TaxRules`: `regionOf()`, `decideScenario()`
   (the place-of-supply rule table over `CustomerTaxContext` and `LineTaxContext`,
   answering a `ScenarioDecision`), `describeCustomer()`, `rate()`, `ratesFor()`,
   `revenueAccount()`, `expenseAccount()`, `restrictedExpenseAccounts()`,
@@ -198,6 +198,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `annotate()`), drawn on the capture form through the slot
   `incoming_invoice.item.editor`. `IncomingInvoiceItemRef` carries the line's
   `extras`. Fake `FakeIncomingInvoiceItemExtension`.
+- Fiscal profile parts completed (replacing the first version that only named
+  their kinds): `ReturnsProfile` — `kinds()` (`ReturnKind`), `taxCodes()`
+  (`TaxCodeInfo`), `taxCodeFor()` (by `TaxCodePurpose`, scenario, rate key and
+  `VatBasis`), `isDebitPositive()`, `vatAdvanceLayout()` (`ReturnSection` ->
+  `ReturnBox` with `ReturnAmount`, `ReturnTerm`, `ReturnRateVariant`,
+  `ReturnBoxGrouping`, `ReturnTaxEffect`, `ReturnSide`), `vatAdvanceInfo()`
+  (`ReturnInfoLine`), `recapitulativeLayout()` (`RecapitulativeLayout`,
+  `RecapitulativeKind`) and `periodRules()` (`ReturnPeriodRules`,
+  `ReturnPeriod`); `ClosingProfile` — `statements()` (`StatementLayout`,
+  `StatementSide`, `StatementPosition`, `AccountSpan`), `closingEntries()`
+  (`ClosingRule`) and `fiscalYearRules()` (`FiscalYearRules`); `InvoiceFormats`
+  — `formats()` (`DocumentFormatInfo`), `lineTaxCategory()`,
+  `breakdownTaxCategory()`, `exemptionReason()` (`ExemptionReason`),
+  `mandatoryFields()` and `rounding()` (`RoundingRule`); `Exports` — `kinds()`
+  (`ExportKind`, none for the German profile until its DATEV export exists).
+  Fakes `FakeReturnsProfile`, `FakeClosingProfile`, `FakeInvoiceFormats` and
+  `FakeExports` back `FakeFiscalProfile`.
 
 ### Deprecated
 

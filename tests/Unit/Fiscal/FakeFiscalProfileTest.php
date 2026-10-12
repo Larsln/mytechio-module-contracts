@@ -25,10 +25,10 @@ it('describes a small synthetic profile with two scenarios', function () {
         ->and(array_map(fn ($scenario) => $scenario->code, $profile->incomingScenarios()))->toBe(['de_domestic', 'rc_13b'])
         ->and($profile->scenario('third_country_export')->exportProofRequired)->toBeTrue()
         ->and($profile->incomingScenario('rc_13b')->label)->toBe('Fake reverse charge')
-        ->and($profile->returns()->kinds())->toBe(['vat_return'])
-        ->and($profile->closing()->statements())->toBe(['balance_sheet'])
-        ->and($profile->invoiceFormats()->formats())->toBe(['pdf'])
-        ->and($profile->exports()->formats())->toBe([]);
+        ->and(array_map(fn ($kind) => $kind->code, $profile->returns()->kinds()))->toBe(['vat_advance'])
+        ->and(array_map(fn ($layout) => $layout->code, $profile->closing()->statements()))->toBe(['balance_sheet', 'profit_and_loss'])
+        ->and(array_map(fn ($format) => $format->code, $profile->invoiceFormats()->formats()))->toBe(['pdf'])
+        ->and($profile->exports()->kinds())->toBe([]);
 });
 
 it('throws for a scenario the profile does not define', function () {
