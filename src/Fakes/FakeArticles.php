@@ -30,6 +30,11 @@ final class FakeArticles implements Articles
         return $this->articles[$id] ?? null;
     }
 
+    public function findMany(array $ids): array
+    {
+        return array_intersect_key($this->articles, array_flip($ids));
+    }
+
     public function findByNumber(string $articleNumber): ?ArticleData
     {
         foreach ($this->articles as $article) {

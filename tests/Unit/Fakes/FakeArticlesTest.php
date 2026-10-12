@@ -65,3 +65,15 @@ it('skips inactive articles unless asked to include them', function () {
     expect($articles->search('kabel'))->toHaveCount(1)
         ->and($articles->search('kabel', includeInactive: true))->toHaveCount(2);
 });
+
+it('finds several seeded articles by id and leaves unknown ones out', function () {
+    $articles = new FakeArticles;
+    $articles->seed(makeArticle(1, 'A-1', 'Kabel'));
+    $articles->seed(makeArticle(2, 'A-2', 'Stecker'));
+
+    $found = $articles->findMany([2, 1, 99]);
+
+    expect(array_keys($found))->toBe([1, 2])
+        ->and($found[2]->name)->toBe('Stecker')
+        ->and($articles->findMany([]))->toBe([]);
+});

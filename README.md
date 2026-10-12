@@ -38,6 +38,8 @@ composer require mytechio/module-contracts
 | `Invoices` | `RecurringInvoices` | Recurring-invoice templates (Abo-Rechnungen); see section "Recurring invoices". |
 | `Contacts` | `Contacts` | Read-only contact access — modules do not create or modify contacts. |
 | `Accounting` | `Journal` | Debit must equal credit (enforced via `UnbalancedEntryException`); closed periods are rejected (`PeriodClosedException`). |
+| `Orders` | `Orders` | Read access to orders: `find()` returns the `OrderRef` (number, page URL, lines) for an order reference. Creating and changing orders stays with the core UI; modules join the lifecycle through `OrderHook`. |
+| `Audit` | `MaintenanceLog` | Appends a superadmin break-glass action to the core's hash-chained maintenance log (`record()`); reading and verifying stay with the core. |
 | `Accounting` | `JournalSourceResolver` | A module explains the journal entries it posted (`sourceTypes()`, `link()`, `reversalHint()`), container tag `mytechio.journal_source_resolvers`; the core asks it for the link on the journal pages and for the refusal text of a manual reversal. |
 | `Invoices` | `Invoices` | `createDraft()` always returns an invoice in draft status; defaults (bank account, payment terms, tax category) are filled in by the core. Finalization/sending/cancellation remain the responsibility of the core UI. `findItem()` returns the reference to an invoice item (including invoice number/status and core URL) by its ID, or `null`. `paidBetween()` returns all outgoing invoices paid within the period as `PaidDocument` (`type = "invoice"`), e.g. for the profit split. |
 | `Invoices` | `InvoiceItemExtension` | A module's extension of an invoice item (see section "Invoice item extensions"). |
@@ -305,6 +307,8 @@ $this->app->instance(CustomerAssets::class, new FakeCustomerAssets);
 - `FakeUnits` — `seed()` in picker order; seeding a second default clears the first one's flag.
 - `FakeJournal` — checks debit = credit exactly using integer arithmetic (no floats),
   `seedAccount()` for the chart of accounts.
+- `FakeOrders` — `seed(OrderRef)` for `find()`.
+- `FakeMaintenanceLog` — keeps the appended entries in `entries()`.
 - `FakeJournalSourceResolver` — answers for the configured source types (`/prefix/{sourceId}` links, configurable reversal hint), asked entries recorded in `linkCalls`/`reversalHintCalls`.
 - `FakeInvoices` — remembers drafts, always returns status `draft`; `seedItem()` for `findItem()`, `seedPaidDocument()` for `paidBetween()` (sorted, filtered by period).
 - `FakeModuleSettings` — `markFromEnvironment()` simulates ENV precedence.

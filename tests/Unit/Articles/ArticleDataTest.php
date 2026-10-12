@@ -61,8 +61,24 @@ it('converts to an array with snake_case keys and enum values', function () {
             'price_b2b_net' => '10.0000',
             'is_default' => true,
         ]],
+        'last_purchase_price_net' => null,
+        'tax_rate' => null,
     ]);
 });
+
+it('carries the last purchase price and the tax rate', function () {
+    $article = new ArticleData(1, 'A-1', 'Kabel', null, ArticleKind::Goods, TaxClassification::SupplyOfGoods, 'Stk', 'Stück', 'H87', '1', '1', true, true, 70, [oneOffOption(70, '1', '1')], '4.5000', '19');
+
+    expect($article->toArray()['last_purchase_price_net'])->toBe('4.5000')
+        ->and($article->toArray()['tax_rate'])->toBe('19');
+});
+
+it('rejects a malformed last purchase price or tax rate', function (string $field) {
+    $price = $field === 'price' ? '4,5' : null;
+    $rate = $field === 'rate' ? '19 %' : null;
+
+    new ArticleData(1, 'A-1', 'Kabel', null, ArticleKind::Goods, TaxClassification::SupplyOfGoods, 'Stk', 'Stück', 'H87', '1', '1', true, true, 70, [oneOffOption(70, '1', '1')], $price, $rate);
+})->with(['price', 'rate'])->throws(ContractException::class);
 
 it('accepts a missing description and integer or negative decimal prices', function () {
     $article = new ArticleData(1, 'A-1', 'Rabatt', null, ArticleKind::Service, TaxClassification::OtherService, 'Stk', 'Stück', 'H87', '0', '-5.5', false, true, 70, [oneOffOption(70, '0', '-5.5')]);

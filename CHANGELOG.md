@@ -61,6 +61,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   cases. `Accounting\JournalEntryRef` gains the appended optional fields
   `sourceType`, `sourceId` and `documentReference`, filled from the booking.
   Fake `FakeJournalSourceResolver`; `FakeJournal` passes the source through.
+- `Articles\ArticleData` gains the appended optional fields `lastPurchasePriceNet`
+  and `taxRate` (the German VAT rate of the article's tax category in percent),
+  and `Articles\Articles::findMany()` reads several articles by ID in one call —
+  what a stock module needs to value, list and book goods.
+- `Orders\Orders` read contract (`find()` returns the `OrderRef` with its lines)
+  and the appended `OrderRef::$url`: a module resolves an order reference to its
+  number, page and lines. Fake `FakeOrders`.
+- `Audit\MaintenanceLog` (`record()`): a module appends a superadmin break-glass
+  action to the core's hash-chained maintenance log inside its own transaction.
+  Fake `FakeMaintenanceLog`.
 - `Articles\ArticleData::$stockTracked` is documented as coming from the stock
   implementation: `false` while no module provides stock keeping.
 

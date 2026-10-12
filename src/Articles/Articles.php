@@ -21,6 +21,16 @@ interface Articles
     public function findByNumber(string $articleNumber): ?ArticleData;
 
     /**
+     * Several articles by ID in one call (active and inactive; deleted and
+     * unknown IDs are left out) — for lists that would otherwise ask `find()`
+     * once per row.
+     *
+     * @param  list<int>  $ids
+     * @return array<int, ArticleData> by article ID
+     */
+    public function findMany(array $ids): array;
+
+    /**
      * Matches at least article number and name (case-insensitive; the core
      * may match further fields such as the manufacturer) in an order defined
      * by the core. Inactive articles are only included with `$includeInactive`.

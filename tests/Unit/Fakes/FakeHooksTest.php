@@ -9,6 +9,7 @@ use MyTechIO\Contracts\ContractException;
 use MyTechIO\Contracts\Fakes\FakeArticleGuard;
 use MyTechIO\Contracts\Fakes\FakeInvoiceHook;
 use MyTechIO\Contracts\Fakes\FakeOrderHook;
+use MyTechIO\Contracts\Fakes\FakeOrders;
 use MyTechIO\Contracts\HookWarning;
 use MyTechIO\Contracts\Invoices\InvoiceHook;
 use MyTechIO\Contracts\Invoices\InvoiceRef;
@@ -16,6 +17,7 @@ use MyTechIO\Contracts\Orders\CancellationRef;
 use MyTechIO\Contracts\Orders\OrderHook;
 use MyTechIO\Contracts\Orders\OrderItemRef;
 use MyTechIO\Contracts\Orders\OrderRef;
+use MyTechIO\Contracts\Orders\Orders;
 
 it('records order hook calls and returns the configured warnings', function () {
     $hook = new FakeOrderHook;
@@ -66,4 +68,14 @@ it('vetoes article deletion unless a forced delete may override', function () {
     $guard->vetoDeletion('Gesperrt.');
 
     expect(fn () => $guard->beforeDelete($article, true))->toThrow(ContractException::class, 'Gesperrt');
+});
+
+it('resolves a seeded order by id', function () {
+    $orders = new FakeOrders;
+    $orders->seed(new OrderRef(4, 'AB-2026-00004', 'open', 8, '2026-02-01', null, [], '/orders/4'));
+
+    expect($orders)->toBeInstanceOf(Orders::class)
+        ->and($orders->find(4)?->number)->toBe('AB-2026-00004')
+        ->and($orders->find(4)?->toArray()['url'])->toBe('/orders/4')
+        ->and($orders->find(5))->toBeNull();
 });

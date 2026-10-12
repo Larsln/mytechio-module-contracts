@@ -21,6 +21,11 @@ use MyTechIO\Contracts\Invoices\Validate;
  * stock of the article is tracked: the value comes from the stock
  * implementation (`Stock::level()`), so it is `false` while no module provides
  * stock keeping — the core itself no longer stores such a flag.
+ * `lastPurchasePriceNet` is the article's last known net purchase price per
+ * unit (decimal string, `null` before the first purchase) and `taxRate` the
+ * German VAT rate of its tax category in percent without a percent sign
+ * (`"19"`, `"7"`, `"0"`; `null` when the category has none) — what a module
+ * needs to value and book goods that leave the stock.
  */
 final readonly class ArticleData
 {
@@ -43,9 +48,19 @@ final readonly class ArticleData
         public bool $isActive,
         public int $defaultPriceOptionId,
         public array $priceOptions,
+        public ?string $lastPurchasePriceNet = null,
+        public ?string $taxRate = null,
     ) {
         Validate::decimal($priceB2cNet, 'priceB2cNet');
         Validate::decimal($priceB2bNet, 'priceB2bNet');
+
+        if ($lastPurchasePriceNet !== null) {
+            Validate::decimal($lastPurchasePriceNet, 'lastPurchasePriceNet');
+        }
+
+        if ($taxRate !== null) {
+            Validate::decimal($taxRate, 'taxRate');
+        }
 
         $defaultIsListed = false;
 
@@ -86,6 +101,8 @@ final readonly class ArticleData
                 static fn (PriceOptionData $option): array => $option->toArray(),
                 $this->priceOptions,
             ),
+            'last_purchase_price_net' => $this->lastPurchasePriceNet,
+            'tax_rate' => $this->taxRate,
         ];
     }
 }

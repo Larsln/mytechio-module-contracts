@@ -9,7 +9,7 @@ namespace MyTechIO\Contracts\Orders;
  * number (`null` for a draft), `status` the core status value (`draft`,
  * `open`, `completed`, `cancelled`), `orderDate` is `Y-m-d`, `quoteId` names
  * the quote the order was created from. `items` are the lines in position
- * order.
+ * order and `url` is the core-relative path of the order's page.
  */
 final readonly class OrderRef
 {
@@ -24,6 +24,7 @@ final readonly class OrderRef
         public ?string $orderDate = null,
         public ?int $quoteId = null,
         public array $items = [],
+        public ?string $url = null,
     ) {}
 
     /**
@@ -39,6 +40,7 @@ final readonly class OrderRef
             'order_date' => $this->orderDate,
             'quote_id' => $this->quoteId,
             'items' => array_map(static fn (OrderItemRef $item): array => $item->toArray(), $this->items),
+            'url' => $this->url,
         ];
     }
 }
