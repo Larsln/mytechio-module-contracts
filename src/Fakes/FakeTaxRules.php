@@ -74,21 +74,6 @@ final class FakeTaxRules implements TaxRules
         return $scenario === 'third_country_export' ? '8100' : ($taxCategoryCode === 'zero' ? '8200' : '8000');
     }
 
-    public function expenseAccount(string $incomingScenario, string $taxCategoryCode): ?string
-    {
-        return $taxCategoryCode === 'standard' ? '4000' : null;
-    }
-
-    public function restrictedExpenseAccounts(): array
-    {
-        return [];
-    }
-
-    public function exclusiveExpenseAccounts(): array
-    {
-        return [];
-    }
-
     public function taxCategories(): array
     {
         return [

@@ -54,34 +54,6 @@ interface TaxRules
     public function revenueAccount(string $scenario, string $taxCategoryCode): string;
 
     /**
-     * Default expense account of an incoming scenario and tax category, or null
-     * when the profile names none.
-     *
-     * @deprecated since 1.11.0 The core ignores it; bindings on the accounts replace it.
-     */
-    public function expenseAccount(string $incomingScenario, string $taxCategoryCode): ?string;
-
-    /**
-     * Incoming scenarios restricted to exactly these expense accounts.
-     *
-     * @deprecated since 1.11.0 The core ignores it; the bindings on the accounts
-     *             (`ChartOfAccounts::autoBookingLinks()` with incoming scenarios) replace it.
-     *
-     * @return array<string, list<string>> incoming scenario code => account numbers
-     */
-    public function restrictedExpenseAccounts(): array;
-
-    /**
-     * Expense accounts reserved for one incoming scenario and blocked in every other.
-     *
-     * @deprecated since 1.11.0 The core ignores it; the bindings on the accounts
-     *             (`ChartOfAccounts::autoBookingLinks()` with incoming scenarios) replace it.
-     *
-     * @return array<string, list<string>> incoming scenario code => account numbers
-     */
-    public function exclusiveExpenseAccounts(): array;
-
-    /**
      * Seed data of the tax categories.
      *
      * @return list<TaxCategoryInfo>

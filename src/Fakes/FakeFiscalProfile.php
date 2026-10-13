@@ -108,6 +108,7 @@ final class FakeFiscalProfile implements FiscalProfile
         return $this->taxRules;
     }
 
+    /** The fake's account map, to seed the mapping a test binds as `AccountMap`. */
     public function accounts(): FakeAccountMap
     {
         return $this->accounts;

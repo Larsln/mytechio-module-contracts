@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [1.12.0] - 2026-10-13
+## [2.0.0] - 2026-10-13
 
 ### Added
 
@@ -17,6 +17,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `Ai\StructuredCompletion` (`completionKey()`, `label()`, `configured()`, `complete()`) and `Ai\StructuredCompletionException`: a text-in, JSON-out model call; container tag `mytechio.structured_completions`, exclusive capability `structured_completion`.
 - `Ai\StructuredCompletions` (`current()`, `available()`): the resolver the core binds in the container for the provider of the active `structured_completion` module; features ask it instead of the tag.
 - `Fakes\FakeFileStatementSource`, `Fakes\FakeFetchStatementSource` `Fakes\FakeStructuredCompletion` and `Fakes\FakeStructuredCompletions`.
+
+### Removed
+
+- `Invoices\RecurringInvoices`, `Invoices\RecurringInvoiceDraft`, `Invoices\RecurringInvoiceRef`, `Invoices\RecurringInvoiceSummary`, `Invoices\RecurringItemDraft`, `Invoices\RecurringItemSummary`, `Invoices\RecurringBillingStatus` and `Fakes\FakeRecurringInvoices`: the core removed the recurring-invoice templates. Use `Subscriptions\Subscriptions`.
+- The whole `Assets` namespace (`CustomerAssets`, `AssetSource`, `AssetSourceDefaults`, `AssetType`, `AssetSuggestion`, `AssetActionRef`, `AssetNotFoundException`, `CustomerAssetData`, `NewCustomerAsset`) and `Fakes\FakeCustomerAssets`, `Fakes\FakeAssetSource`: deprecated since 1.x in favour of `Subscriptions\*`.
+- `Fiscal\TaxRules::expenseAccount()`, `restrictedExpenseAccounts()` and `exclusiveExpenseAccounts()` and `Fiscal\FiscalProfile::accounts()`: deprecated since 1.11.0, the core ignored them. The organization's mapping is the container-bound `Fiscal\AccountMap`, the chart's template comes from `ChartOfAccounts::roles()` and `ranges()`. `FakeFiscalProfile::accounts()` stays as a fake-only accessor to seed the map a test binds.
+
+### Changed
+
+- `Contracts::VERSION` is `2.0.0`. Modules declare `core_api: ^2.0`. The version 1.12.0 was never published; its additions are part of 2.0.0.
 
 ## [1.11.0] - 2026-10-12
 
