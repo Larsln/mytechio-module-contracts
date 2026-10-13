@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-10-13
+
+### Added
+
+- `Banking\BankStatementSource` (`sourceKey()`, `label()`, `kind()`), `Banking\FileStatementSource` (`accepts()`, `detect()`, `parse()`) and `Banking\FetchStatementSource` (`fetch()`, `connectionStatus()`): origins of bank statements, container tag `mytechio.bank_statement_sources`.
+- `Banking\StatementContext`, `Banking\ParsedStatementSet`, `Banking\ParsedStatement` and `Banking\ParsedTransaction` (including `creditorId`, `creditorReference`, `balanceAfter`, `raw` and `batchChildren`): the statement DTOs, amounts as signed four-decimal strings, dates as `YYYY-MM-DD`, each with `toArray()`/`fromArray()`.
+- `Banking\StatementParseException`: a source or a DTO rejects its input.
+- `Ai\StructuredCompletion` (`completionKey()`, `label()`, `configured()`, `complete()`) and `Ai\StructuredCompletionException`: a text-in, JSON-out model call; container tag `mytechio.structured_completions`, exclusive capability `structured_completion`.
+- `Ai\StructuredCompletions` (`current()`, `available()`): the resolver the core binds in the container for the provider of the active `structured_completion` module; features ask it instead of the tag.
+- `Fakes\FakeFileStatementSource`, `Fakes\FakeFetchStatementSource` `Fakes\FakeStructuredCompletion` and `Fakes\FakeStructuredCompletions`.
+
 ## [1.11.0] - 2026-10-12
 
 ### Added
