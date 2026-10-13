@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-10-13
+
 ### Added
 
 - `Banking\BankStatementSource` (`sourceKey()`, `label()`, `kind()`), `Banking\FileStatementSource` (`accepts()`, `detect()`, `parse()`) and `Banking\FetchStatementSource` (`fetch()`, `connectionStatus()`): origins of bank statements, container tag `mytechio.bank_statement_sources`.
