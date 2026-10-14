@@ -26,6 +26,10 @@ use MyTechIO\Contracts\Invoices\Validate;
  * German VAT rate of its tax category in percent without a percent sign
  * (`"19"`, `"7"`, `"0"`; `null` when the category has none) — what a module
  * needs to value and book goods that leave the stock.
+ * `manufacturer` is the manufacturer's name, `manufacturerLabel` the
+ * manufacturer's own designation of the article ("Bezeichnung des Herstellers"),
+ * `productGroupId` and `productGroupName` the product group the article is filed
+ * under; each is `null` when not maintained.
  */
 final readonly class ArticleData
 {
@@ -50,6 +54,10 @@ final readonly class ArticleData
         public array $priceOptions,
         public ?string $lastPurchasePriceNet = null,
         public ?string $taxRate = null,
+        public ?string $manufacturer = null,
+        public ?string $manufacturerLabel = null,
+        public ?int $productGroupId = null,
+        public ?string $productGroupName = null,
     ) {
         Validate::decimal($priceB2cNet, 'priceB2cNet');
         Validate::decimal($priceB2bNet, 'priceB2bNet');
@@ -103,6 +111,10 @@ final readonly class ArticleData
             ),
             'last_purchase_price_net' => $this->lastPurchasePriceNet,
             'tax_rate' => $this->taxRate,
+            'manufacturer' => $this->manufacturer,
+            'manufacturer_label' => $this->manufacturerLabel,
+            'product_group_id' => $this->productGroupId,
+            'product_group_name' => $this->productGroupName,
         ];
     }
 }

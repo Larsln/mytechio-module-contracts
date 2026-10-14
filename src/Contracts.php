@@ -14,5 +14,5 @@ namespace MyTechIO\Contracts;
  */
 final class Contracts
 {
-    public const string VERSION = '2.0.0';
+    public const string VERSION = '2.1.0';
 }

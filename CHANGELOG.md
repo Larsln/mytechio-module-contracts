@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-10-14
+
+### Added
+
+- `Articles\ArticleData::$manufacturer`, `$manufacturerLabel` (the manufacturer's designation of the article), `$productGroupId` and `$productGroupName`: nullable, defaulting to `null`, also in `toArray()` (`manufacturer`, `manufacturer_label`, `product_group_id`, `product_group_name`).
+
 ## [2.0.0] - 2026-10-13
 
 ### Added

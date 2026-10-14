@@ -5,5 +5,5 @@ declare(strict_types=1);
 use MyTechIO\Contracts\Contracts;
 
 it('exposes the package version', function () {
-    expect(Contracts::VERSION)->toBe('2.0.0');
+    expect(Contracts::VERSION)->toBe('2.1.0');
 });

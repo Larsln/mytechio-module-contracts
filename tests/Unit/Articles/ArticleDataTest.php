@@ -63,6 +63,21 @@ it('converts to an array with snake_case keys and enum values', function () {
         ]],
         'last_purchase_price_net' => null,
         'tax_rate' => null,
+        'manufacturer' => null,
+        'manufacturer_label' => null,
+        'product_group_id' => null,
+        'product_group_name' => null,
+    ]);
+});
+
+it('carries manufacturer, manufacturer label and product group', function () {
+    $article = new ArticleData(1, 'A-1', 'Kabel', null, ArticleKind::Goods, TaxClassification::SupplyOfGoods, 'Stk', 'Stück', 'H87', '1', '1', true, true, 70, [oneOffOption(70, '1', '1')], null, null, 'Acme', 'AC-100', 5, 'Kabel');
+
+    expect($article->toArray())->toMatchArray([
+        'manufacturer' => 'Acme',
+        'manufacturer_label' => 'AC-100',
+        'product_group_id' => 5,
+        'product_group_name' => 'Kabel',
     ]);
 });
 
