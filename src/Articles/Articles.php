@@ -38,4 +38,13 @@ interface Articles
      * @return list<ArticleData>
      */
     public function search(string $query, int $limit = 20, bool $includeInactive = false): array;
+
+    /**
+     * The complete catalog ordered by name (then ID), for client-side pickers
+     * that filter locally instead of asking `search()` per keystroke. Inactive
+     * articles are only included with `$includeInactive`.
+     *
+     * @return list<ArticleData>
+     */
+    public function all(bool $includeInactive = false): array;
 }

@@ -59,4 +59,17 @@ final class FakeArticles implements Articles
 
         return array_slice($matches, 0, $limit);
     }
+
+    /** All seeded articles ordered by name, then ID. */
+    public function all(bool $includeInactive = false): array
+    {
+        $articles = array_values(array_filter(
+            $this->articles,
+            static fn (ArticleData $article): bool => $includeInactive || $article->isActive,
+        ));
+
+        usort($articles, static fn (ArticleData $a, ArticleData $b): int => [mb_strtolower($a->name), $a->id] <=> [mb_strtolower($b->name), $b->id]);
+
+        return $articles;
+    }
 }

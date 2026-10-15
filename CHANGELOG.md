@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 
 - `Articles\ArticleData::$manufacturer`, `$manufacturerLabel` (the manufacturer's designation of the article), `$productGroupId` and `$productGroupName`: nullable, defaulting to `null`, also in `toArray()` (`manufacturer`, `manufacturer_label`, `product_group_id`, `product_group_name`).
+- `Articles\Articles::all(bool $includeInactive = false)` (and `Fakes\FakeArticles::all()`): the complete catalog ordered by name, for client-side pickers.
 
 ## [2.0.0] - 2026-10-13
 
