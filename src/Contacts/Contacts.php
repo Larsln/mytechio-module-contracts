@@ -21,6 +21,15 @@ interface Contacts
     public function search(string $query, int $limit = 20): array;
 
     /**
+     * All active contacts on the supplier side (`direction` `supplier` or
+     * `both`), ordered by display name — for client-side pickers that
+     * filter the whole list themselves.
+     *
+     * @return list<ContactData>
+     */
+    public function suppliers(): array;
+
+    /**
      * @return array<string, string> ISO-2 ⇒ country name (German)
      */
     public function countries(): array;

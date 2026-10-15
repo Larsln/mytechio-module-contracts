@@ -11,7 +11,8 @@ use MyTechIO\Contracts\Contacts\Contacts;
  * Test double for `Contacts`: in-memory store, `seed()` sets the
  * initial state. `search()` filters simply by substring
  * (case-insensitive) over `displayName` — sufficient for module tests,
- * no relevance ranking like in the core.
+ * no relevance ranking like in the core. `suppliers()` returns the seeded
+ * contacts with direction `supplier`/`both`, ordered by display name.
  */
 final class FakeContacts implements Contacts
 {
@@ -49,6 +50,18 @@ final class FakeContacts implements Contacts
         ));
 
         return array_slice($matches, 0, $limit);
+    }
+
+    public function suppliers(): array
+    {
+        $suppliers = array_values(array_filter(
+            $this->contacts,
+            static fn (ContactData $contact): bool => in_array($contact->direction, ['supplier', 'both'], true),
+        ));
+
+        usort($suppliers, static fn (ContactData $a, ContactData $b): int => strcmp(mb_strtolower($a->displayName), mb_strtolower($b->displayName)));
+
+        return $suppliers;
     }
 
     public function countries(): array
