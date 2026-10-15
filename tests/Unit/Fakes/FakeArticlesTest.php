@@ -77,3 +77,14 @@ it('finds several seeded articles by id and leaves unknown ones out', function (
         ->and($found[2]->name)->toBe('Stecker')
         ->and($articles->findMany([]))->toBe([]);
 });
+
+it('lists the whole catalog ordered by name, active only unless asked otherwise', function () {
+    $articles = new FakeArticles;
+    $articles->seed(makeArticle(1, 'A-1', 'Stecker'));
+    $articles->seed(makeArticle(2, 'A-2', 'kabel'));
+    $articles->seed(makeArticle(3, 'A-3', 'Altgerät', isActive: false));
+
+    expect(array_map(fn (ArticleData $a) => $a->id, $articles->all()))->toBe([2, 1])
+        ->and(array_map(fn (ArticleData $a) => $a->id, $articles->all(includeInactive: true)))->toBe([3, 2, 1])
+        ->and((new FakeArticles)->all())->toBe([]);
+});
