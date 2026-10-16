@@ -138,6 +138,11 @@ final class FakeSubscriptions implements Subscriptions
         return $this->replace($this->get($id), ['source' => $source, 'externalId' => $externalId]);
     }
 
+    public function detachSource(int $id): SubscriptionData
+    {
+        return $this->replace($this->get($id), ['source' => null, 'externalId' => null]);
+    }
+
     public function updateFromSource(int $id, ConnectorStatus $status): SubscriptionData
     {
         $current = $this->get($id);

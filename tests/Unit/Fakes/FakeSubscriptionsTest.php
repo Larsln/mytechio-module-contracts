@@ -233,3 +233,20 @@ it('throws ContractException when cancelling an ended subscription and records n
 
     $this->fail('Expected a ContractException.');
 });
+
+it('detaches the source again and is a no-op without one', function () {
+    $subscriptions = new FakeSubscriptions;
+    $subscriptions->seed(seededSubscription(1, ['source' => 'domainrobot', 'externalId' => 'example.de']));
+    $subscriptions->seed(seededSubscription(2));
+
+    $detached = $subscriptions->detachSource(1);
+
+    expect($detached->source)->toBeNull()
+        ->and($detached->externalId)->toBeNull()
+        ->and($subscriptions->find(1)->source)->toBeNull()
+        ->and($subscriptions->detachSource(2)->source)->toBeNull();
+});
+
+it('throws SubscriptionNotFoundException when detaching the source of an unknown id', function () {
+    (new FakeSubscriptions)->detachSource(999);
+})->throws(SubscriptionNotFoundException::class);
