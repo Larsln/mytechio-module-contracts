@@ -11,6 +11,11 @@ namespace MyTechIO\Contracts\Subscriptions;
  */
 trait SubscriptionTypeDefaults
 {
+    public function singleObject(): bool
+    {
+        return false;
+    }
+
     public function inputComponent(): ?string
     {
         return null;

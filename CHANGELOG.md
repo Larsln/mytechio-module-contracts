@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `SubscriptionType::singleObject()`: a type declares that a subscription stands for exactly one object (quantity fixed to 1); `SubscriptionTypeDefaults` returns false (`Fakes\FakeSubscriptionType` takes it as an optional last constructor argument).
+
 ## [2.2.0] - 2026-10-16
 
 ### Added

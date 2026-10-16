@@ -18,7 +18,12 @@ it('has sensible defaults', function () {
         ->and($type->fields())->toBe([])
         ->and($type->schemaVersion())->toBe(1)
         ->and($type->inputComponent())->toBeNull()
+        ->and($type->singleObject())->toBeFalse()
         ->and($type->calls())->toBe([]);
+});
+
+it('can be configured as a single-object type', function () {
+    expect((new FakeSubscriptionType(singleObject: true))->singleObject())->toBeTrue();
 });
 
 it('exposes the configured key, label, fields, schema version and input component', function () {

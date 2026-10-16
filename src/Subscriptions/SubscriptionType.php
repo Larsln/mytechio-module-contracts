@@ -42,6 +42,14 @@ interface SubscriptionType
     public function fields(): array;
 
     /**
+     * Whether a subscription of this type stands for exactly one object (a
+     * domain, a server): the quantity is then always 1 and the core neither
+     * offers nor accepts another one. Types whose quantity multiplies the
+     * price (licence seats, hours) return false.
+     */
+    public function singleObject(): bool;
+
+    /**
      * Optional frontend component of the module that replaces the generated
      * form.
      */

@@ -10,7 +10,7 @@ use MyTechIO\Contracts\Subscriptions\SubscriptionType;
 
 /**
  * Test double for `SubscriptionType`: configurable key, label, field schema,
- * schema version and input component. Every hook call is recorded in
+ * schema version, input component and single-object flag. Every hook call is recorded in
  * `calls()` with the hook name and the ID of the subscription.
  */
 final class FakeSubscriptionType implements SubscriptionType
@@ -29,6 +29,7 @@ final class FakeSubscriptionType implements SubscriptionType
         private readonly array $fields = [],
         private readonly int $schemaVersion = 1,
         private readonly ?string $inputComponent = null,
+        private readonly bool $singleObject = false,
     ) {}
 
     public function key(): string
@@ -49,6 +50,11 @@ final class FakeSubscriptionType implements SubscriptionType
     public function fields(): array
     {
         return $this->fields;
+    }
+
+    public function singleObject(): bool
+    {
+        return $this->singleObject;
     }
 
     public function inputComponent(): ?string

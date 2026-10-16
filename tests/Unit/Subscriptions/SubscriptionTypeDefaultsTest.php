@@ -38,5 +38,6 @@ it('gives types no input component and no-op hooks through the trait', function 
     $type->cancelled($subscription);
     $type->ended($subscription);
 
-    expect($type->inputComponent())->toBeNull();
+    expect($type->inputComponent())->toBeNull()
+        ->and($type->singleObject())->toBeFalse();
 });
