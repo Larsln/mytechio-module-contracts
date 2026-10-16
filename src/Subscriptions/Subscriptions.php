@@ -59,6 +59,14 @@ interface Subscriptions
     public function attachSource(int $id, string $source, string $externalId): SubscriptionData;
 
     /**
+     * Clears `source` and `externalId` of the subscription again, e.g. when a
+     * connector module unlinks an object; a no-op when it has no source.
+     *
+     * @throws SubscriptionNotFoundException if `$id` is unknown.
+     */
+    public function detachSource(int $id): SubscriptionData;
+
+    /**
      * Applies a connector's report to the subscription: `renewsAt` becomes
      * `renewsOn` (date part), `autorenew` is taken over, `status` becomes
      * `externalStatus`, and `attributes` are merged with the existing ones,

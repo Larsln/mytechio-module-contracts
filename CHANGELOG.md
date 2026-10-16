@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `Subscriptions\Subscriptions::detachSource(int $id)` (and `Fakes\FakeSubscriptions::detachSource()`): clears `source` and `externalId` of a subscription again; a no-op without a source.
 - `Contacts\Contacts::suppliers()` (and `Fakes\FakeContacts::suppliers()`): all active contacts with direction `supplier` or `both`, ordered by display name, for client-side pickers.
 
 ## [2.1.0] - 2026-10-14
