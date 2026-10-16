@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-10-16
+
 ### Added
 
 - `Subscriptions\Subscriptions::detachSource(int $id)` (and `Fakes\FakeSubscriptions::detachSource()`): clears `source` and `externalId` of a subscription again; a no-op without a source.
