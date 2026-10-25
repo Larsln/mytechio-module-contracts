@@ -33,6 +33,7 @@ composer require mytechio/module-contracts
 | `Subscriptions` | `SubscriptionType` | Subscription type provided by a plugin module (field schema plus lifecycle hooks), container tag `mytechio.subscription_types`; see section "Subscriptions". |
 | `Subscriptions` | `SubscriptionSource` | Subscription suggestions and actions of an external source (e.g. a registrar), container tag `mytechio.subscription_sources`; see section "Subscriptions". |
 | `Contacts` | `Contacts` | Read-only contact access — modules do not create or modify contacts. |
+| `SepaMandates` | `Contacts\SepaMandates` | Read, create and revoke SEPA mandates of contacts (provider modules). |
 | `Accounting` | `Journal` | Debit must equal credit (enforced via `UnbalancedEntryException`); closed periods are rejected (`PeriodClosedException`). |
 | `Orders` | `Orders` | Read access to orders: `find()` returns the `OrderRef` (number, page URL, lines) for an order reference. Creating and changing orders stays with the core UI; modules join the lifecycle through `OrderHook`. |
 | `Audit` | `MaintenanceLog` | Appends a superadmin break-glass action to the core's hash-chained maintenance log (`record()`); reading and verifying stay with the core. |
@@ -269,6 +270,7 @@ $this->app->instance(Subscriptions::class, new FakeSubscriptions);
 - `FakeDocumentStore` — returns deterministic paths/hashes, `stored()` for assertions.
 - `FakeMailOutbox` — `sent()`/`sentTo(email)` with no PHPUnit dependency.
 - `FakeContacts` — `seed()`, `setCountries()`.
+- `FakeSepaMandates` — `created()`, `revocations()`.
 - `FakeArticles` — `seed()`; `search()` filters by case-insensitive substring over article number and name in insertion order and skips inactive articles unless `$includeInactive`.
 - `FakeUnits` — `seed()` in picker order; seeding a second default clears the first one's flag.
 - `FakeJournal` — checks debit = credit exactly using integer arithmetic (no floats),
