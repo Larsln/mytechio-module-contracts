@@ -9,7 +9,8 @@ namespace MyTechIO\Contracts\Invoices;
  *
  * Core semantics: the invoice is created in draft status; defaults (bank
  * account, payment terms, tax category derived from the article or the
- * organization default) are filled in by the core when left `null` here.
+ * organization default, payment method `bank_transfer` or `direct_debit` taken
+ * from the contact) are filled in by the core when left `null` here.
  * This contract never finalizes an invoice — that remains the sole
  * responsibility of the core UI.
  */
@@ -28,6 +29,7 @@ final readonly class InvoiceDraft
         public ?string $footerText = null,
         public ?string $projectTitle = null,
         public ?string $internalNotes = null,
+        public ?string $paymentMethod = null,
     ) {}
 
     /**
@@ -45,6 +47,7 @@ final readonly class InvoiceDraft
             'footer_text' => $this->footerText,
             'project_title' => $this->projectTitle,
             'internal_notes' => $this->internalNotes,
+            'payment_method' => $this->paymentMethod,
         ];
     }
 }

@@ -16,5 +16,12 @@ it('converts nested items to arrays', function () {
     expect($array['items'])->toHaveCount(1)
         ->and($array['items'][0]['description'])->toBe('Domain example.de')
         ->and($array['payment_terms_days'])->toBeNull()
-        ->and($array['bank_account_id'])->toBeNull();
+        ->and($array['bank_account_id'])->toBeNull()
+        ->and($array['payment_method'])->toBeNull();
+});
+
+it('carries an explicit payment method', function () {
+    $draft = new InvoiceDraft(contactId: 1, items: [], paymentMethod: 'direct_debit');
+
+    expect($draft->toArray()['payment_method'])->toBe('direct_debit');
 });

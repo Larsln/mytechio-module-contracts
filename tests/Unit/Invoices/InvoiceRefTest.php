@@ -19,6 +19,7 @@ it('allows a null number for drafts', function () {
         'order_id' => null,
         'cancels_invoice_id' => null,
         'items' => [],
+        'payment_method' => null,
     ]);
 });
 
@@ -37,4 +38,10 @@ it('carries the lines and links the hooks need', function () {
 
     expect($ref->toArray()['order_id'])->toBe(5)
         ->and($ref->toArray()['items'][0])->toMatchArray(['article_id' => 7, 'quantity' => '2.0000', 'net_amount' => '20.0000', 'position' => 1, 'unit' => 'Stk']);
+});
+
+it('carries the payment method', function () {
+    $ref = new InvoiceRef(id: 4, number: null, status: 'draft', paymentMethod: 'direct_debit');
+
+    expect($ref->toArray()['payment_method'])->toBe('direct_debit');
 });

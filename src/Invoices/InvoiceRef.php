@@ -15,7 +15,8 @@ namespace MyTechIO\Contracts\Invoices;
  * (`invoice`, `cancellation`, `credit_note`, ...), `contactId`, the dates
  * (`Y-m-d`), `orderId` (set when the invoice was generated from an order, so
  * it moved no stock itself), `cancelsInvoiceId` (set on a cancellation
- * invoice) and the `items` in position order.
+ * invoice), the `items` in position order and the `paymentMethod`
+ * (`bank_transfer` or `direct_debit`).
  */
 final readonly class InvoiceRef
 {
@@ -33,6 +34,7 @@ final readonly class InvoiceRef
         public ?int $orderId = null,
         public ?int $cancelsInvoiceId = null,
         public array $items = [],
+        public ?string $paymentMethod = null,
     ) {}
 
     /**
@@ -51,6 +53,7 @@ final readonly class InvoiceRef
             'order_id' => $this->orderId,
             'cancels_invoice_id' => $this->cancelsInvoiceId,
             'items' => array_map(static fn (InvoiceItemRef $item): array => $item->toArray(), $this->items),
+            'payment_method' => $this->paymentMethod,
         ];
     }
 }

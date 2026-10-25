@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `Contacts\SepaMandates` (`find()`, `forContact()`, `active()`, `create()`, `revoke()`) with `Contacts\NewSepaMandate` and `Contacts\SepaMandateData`: a module registers and revokes SEPA mandates on contacts and reads them; a mandate carries `source`/`externalId` of its provider and may know only the last four IBAN digits (`ibanMasked` is then `**** 3000`). `Fakes\FakeSepaMandates` is the in-memory double.
+- `Invoices\InvoiceRef::$paymentMethod` (`payment_method` in `toArray()`) and `Invoices\InvoiceDraft::$paymentMethod`: `bank_transfer` or `direct_debit`; `null` on a draft lets the core resolve it from the contact.
+
 ## [2.3.0] - 2026-10-16
 
 ### Added
