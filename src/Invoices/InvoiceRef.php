@@ -17,6 +17,11 @@ namespace MyTechIO\Contracts\Invoices;
  * it moved no stock itself), `cancelsInvoiceId` (set on a cancellation
  * invoice), the `items` in position order and the `paymentMethod`
  * (`bank_transfer` or `direct_debit`).
+ *
+ * `find()` additionally fills the money and dating fields: `grossTotal`
+ * (decimal string, 4 places), `openAmount` (gross total minus what is paid,
+ * `'0.0000'` once paid), the ISO 4217 `currency`, the `dueDate` (`Y-m-d`)
+ * and `sentAt` (ISO-8601, `null` until the invoice was sent).
  */
 final readonly class InvoiceRef
 {
@@ -35,6 +40,11 @@ final readonly class InvoiceRef
         public ?int $cancelsInvoiceId = null,
         public array $items = [],
         public ?string $paymentMethod = null,
+        public ?string $grossTotal = null,
+        public ?string $openAmount = null,
+        public ?string $currency = null,
+        public ?string $dueDate = null,
+        public ?string $sentAt = null,
     ) {}
 
     /**
@@ -54,6 +64,11 @@ final readonly class InvoiceRef
             'cancels_invoice_id' => $this->cancelsInvoiceId,
             'items' => array_map(static fn (InvoiceItemRef $item): array => $item->toArray(), $this->items),
             'payment_method' => $this->paymentMethod,
+            'gross_total' => $this->grossTotal,
+            'open_amount' => $this->openAmount,
+            'currency' => $this->currency,
+            'due_date' => $this->dueDate,
+            'sent_at' => $this->sentAt,
         ];
     }
 }

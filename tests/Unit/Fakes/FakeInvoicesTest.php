@@ -5,6 +5,7 @@ declare(strict_types=1);
 use MyTechIO\Contracts\Fakes\FakeInvoices;
 use MyTechIO\Contracts\Invoices\InvoiceDraft;
 use MyTechIO\Contracts\Invoices\InvoiceItemRef;
+use MyTechIO\Contracts\Invoices\InvoiceRef;
 use MyTechIO\Contracts\Invoices\PaidDocument;
 
 it('creates drafts with ascending ids, null number and draft status', function () {
@@ -52,4 +53,14 @@ it('returns paid documents within the range, sorted by paidOn', function () {
         ->and($result[0]->id)->toBe(1)
         ->and($result[1]->id)->toBe(2)
         ->and($result[0]->type)->toBe('invoice');
+});
+
+it('finds created drafts and seeded invoices by id, or null when unknown', function () {
+    $invoices = new FakeInvoices;
+    $draft = $invoices->createDraft(new InvoiceDraft(contactId: 1, items: []));
+    $invoices->seedInvoice(new InvoiceRef(id: 40, number: 'RE-40', status: 'sent', grossTotal: '10.0000', openAmount: '10.0000'));
+
+    expect($invoices->find($draft->id)?->status)->toBe('draft')
+        ->and($invoices->find(40)?->openAmount)->toBe('10.0000')
+        ->and($invoices->find(999))->toBeNull();
 });

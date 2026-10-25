@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `Invoices\Invoices::find(int $invoiceId): ?InvoiceRef` (drafts included; `null` when unknown) and `Fakes\FakeInvoices::find()` / `seedInvoice()`.
+- `Invoices\InvoiceRef::$grossTotal`, `$openAmount` (`'0.0000'` when paid), `$currency`, `$dueDate` and `$sentAt` (`gross_total`, `open_amount`, `currency`, `due_date`, `sent_at` in `toArray()`), filled by `find()`.
+- `Banking\StatementContext` documents that for an account without IBAN the core passes the account's `import_key` as the `$accountIban` argument of `FetchStatementSource::fetch()`.
+
 ## [2.4.0] - 2026-10-25
 
 ### Added
