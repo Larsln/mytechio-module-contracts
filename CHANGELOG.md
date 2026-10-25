@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-10-25
+
 ### Added
 
 - `Contacts\SepaMandates` (`find()`, `forContact()`, `active()`, `create()`, `revoke()`) with `Contacts\NewSepaMandate` and `Contacts\SepaMandateData`: a module registers and revokes SEPA mandates on contacts and reads them; a mandate carries `source`/`externalId` of its provider and may know only the last four IBAN digits (`ibanMasked` is then `**** 3000`). `Fakes\FakeSepaMandates` is the in-memory double.
