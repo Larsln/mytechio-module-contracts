@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-10-25
+
 ### Added
 
 - `Invoices\Invoices::find(int $invoiceId): ?InvoiceRef` (drafts included; `null` when unknown) and `Fakes\FakeInvoices::find()` / `seedInvoice()`.
