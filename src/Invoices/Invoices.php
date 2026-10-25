@@ -16,6 +16,12 @@ interface Invoices
     public function createDraft(InvoiceDraft $draft): InvoiceRef;
 
     /**
+     * Returns the complete reference to an invoice by its ID (drafts
+     * included), or `null` if no invoice with this ID exists.
+     */
+    public function find(int $invoiceId): ?InvoiceRef;
+
+    /**
      * Returns the reference to an invoice line item (including its invoice)
      * by its ID, or `null` if no line item with this ID exists.
      */

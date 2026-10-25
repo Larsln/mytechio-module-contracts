@@ -20,6 +20,11 @@ it('allows a null number for drafts', function () {
         'cancels_invoice_id' => null,
         'items' => [],
         'payment_method' => null,
+        'gross_total' => null,
+        'open_amount' => null,
+        'currency' => null,
+        'due_date' => null,
+        'sent_at' => null,
     ]);
 });
 
@@ -44,4 +49,25 @@ it('carries the payment method', function () {
     $ref = new InvoiceRef(id: 4, number: null, status: 'draft', paymentMethod: 'direct_debit');
 
     expect($ref->toArray()['payment_method'])->toBe('direct_debit');
+});
+
+it('carries the amounts and dates of a looked-up invoice', function () {
+    $ref = new InvoiceRef(
+        id: 5,
+        number: 'RE-2026-00005',
+        status: 'sent',
+        grossTotal: '119.0000',
+        openAmount: '0.0000',
+        currency: 'EUR',
+        dueDate: '2026-11-08',
+        sentAt: '2026-10-25T09:30:00+01:00',
+    );
+
+    expect($ref->toArray())->toMatchArray([
+        'gross_total' => '119.0000',
+        'open_amount' => '0.0000',
+        'currency' => 'EUR',
+        'due_date' => '2026-11-08',
+        'sent_at' => '2026-10-25T09:30:00+01:00',
+    ]);
 });

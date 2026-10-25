@@ -13,6 +13,8 @@ use MyTechIO\Contracts\Invoices\PaidDocument;
 /**
  * Test double for `Invoices`: remembers every draft, always returns
  * status `'draft'` and no invoice number — matching the core semantics.
+ * `find()` serves the created drafts and the invoices seeded via
+ * `seedInvoice()`.
  */
 final class FakeInvoices implements Invoices
 {
@@ -20,6 +22,11 @@ final class FakeInvoices implements Invoices
      * @var array<int, InvoiceDraft>
      */
     private array $drafts = [];
+
+    /**
+     * @var array<int, InvoiceRef>
+     */
+    private array $invoices = [];
 
     /**
      * @var array<int, InvoiceItemRef>
@@ -37,8 +44,19 @@ final class FakeInvoices implements Invoices
     {
         $id = $this->nextId++;
         $this->drafts[$id] = $draft;
+        $this->invoices[$id] = new InvoiceRef(id: $id, number: null, status: 'draft');
 
-        return new InvoiceRef(id: $id, number: null, status: 'draft');
+        return $this->invoices[$id];
+    }
+
+    public function find(int $invoiceId): ?InvoiceRef
+    {
+        return $this->invoices[$invoiceId] ?? null;
+    }
+
+    public function seedInvoice(InvoiceRef $invoice): void
+    {
+        $this->invoices[$invoice->id] = $invoice;
     }
 
     public function findItem(int $invoiceItemId): ?InvoiceItemRef

@@ -8,6 +8,11 @@ namespace MyTechIO\Contracts\Banking;
  * What the core knows about the target account when it asks a source to
  * parse or fetch: the IBAN and currency of the account and the options the
  * person stored for the source (e.g. a CSV profile name).
+ *
+ * An account without an IBAN (a clearing account) has `$accountIban === null`.
+ * For such an account the core passes the account's `import_key` as the
+ * `$accountIban` argument of `FetchStatementSource::fetch()`, so a fetch source
+ * always receives a stable identifier of the account.
  */
 final readonly class StatementContext
 {
