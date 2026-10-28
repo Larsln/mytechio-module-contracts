@@ -16,6 +16,14 @@ interface Contacts
     public function find(int $id): ?ContactData;
 
     /**
+     * Contacts by id in one lookup, keyed by id; unknown ids are left out. The order of the result is unspecified.
+     *
+     * @param  list<int>  $ids
+     * @return array<int, ContactData>
+     */
+    public function findMany(array $ids): array;
+
+    /**
      * @return list<ContactData>
      */
     public function search(string $query, int $limit = 20): array;

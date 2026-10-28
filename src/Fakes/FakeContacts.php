@@ -40,6 +40,11 @@ final class FakeContacts implements Contacts
         return $this->contacts[$id] ?? null;
     }
 
+    public function findMany(array $ids): array
+    {
+        return array_intersect_key($this->contacts, array_flip($ids));
+    }
+
     public function search(string $query, int $limit = 20): array
     {
         $needle = mb_strtolower($query);

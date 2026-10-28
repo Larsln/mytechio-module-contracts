@@ -18,6 +18,19 @@ it('finds a seeded contact by id', function () {
         ->and($contacts->find(999))->toBeNull();
 });
 
+it('finds several contacts by id keyed by id and leaves unknown ids out', function () {
+    $contacts = new FakeContacts;
+    $contacts->seed(makeContact(1, 'Kunde GmbH'));
+    $contacts->seed(makeContact(2, 'Anderer Kunde'));
+    $contacts->seed(makeContact(3, 'Dritte Firma'));
+
+    $found = $contacts->findMany([3, 1, 999]);
+
+    expect(array_keys($found))->toEqualCanonicalizing([1, 3])
+        ->and($found[3]->displayName)->toBe('Dritte Firma')
+        ->and($contacts->findMany([]))->toBe([]);
+});
+
 it('searches case-insensitively by display name with a limit', function () {
     $contacts = new FakeContacts;
     $contacts->seed(makeContact(1, 'Kunde GmbH'));

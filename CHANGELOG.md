@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-10-28
+
+### Added
+
+- `Contacts\Contacts::findMany(array $ids): array` resolves several contacts in one lookup (keyed by id, unknown ids left out) and `Fakes\FakeContacts::findMany()`.
+
 ## [2.5.0] - 2026-10-25
 
 ### Added
