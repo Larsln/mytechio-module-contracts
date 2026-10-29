@@ -29,6 +29,7 @@ it('round-trips a full set through toArray and fromArray', function () {
         balanceAfter: '970.0000',
         raw: ['row' => 7],
         batchChildren: [$child],
+        settlesInvoiceNumber: 'RE-2026-00077',
     );
     $set = new ParsedStatementSet([
         new ParsedStatement(
@@ -49,6 +50,7 @@ it('round-trips a full set through toArray and fromArray', function () {
 
     expect($copy)->toEqual($set)
         ->and($copy->statements[0]->transactions[0]->batchChildren[0]->purpose)->toBe('Einzelposten')
+        ->and($copy->statements[0]->transactions[0]->settlesInvoiceNumber)->toBe('RE-2026-00077')
         ->and($copy->transactionCount())->toBe(1);
 });
 
@@ -58,7 +60,8 @@ it('defaults optional fields to null and empty lists', function () {
     expect($transaction->valueDate)->toBeNull()
         ->and($transaction->creditorId)->toBeNull()
         ->and($transaction->raw)->toBe([])
-        ->and($transaction->batchChildren)->toBe([]);
+        ->and($transaction->batchChildren)->toBe([])
+        ->and($transaction->settlesInvoiceNumber)->toBeNull();
 });
 
 it('rejects malformed dates and amounts with a StatementParseException', function (callable $make) {

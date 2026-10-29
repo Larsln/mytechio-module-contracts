@@ -25,6 +25,7 @@ final readonly class ParsedTransaction
      * @param  string|null  $balanceAfter  running balance after the line, four fractional digits
      * @param  array<string, mixed>  $raw  source-specific details kept for the audit trail
      * @param  list<ParsedTransaction>  $batchChildren  single items of a batch booking (camt.054 details)
+     * @param  string|null  $settlesInvoiceNumber  the outgoing invoice this line pays, when the source knows it from its own records (a payment it initiated itself for that invoice), never from parsing free text; the core confirms the match automatically
      *
      * @throws StatementParseException on a malformed date or amount
      */
@@ -46,6 +47,7 @@ final readonly class ParsedTransaction
         public ?string $balanceAfter = null,
         public array $raw = [],
         public array $batchChildren = [],
+        public ?string $settlesInvoiceNumber = null,
     ) {
         StatementFormat::assertDate($bookingDate, 'bookingDate');
         StatementFormat::assertDate($valueDate, 'valueDate');
@@ -79,6 +81,7 @@ final readonly class ParsedTransaction
                 static fn (ParsedTransaction $child): array => $child->toArray(),
                 $this->batchChildren,
             ),
+            'settles_invoice_number' => $this->settlesInvoiceNumber,
         ];
     }
 
@@ -115,6 +118,7 @@ final readonly class ParsedTransaction
                 static fn (array $child): self => self::fromArray($child),
                 array_filter($children, 'is_array'),
             )),
+            settlesInvoiceNumber: StatementFormat::string($data, 'settles_invoice_number'),
         );
     }
 }

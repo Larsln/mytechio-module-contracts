@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-10-29
+
+### Added
+
+- `Banking\ParsedTransaction::$settlesInvoiceNumber` (`settles_invoice_number` in `toArray()`): a fetch source that initiated a payment itself names the outgoing invoice the line pays; the core confirms that match automatically instead of scoring it. Never set it from parsed free text.
+
 ## [2.6.0] - 2026-10-28
 
 ### Added
