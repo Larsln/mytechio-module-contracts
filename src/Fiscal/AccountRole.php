@@ -44,4 +44,7 @@ enum AccountRole: string
 
     /** Output VAT liability of a self-assessed incoming invoice (reverse charge, acquisition), by incoming scenario and rate. */
     case ReverseChargeVat = 'reverse_charge_vat';
+
+    /** Fees a bank or payment provider deducts on its own statement (expense; in DE VAT-exempt); bound optionally, used by statement sources that declare their fee lines. */
+    case BankCharges = 'bank_charges';
 }

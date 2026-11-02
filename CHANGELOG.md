@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.8.0] - 2026-11-03
+
+### Added
+
+- `Banking\ParsedTransaction::$booksToRole` (`books_to_role` in `toArray()`): a statement source that knows a line's nature from its own records (a provider's own fee line) names the chart role the line is booked to; the core books it against the account bound to that role and confirms the match automatically. Never set it from parsed free text.
+- `Fiscal\AccountRole::BankCharges` (`bank_charges`): fees a bank or payment provider deducts on its own statement; bound optionally; `Fakes\FakeAccountMap` and `Fakes\FakeChartOfAccounts` map it to `6855`.
+
 ## [2.7.0] - 2026-10-29
 
 ### Added

@@ -34,6 +34,7 @@ final class FakeAccountMap implements AccountMap
         'output_vat_not_yet_due' => '1775',
         'input_vat' => '1576',
         'reverse_charge_vat' => '1787',
+        'bank_charges' => '6855',
     ];
 
     /**

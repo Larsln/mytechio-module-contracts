@@ -8,6 +8,7 @@ use MyTechIO\Contracts\Banking\ParsedTransaction;
 use MyTechIO\Contracts\Banking\StatementParseException;
 use MyTechIO\Contracts\ContractException;
 use MyTechIO\Contracts\Fakes\FakeFileStatementSource;
+use MyTechIO\Contracts\Fiscal\AccountRole;
 
 it('round-trips a full set through toArray and fromArray', function () {
     $child = new ParsedTransaction(bookingDate: '2026-10-01', amount: '-10.0000', currency: 'EUR', purpose: 'Einzelposten');
@@ -30,6 +31,7 @@ it('round-trips a full set through toArray and fromArray', function () {
         raw: ['row' => 7],
         batchChildren: [$child],
         settlesInvoiceNumber: 'RE-2026-00077',
+        booksToRole: AccountRole::BankCharges->value,
     );
     $set = new ParsedStatementSet([
         new ParsedStatement(
@@ -51,6 +53,8 @@ it('round-trips a full set through toArray and fromArray', function () {
     expect($copy)->toEqual($set)
         ->and($copy->statements[0]->transactions[0]->batchChildren[0]->purpose)->toBe('Einzelposten')
         ->and($copy->statements[0]->transactions[0]->settlesInvoiceNumber)->toBe('RE-2026-00077')
+        ->and($copy->statements[0]->transactions[0]->booksToRole)->toBe('bank_charges')
+        ->and($copy->toArray()['statements'][0]['transactions'][0]['books_to_role'])->toBe('bank_charges')
         ->and($copy->transactionCount())->toBe(1);
 });
 
@@ -61,7 +65,9 @@ it('defaults optional fields to null and empty lists', function () {
         ->and($transaction->creditorId)->toBeNull()
         ->and($transaction->raw)->toBe([])
         ->and($transaction->batchChildren)->toBe([])
-        ->and($transaction->settlesInvoiceNumber)->toBeNull();
+        ->and($transaction->settlesInvoiceNumber)->toBeNull()
+        ->and($transaction->booksToRole)->toBeNull()
+        ->and($transaction->toArray()['books_to_role'])->toBeNull();
 });
 
 it('rejects malformed dates and amounts with a StatementParseException', function (callable $make) {

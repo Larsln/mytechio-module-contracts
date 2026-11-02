@@ -26,6 +26,7 @@ final readonly class ParsedTransaction
      * @param  array<string, mixed>  $raw  source-specific details kept for the audit trail
      * @param  list<ParsedTransaction>  $batchChildren  single items of a batch booking (camt.054 details)
      * @param  string|null  $settlesInvoiceNumber  the outgoing invoice this line pays, when the source knows it from its own records (a payment it initiated itself for that invoice), never from parsing free text; the core confirms the match automatically
+     * @param  string|null  $booksToRole  the chart role (an `AccountRole` value) this line is booked to directly, when the source knows the line's nature from its own records (a provider's own fee line) — never from parsing free text; the core books it against the account bound to that role and confirms the match automatically
      *
      * @throws StatementParseException on a malformed date or amount
      */
@@ -48,6 +49,7 @@ final readonly class ParsedTransaction
         public array $raw = [],
         public array $batchChildren = [],
         public ?string $settlesInvoiceNumber = null,
+        public ?string $booksToRole = null,
     ) {
         StatementFormat::assertDate($bookingDate, 'bookingDate');
         StatementFormat::assertDate($valueDate, 'valueDate');
@@ -82,6 +84,7 @@ final readonly class ParsedTransaction
                 $this->batchChildren,
             ),
             'settles_invoice_number' => $this->settlesInvoiceNumber,
+            'books_to_role' => $this->booksToRole,
         ];
     }
 
@@ -119,6 +122,7 @@ final readonly class ParsedTransaction
                 array_filter($children, 'is_array'),
             )),
             settlesInvoiceNumber: StatementFormat::string($data, 'settles_invoice_number'),
+            booksToRole: StatementFormat::string($data, 'books_to_role'),
         );
     }
 }

@@ -79,6 +79,7 @@ final class FakeChartOfAccounts implements ChartOfAccounts
             new RoleMapping(AccountRole::OutputVatNotYetDue, null, null, '1775'),
             new RoleMapping(AccountRole::InputVat, null, null, '1576'),
             new RoleMapping(AccountRole::ReverseChargeVat, null, null, '1787'),
+            new RoleMapping(AccountRole::BankCharges, null, null, '6855'),
         ];
     }
 
