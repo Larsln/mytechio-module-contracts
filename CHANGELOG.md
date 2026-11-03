@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.10.0] - 2026-11-03
+
+### Added
+
+- `Pricing\PriceLists`: customer price lists for modules (e.g. a web shop price feed) with reads (`find`, `all`, `forContact`, `resolve`) and every write (`create`, `update`, `delete`, `addEntry`, `updateEntry`, `removeEntry`, `assign`), each write with an `ActorRef`. `resolve()` returns what a contact pays for a price option, also without a list.
+- DTOs `Pricing\PriceListData`, `PriceListEntryData`, `CustomerPriceData` (with `toArray()`/`fromArray()`), inputs `NewPriceList` and `NewPriceListEntry`, enum `Pricing\CustomerPriceSource` (mirrors the core), exceptions `PriceListException` (the core's German refusal) and `PriceListNotFoundException`.
+- `Fakes\FakePriceLists` with the core's entry rules and `resolve()` precedence; tests declare options with `registerOption()` and contact discounts with `setDefaultDiscount()`.
+
 ## [2.9.0] - 2026-11-03
 
 ### Added
