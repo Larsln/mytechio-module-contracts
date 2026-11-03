@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.10.1] - 2026-11-03
+
+### Fixed
+
+- `Contracts::VERSION` names the released version again (it had stayed at 2.6.0 since 2.7.0); the docblock says what the constant is for.
+
 ## [2.10.0] - 2026-11-03
 
 ### Added
