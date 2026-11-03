@@ -17,6 +17,7 @@ it('defaults to quantity 1 and null for everything optional', function () {
         ->and($subscription->providerName)->toBeNull()
         ->and($subscription->renewsOn)->toBeNull()
         ->and($subscription->autorenew)->toBeNull()
+        ->and($subscription->paymentMethod)->toBeNull()
         ->and($subscription->attributes)->toBe([]);
 });
 
@@ -37,6 +38,7 @@ it('converts to an array with snake_case keys', function () {
         'renews_on' => null,
         'autorenew' => null,
         'attributes' => [],
+        'payment_method' => null,
     ]);
 });
 
@@ -54,6 +56,7 @@ it('converts a fully specified subscription to an array', function () {
         renewsOn: '2027-11-01',
         autorenew: true,
         attributes: ['registrar' => 'kyberio'],
+        paymentMethod: 'direct_debit',
     );
 
     expect($subscription->toArray())->toBe([
@@ -70,6 +73,7 @@ it('converts a fully specified subscription to an array', function () {
         'renews_on' => '2027-11-01',
         'autorenew' => true,
         'attributes' => ['registrar' => 'kyberio'],
+        'payment_method' => 'direct_debit',
     ]);
 });
 

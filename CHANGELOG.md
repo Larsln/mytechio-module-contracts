@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.9.0] - 2026-11-03
+
+### Added
+
+- `Subscriptions\SubscriptionData::$paymentMethod` and `Subscriptions\NewSubscription::$paymentMethod` (`payment_method` in `toArray()`): a service may carry its own payment method (`bank_transfer` or `direct_debit`) for its invoices; `null` means the contact's default decides. `Fakes\FakeSubscriptions::create()` passes it through.
+
 ## [2.8.0] - 2026-11-03
 
 ### Added

@@ -125,6 +125,7 @@ final class FakeSubscriptions implements Subscriptions
             renewsOn: $subscription->renewsOn,
             autorenew: $subscription->autorenew,
             attributes: $subscription->attributes,
+            paymentMethod: $subscription->paymentMethod,
         );
 
         $this->subscriptions[$id] = $data;

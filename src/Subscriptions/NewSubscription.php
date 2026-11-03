@@ -18,6 +18,8 @@ use MyTechIO\Contracts\Invoices\Validate;
  * not at all; `providerName` is the free-text provider of a subscription
  * without a source. `attributes` are the type-specific fields according to the
  * schema of the `SubscriptionType`; the core validates them server-side.
+ * `paymentMethod` is the service's own payment method (`"bank_transfer"` or
+ * `"direct_debit"`) for its invoices; `null` means the contact's default decides.
  */
 final readonly class NewSubscription
 {
@@ -38,6 +40,7 @@ final readonly class NewSubscription
         public ?string $renewsOn = null,
         public ?bool $autorenew = null,
         public array $attributes = [],
+        public ?string $paymentMethod = null,
     ) {
         if ($priceOptionId !== null && $articleId === null) {
             throw new ContractException('priceOptionId requires articleId.');
@@ -79,6 +82,7 @@ final readonly class NewSubscription
             'renews_on' => $this->renewsOn,
             'autorenew' => $this->autorenew,
             'attributes' => $this->attributes,
+            'payment_method' => $this->paymentMethod,
         ];
     }
 }

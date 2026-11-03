@@ -33,6 +33,9 @@ use MyTechIO\Contracts\Invoices\Validate;
  * `unitPriceNetOverride` is a decimal string that replaces the net unit price
  * of the price option; `null` means the option's price applies.
  *
+ * `paymentMethod` is the service's own payment method (`"bank_transfer"` or
+ * `"direct_debit"`) for its invoices; `null` means the contact's default decides.
+ *
  * `attributes` are the type-specific fields according to the schema of the
  * subscription's `SubscriptionType`. Secret fields are delivered decrypted:
  * modules are trusted code and must never log them.
@@ -68,6 +71,7 @@ final readonly class SubscriptionData
         public ?string $minimumTermUntil = null,
         public ?int $noticePeriodCount = null,
         public ?string $noticePeriodUnit = null,
+        public ?string $paymentMethod = null,
     ) {
         Validate::decimal($quantity, 'quantity');
         Validate::date($startsOn, 'startsOn');
@@ -124,6 +128,7 @@ final readonly class SubscriptionData
             'minimum_term_until' => $this->minimumTermUntil,
             'notice_period_count' => $this->noticePeriodCount,
             'notice_period_unit' => $this->noticePeriodUnit,
+            'payment_method' => $this->paymentMethod,
         ];
     }
 }

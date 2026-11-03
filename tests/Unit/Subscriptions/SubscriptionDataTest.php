@@ -69,7 +69,15 @@ it('converts to an array with snake_case keys and the status value', function ()
         'minimum_term_until' => null,
         'notice_period_count' => null,
         'notice_period_unit' => null,
+        'payment_method' => null,
     ]);
+});
+
+it('carries its own payment method', function () {
+    $subscription = subscriptionData(['paymentMethod' => 'direct_debit']);
+
+    expect($subscription->paymentMethod)->toBe('direct_debit')
+        ->and($subscription->toArray()['payment_method'])->toBe('direct_debit');
 });
 
 it('carries the subscription terms and rejects malformed ones', function () {
@@ -140,6 +148,7 @@ it('converts a cancelled, sourced subscription with attributes to an array', fun
         'minimum_term_until' => null,
         'notice_period_count' => null,
         'notice_period_unit' => null,
+        'payment_method' => null,
     ]);
 });
 
