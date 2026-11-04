@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.11.0] - 2026-11-04
+
+### Added
+
+- `Articles\PriceOptionData` and `Subscriptions\SubscriptionData` carry an optional price period (`pricePeriodUnit`, `pricePeriodCount`, `toArray()` keys `price_period_unit`/`price_period_count`): a per-period option may price a smaller period than it bills (e.g. per month, billed every 3 months); `null` keeps the price per billing period. Existing constructor calls are unaffected.
+
 ## [2.10.1] - 2026-11-03
 
 ### Fixed
