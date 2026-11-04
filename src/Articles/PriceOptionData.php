@@ -17,6 +17,12 @@ use MyTechIO\Contracts\Invoices\Validate;
  * decimal strings with up to 4 decimals, never floats; derived options
  * (e.g. a yearly price computed from the monthly one) arrive with their
  * current computed prices.
+ *
+ * The prices are per price period: by default the billing period itself
+ * (`pricePeriodUnit` and `pricePeriodCount` are `null`), otherwise the
+ * smaller period they name, e.g. a price per month (`"month"`, 1) billed
+ * every 3 months — the invoice then shows 3 months × the monthly price. The
+ * billing period is always a whole multiple of the price period.
  */
 final readonly class PriceOptionData
 {
@@ -29,14 +35,17 @@ final readonly class PriceOptionData
         public string $priceB2cNet,
         public string $priceB2bNet,
         public bool $isDefault,
+        public ?string $pricePeriodUnit = null,
+        public ?int $pricePeriodCount = null,
     ) {
         Validate::decimal($priceB2cNet, 'priceB2cNet');
         Validate::decimal($priceB2bNet, 'priceB2bNet');
 
         $hasPeriod = $intervalUnit !== null || $intervalCount !== null;
+        $hasPricePeriod = $pricePeriodUnit !== null || $pricePeriodCount !== null;
 
-        if ($priceForm === PriceForm::OneOff && $hasPeriod) {
-            throw new ContractException('A one-off price option must not carry an interval.');
+        if ($priceForm === PriceForm::OneOff && ($hasPeriod || $hasPricePeriod)) {
+            throw new ContractException('A one-off price option must not carry an interval or a price period.');
         }
 
         if ($priceForm === PriceForm::PerPeriod) {
@@ -44,13 +53,26 @@ final readonly class PriceOptionData
                 throw new ContractException('A per-period price option needs intervalUnit and intervalCount.');
             }
 
-            if (! in_array($intervalUnit, ['day', 'week', 'month', 'year'], true)) {
-                throw new ContractException("intervalUnit must be 'day', 'week', 'month' or 'year', got \"{$intervalUnit}\".");
-            }
+            self::validatePeriod($intervalUnit, $intervalCount, 'intervalUnit', 'intervalCount');
 
-            if ($intervalCount < 1) {
-                throw new ContractException('intervalCount must be at least 1.');
+            if ($hasPricePeriod) {
+                if ($pricePeriodUnit === null || $pricePeriodCount === null) {
+                    throw new ContractException('pricePeriodUnit and pricePeriodCount must either both be set or both be null.');
+                }
+
+                self::validatePeriod($pricePeriodUnit, $pricePeriodCount, 'pricePeriodUnit', 'pricePeriodCount');
             }
+        }
+    }
+
+    private static function validatePeriod(string $unit, int $count, string $unitField, string $countField): void
+    {
+        if (! in_array($unit, ['day', 'week', 'month', 'year'], true)) {
+            throw new ContractException("{$unitField} must be 'day', 'week', 'month' or 'year', got \"{$unit}\".");
+        }
+
+        if ($count < 1) {
+            throw new ContractException("{$countField} must be at least 1.");
         }
     }
 
@@ -68,6 +90,8 @@ final readonly class PriceOptionData
             'price_b2c_net' => $this->priceB2cNet,
             'price_b2b_net' => $this->priceB2bNet,
             'is_default' => $this->isDefault,
+            'price_period_unit' => $this->pricePeriodUnit,
+            'price_period_count' => $this->pricePeriodCount,
         ];
     }
 }

@@ -31,7 +31,10 @@ use MyTechIO\Contracts\Invoices\Validate;
  * `minimumTermUntil` the last day of the minimum term (the earliest permitted `endsOn`),
  * `noticePeriodCount` with `noticePeriodUnit` the notice period.
  * `unitPriceNetOverride` is a decimal string that replaces the net unit price
- * of the price option; `null` means the option's price applies.
+ * of the price option; `null` means the option's price applies. The unit price
+ * is per price period: `pricePeriodUnit` with `pricePeriodCount` when the
+ * option prices a smaller period than it bills (e.g. per month, billed every
+ * 3 months), otherwise `null` and the price is per billing period.
  *
  * `paymentMethod` is the service's own payment method (`"bank_transfer"` or
  * `"direct_debit"`) for its invoices; `null` means the contact's default decides.
@@ -72,6 +75,8 @@ final readonly class SubscriptionData
         public ?int $noticePeriodCount = null,
         public ?string $noticePeriodUnit = null,
         public ?string $paymentMethod = null,
+        public ?string $pricePeriodUnit = null,
+        public ?int $pricePeriodCount = null,
     ) {
         Validate::decimal($quantity, 'quantity');
         Validate::date($startsOn, 'startsOn');
@@ -86,10 +91,18 @@ final readonly class SubscriptionData
             Validate::decimal($unitPriceNetOverride, 'unitPriceNetOverride');
         }
 
-        foreach (['intervalUnit' => $intervalUnit, 'noticePeriodUnit' => $noticePeriodUnit] as $field => $unit) {
+        foreach (['intervalUnit' => $intervalUnit, 'noticePeriodUnit' => $noticePeriodUnit, 'pricePeriodUnit' => $pricePeriodUnit] as $field => $unit) {
             if ($unit !== null && ! in_array($unit, ['day', 'week', 'month', 'year'], true)) {
                 throw new ContractException("{$field} must be 'day', 'week', 'month' or 'year', got \"{$unit}\".");
             }
+        }
+
+        if (($pricePeriodUnit === null) !== ($pricePeriodCount === null)) {
+            throw new ContractException('pricePeriodUnit and pricePeriodCount must either both be set or both be null.');
+        }
+
+        if ($pricePeriodCount !== null && $pricePeriodCount < 1) {
+            throw new ContractException('pricePeriodCount must be at least 1.');
         }
 
         if (($source === null) !== ($externalId === null)) {
@@ -129,6 +142,8 @@ final readonly class SubscriptionData
             'notice_period_count' => $this->noticePeriodCount,
             'notice_period_unit' => $this->noticePeriodUnit,
             'payment_method' => $this->paymentMethod,
+            'price_period_unit' => $this->pricePeriodUnit,
+            'price_period_count' => $this->pricePeriodCount,
         ];
     }
 }

@@ -70,6 +70,8 @@ it('converts to an array with snake_case keys and the status value', function ()
         'notice_period_count' => null,
         'notice_period_unit' => null,
         'payment_method' => null,
+        'price_period_unit' => null,
+        'price_period_count' => null,
     ]);
 });
 
@@ -149,6 +151,8 @@ it('converts a cancelled, sourced subscription with attributes to an array', fun
         'notice_period_count' => null,
         'notice_period_unit' => null,
         'payment_method' => null,
+        'price_period_unit' => null,
+        'price_period_count' => null,
     ]);
 });
 
@@ -175,4 +179,19 @@ it('rejects a source without an external id and vice versa', function (?string $
 })->with([
     'source only' => ['domainrobot', null],
     'external id only' => [null, 'example.de'],
+])->throws(ContractException::class);
+
+it('carries the price period of a subscription priced per month and billed quarterly', function () {
+    $subscription = new SubscriptionData(1, 2, 'license', 'Web M', SubscriptionStatus::Active, 3, 4, '1', '2026-01-01', intervalUnit: 'month', intervalCount: 3, pricePeriodUnit: 'month', pricePeriodCount: 1);
+
+    expect($subscription->toArray())->toMatchArray(['price_period_unit' => 'month', 'price_period_count' => 1]);
+});
+
+it('rejects a half-set or invalid price period', function (?string $unit, ?int $count) {
+    new SubscriptionData(1, 2, 'license', 'Web M', SubscriptionStatus::Active, 3, 4, '1', '2026-01-01', pricePeriodUnit: $unit, pricePeriodCount: $count);
+})->with([
+    'unit without count' => ['month', null],
+    'count without unit' => [null, 1],
+    'unknown unit' => ['decade', 1],
+    'zero count' => ['month', 0],
 ])->throws(ContractException::class);

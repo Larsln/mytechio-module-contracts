@@ -60,6 +60,8 @@ it('converts to an array with snake_case keys and enum values', function () {
             'price_b2c_net' => '11.9000',
             'price_b2b_net' => '10.0000',
             'is_default' => true,
+            'price_period_unit' => null,
+            'price_period_count' => null,
         ]],
         'last_purchase_price_net' => null,
         'tax_rate' => null,
