@@ -70,6 +70,20 @@ it('sorts findByLabel matches with active subscriptions first, then by id', func
     expect(array_map(fn (SubscriptionData $s) => $s->id, $matches))->toBe([2, 3, 1]);
 });
 
+it('finds subscriptions by a type field, active first and then by id', function () {
+    $subscriptions = new FakeSubscriptions;
+    $subscriptions->seed(seededSubscription(1, ['status' => SubscriptionStatus::Cancelled, 'attributes' => ['fqdn' => 'example.de']]));
+    $subscriptions->seed(seededSubscription(2, ['contactId' => 2, 'attributes' => ['fqdn' => 'example.de']]));
+    $subscriptions->seed(seededSubscription(3, ['type' => 'license', 'attributes' => ['fqdn' => 'example.de']]));
+    $subscriptions->seed(seededSubscription(4, ['attributes' => ['fqdn' => 'other.de']]));
+    $subscriptions->seed(seededSubscription(5, ['label' => 'example.de']));
+
+    $matches = $subscriptions->findByAttribute('domain', 'fqdn', 'example.de');
+
+    expect(array_map(fn (SubscriptionData $s) => $s->id, $matches))->toBe([2, 1])
+        ->and($subscriptions->findByAttribute('domain', 'registrar', 'example.de'))->toBe([]);
+});
+
 it('finds a subscription by source and external id', function () {
     $subscriptions = new FakeSubscriptions;
     $subscriptions->seed(seededSubscription(1, ['source' => 'domainrobot', 'externalId' => 'example.de']));

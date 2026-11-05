@@ -72,19 +72,16 @@ final class FakeSubscriptions implements Subscriptions
 
     public function findByLabel(string $type, string $label): array
     {
-        $matches = array_values(array_filter(
-            $this->sorted(),
+        return $this->activeFirst(
             static fn (SubscriptionData $subscription): bool => $subscription->type === $type && $subscription->label === $label,
-        ));
+        );
+    }
 
-        usort($matches, static function (SubscriptionData $a, SubscriptionData $b): int {
-            $activeA = $a->status === SubscriptionStatus::Active ? 0 : 1;
-            $activeB = $b->status === SubscriptionStatus::Active ? 0 : 1;
-
-            return $activeA <=> $activeB ?: $a->id <=> $b->id;
-        });
-
-        return $matches;
+    public function findByAttribute(string $type, string $key, string $value): array
+    {
+        return $this->activeFirst(
+            static fn (SubscriptionData $subscription): bool => $subscription->type === $type && ($subscription->attributes[$key] ?? null) === $value,
+        );
     }
 
     public function findBySource(string $source, string $externalId): ?SubscriptionData
@@ -196,6 +193,26 @@ final class FakeSubscriptions implements Subscriptions
         ksort($subscriptions);
 
         return array_values($subscriptions);
+    }
+
+    /**
+     * The subscriptions `$matches` accepts, active ones first and then by id.
+     *
+     * @param  \Closure(SubscriptionData): bool  $matches
+     * @return list<SubscriptionData>
+     */
+    private function activeFirst(\Closure $matches): array
+    {
+        $matches = array_values(array_filter($this->sorted(), $matches));
+
+        usort($matches, static function (SubscriptionData $a, SubscriptionData $b): int {
+            $activeA = $a->status === SubscriptionStatus::Active ? 0 : 1;
+            $activeB = $b->status === SubscriptionStatus::Active ? 0 : 1;
+
+            return $activeA <=> $activeB ?: $a->id <=> $b->id;
+        });
+
+        return $matches;
     }
 
     private function get(int $id): SubscriptionData

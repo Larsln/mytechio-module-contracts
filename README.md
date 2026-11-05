@@ -176,8 +176,11 @@ read subscriptions, create them, bind them to an external source and report
 source state, but never own money, tax or booking logic. The core ships only
 the type `generic`; all other types and all sources come from plugin modules.
 
-- Reading: `find()`, `forContact()`, `findByLabel()` (active first, then by
-  id), `findBySource()` and `forInvoiceItem()` return `SubscriptionData`.
+- Reading: `find()`, `forContact()`, `findByAttribute()` (the subscriptions
+  of a type whose type field holds a value, e.g. the domain whose `fqdn` is
+  `example.de`; active first, then by id), `findBySource()` and
+  `forInvoiceItem()` return `SubscriptionData`. `findByLabel()` is deprecated:
+  the label is the article name, not the object the subscription stands for.
   `billedUntil` is the last day covered by an invoice; `attributes` hold the
   type-specific fields, with secret fields decrypted — modules are trusted
   code and must never log them.

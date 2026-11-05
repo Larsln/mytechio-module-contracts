@@ -36,9 +36,23 @@ interface Subscriptions
     /**
      * Active first, then by id.
      *
+     * @deprecated since 2.12.0, removed in 3.0: the label is the article name
+     *             of the subscription, not the object it stands for; use
+     *             {@see findByAttribute()} with the type field that names the
+     *             object.
+     *
      * @return list<SubscriptionData>
      */
     public function findByLabel(string $type, string $label): array;
+
+    /**
+     * Subscriptions of `$type` whose type field `$key` holds exactly `$value`,
+     * e.g. the domain subscriptions whose `fqdn` is `example.de`. Active
+     * first, then by id.
+     *
+     * @return list<SubscriptionData>
+     */
+    public function findByAttribute(string $type, string $key, string $value): array;
 
     public function findBySource(string $source, string $externalId): ?SubscriptionData;
 
