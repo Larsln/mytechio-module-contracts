@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.12.0] - 2026-11-06
+
 ### Added
 
 - `Subscriptions\Subscriptions::findByAttribute(type, key, value)`: the subscriptions of a type whose type field holds a value (e.g. the `domain` subscriptions whose `fqdn` is `example.de`), active first and then by id. `FakeSubscriptions` implements it.
