@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.13.0] - 2026-11-06
+
+### Added
+
+- `Web\PublicLinks`, `Web\PublicLinkResolver`, `Web\NewPublicLink`, `Web\PublicLinkData`, `Web\PublicLinkStatus`, `Web\LinkTarget` and `Web\PublicLinksUnavailableException`: public links the website answers on behalf of the core (`https://<website>/l/<token>`), issued by the module holding the exclusive capability `public_links` and resolved when followed through the resolver of the link's kind (container tag `mytechio.public_link_resolvers`). `FakePublicLinks` and `FakePublicLinkResolver` for module tests.
+
 ## [2.12.0] - 2026-11-06
 
 ### Added
