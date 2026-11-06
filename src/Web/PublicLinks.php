@@ -6,7 +6,7 @@ namespace MyTechIO\Contracts\Web;
 
 /**
  * Public links the website answers on behalf of the core: the mail of a
- * document carries `https://<website>/l/<token>`, the website asks the holder
+ * document carries `https://<website>/go/<token>`, the website asks the holder
  * of this contract for the target, and the holder resolves it through the
  * {@see PublicLinkResolver} of the link's kind at that moment.
  *

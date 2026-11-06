@@ -261,7 +261,7 @@ are treated as `null`.
 
 `Web\PublicLinks` is implemented by the module holding the exclusive
 capability `public_links` (the "Webpräsenz" module). A public link is
-`https://<website>/l/<token>`: the mail of a document carries it, the website
+`https://<website>/go/<token>`: the mail of a document carries it, the website
 asks the holder for the target when a visitor follows it, and the holder
 resolves it at that moment through the `Web\PublicLinkResolver` registered
 for the link's kind (container tag `mytechio.public_link_resolvers`, one
