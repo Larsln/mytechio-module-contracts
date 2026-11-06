@@ -265,7 +265,8 @@ capability `public_links` (the "Webpräsenz" module). A public link is
 asks the holder for the target when a visitor follows it, and the holder
 resolves it at that moment through the `Web\PublicLinkResolver` registered
 for the link's kind (container tag `mytechio.public_link_resolvers`, one
-resolver per kind, e.g. the Stripe module's `stripe.mandate`).
+resolver per kind; a kind is `<module>.<name>`, e.g. the Stripe module's
+`stripe.mandate`, so the holder can ignore resolvers of disabled modules).
 
 - `available()` says whether a holder is active; the core binds a null
   implementation otherwise, so callers fall back to texts without a link.

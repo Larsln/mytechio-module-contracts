@@ -12,7 +12,12 @@ namespace MyTechIO\Contracts\Web;
  */
 interface PublicLinkResolver
 {
-    /** The kind this resolver answers, e.g. `stripe.mandate`; one resolver per kind. */
+    /**
+     * The kind this resolver answers, one resolver per kind. The kind MUST be
+     * `<module>.<name>` with the module name of the resolver's module
+     * (e.g. `stripe.mandate`): the holder ignores resolvers of disabled modules
+     * by that prefix.
+     */
     public function kind(): string;
 
     /** German name for the link overview, e.g. `SEPA-Mandat (Stripe)`. */
