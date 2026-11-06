@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.13.1] - 2026-11-06
+
+### Changed
+
+- `Web\PublicLinkResolver::kind()` is documented as `<module>.<name>`; the public link path example is `/go`.
+
 ## [2.13.0] - 2026-11-06
 
 ### Added
