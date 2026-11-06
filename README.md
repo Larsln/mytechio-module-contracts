@@ -257,6 +257,29 @@ the top left, relative to the page that `page` refers to; `x0 < x1` and
 the core cross-checks it against the PDF text layer. Absent or invalid boxes
 are treated as `null`.
 
+## Public links
+
+`Web\PublicLinks` is implemented by the module holding the exclusive
+capability `public_links` (the "Webpräsenz" module). A public link is
+`https://<website>/l/<token>`: the mail of a document carries it, the website
+asks the holder for the target when a visitor follows it, and the holder
+resolves it at that moment through the `Web\PublicLinkResolver` registered
+for the link's kind (container tag `mytechio.public_link_resolvers`, one
+resolver per kind, e.g. the Stripe module's `stripe.mandate`).
+
+- `available()` says whether a holder is active; the core binds a null
+  implementation otherwise, so callers fall back to texts without a link.
+- `create(NewPublicLink)` issues a link for a `kind`, a subject
+  (`subjectType`/`subjectId`, e.g. `contact`/`17`) and a payload the resolver
+  needs — never personal data. `expiresAt` and `singleUse` are optional.
+- `find()`, `forSubject()`, `revoke()` and `revokeForSubject()` read and
+  retire links; a revoked, expired or used link answers "invalid".
+- `follow(token)` is what the website triggers: status and expiry first, then
+  the resolver, click count, single use. The answer is a `Web\LinkTarget`:
+  `redirect(url, validUntil)` or `invalid(reason, message)` with a machine
+  reason (`not_found`, `expired`, `revoked`, `used`, `no_resolver`, or one the
+  resolver chooses such as `already_done`) and a German message for the visitor.
+
 ## Fakes for module tests
 
 Every contract has an in-memory test double under `MyTechIO\Contracts\Fakes\*`
