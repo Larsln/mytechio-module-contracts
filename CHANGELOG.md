@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 
 - Service groups in the `Subscriptions` contract: `SubscriptionGroupData`, `NewSubscriptionGroup`, `SubscriptionGroupNotFoundException`, and the methods `findGroup()`, `groupsForContact()`, `groupOf()`, `createGroup()`, `updateGroup()`, `reorderGroups()`, `setGroupMembers()`, `addGroupMember()`, `removeGroupMember()`, `dissolveGroup()`, `cancelGroup()` and `groupEndOptions()` (returns `?array`: `null` = no active member has a billing grid, any date is valid; `[]` = constrained members share no period boundary, the group cannot be cancelled as a whole). `SubscriptionData` gets `groupId` and `groupPosition` (appended, default `null`). `FakeSubscriptions` implements them with `seedGroup()`, `seedEndOptions()` and `groupEvents()` (`SubscriptionGroupCreated`, `SubscriptionGroupUpdated`, `SubscriptionGroupDissolved`).
+- A service group may carry its own tax category: `SubscriptionGroupData::$taxCategoryId` and `NewSubscriptionGroup::$taxCategoryId` (appended, default `null` = inherited from the members), and `updateGroup()` takes `?int $taxCategoryId, bool $clearTaxCategory` before `$actor`. A collapsed group whose members have different tax treatments requires a category (`ContractException`); a category on an expanded or uniform group is dropped to `null`; membership changes re-check. `FakeSubscriptions` gets `seedTaxTreatment()` and `seedTaxCategory()`, and `SubscriptionGroupUpdated` carries `tax_category_id`.
 
 ## [2.13.1] - 2026-11-06
 

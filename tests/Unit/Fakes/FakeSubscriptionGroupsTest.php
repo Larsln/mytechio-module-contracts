@@ -109,13 +109,13 @@ it('updates name, collapse flag and note and keeps null arguments', function () 
     $fake = fakeWithSubscriptions();
     $group = $fake->createGroup(new NewSubscriptionGroup(1, 'A', true, 'alt', [1]), groupActor());
 
-    $renamed = $fake->updateGroup($group->id, 'B', false, null, false, groupActor());
+    $renamed = $fake->updateGroup($group->id, 'B', false, null, false, null, false, groupActor());
     expect($renamed->name)->toBe('B')->and($renamed->collapseOnInvoice)->toBeFalse()->and($renamed->note)->toBe('alt');
 
-    $noted = $fake->updateGroup($group->id, null, null, 'neu', false, groupActor());
+    $noted = $fake->updateGroup($group->id, null, null, 'neu', false, null, false, groupActor());
     expect($noted->note)->toBe('neu')->and($noted->name)->toBe('B');
 
-    $cleared = $fake->updateGroup($group->id, null, null, 'ignoriert', true, groupActor());
+    $cleared = $fake->updateGroup($group->id, null, null, 'ignoriert', true, null, false, groupActor());
     expect($cleared->note)->toBeNull();
 });
 
@@ -124,14 +124,14 @@ it('fires an update event only when the group changed', function () {
     $group = $fake->createGroup(new NewSubscriptionGroup(1, 'A', true, null, [1]), groupActor());
     $count = count($fake->groupEvents());
 
-    $fake->updateGroup($group->id, 'A', true, null, false, groupActor());
+    $fake->updateGroup($group->id, 'A', true, null, false, null, false, groupActor());
     expect($fake->groupEvents())->toHaveCount($count);
 
-    $fake->updateGroup($group->id, 'B', null, null, false, groupActor());
+    $fake->updateGroup($group->id, 'B', null, null, false, null, false, groupActor());
     $event = $fake->groupEvents()[$count];
 
     expect($event['event'])->toBe('SubscriptionGroupUpdated')
-        ->and($event['payload'])->toBe(['group_id' => $group->id, 'contact_id' => 1, 'name' => 'B', 'collapse_on_invoice' => true, 'member_ids' => [1]])
+        ->and($event['payload'])->toBe(['group_id' => $group->id, 'contact_id' => 1, 'name' => 'B', 'collapse_on_invoice' => true, 'tax_category_id' => null, 'member_ids' => [1]])
         ->and($event['actor'])->toEqual(groupActor());
 });
 
@@ -139,8 +139,8 @@ it('refuses invalid update input and unknown groups', function () {
     $fake = fakeWithSubscriptions();
     $group = $fake->createGroup(new NewSubscriptionGroup(1, 'A'), groupActor());
 
-    expect(fn () => $fake->updateGroup($group->id, ' ', null, null, false, groupActor()))->toThrow(ContractException::class, 'nicht leer')
-        ->and(fn () => $fake->updateGroup(99, 'X', null, null, false, groupActor()))->toThrow(SubscriptionGroupNotFoundException::class, 'ID 99');
+    expect(fn () => $fake->updateGroup($group->id, ' ', null, null, false, null, false, groupActor()))->toThrow(ContractException::class, 'nicht leer')
+        ->and(fn () => $fake->updateGroup(99, 'X', null, null, false, null, false, groupActor()))->toThrow(SubscriptionGroupNotFoundException::class, 'ID 99');
 });
 
 it('reorders the groups of a contact and fires updates for moved groups only', function () {
@@ -343,5 +343,102 @@ it('validates the group data value objects', function () {
         ->and((new SubscriptionGroupData(1, 1, 'A', 2, true, 'n', [3], 'u', 'c'))->toArray())->toBe([
             'id' => 1, 'contact_id' => 1, 'name' => 'A', 'position' => 2, 'collapse_on_invoice' => true,
             'note' => 'n', 'member_ids' => [3], 'invoice_group_id' => 'u', 'created_at' => 'c',
+            'tax_category_id' => null,
         ]);
+});
+
+/**
+ * Subscriptions 1 and 2 at 19 percent, 3 at 7 percent; categories 10 and 11 known.
+ */
+function fakeWithTaxTreatments(): FakeSubscriptions
+{
+    $fake = fakeWithSubscriptions();
+    $fake->seedTaxTreatment(1, '19');
+    $fake->seedTaxTreatment(2, '19');
+    $fake->seedTaxTreatment(3, '7');
+    $fake->seedTaxCategory(10);
+    $fake->seedTaxCategory(11);
+
+    return $fake;
+}
+
+it('refuses a collapsed group with mixed tax treatments and no category', function () {
+    $fake = fakeWithTaxTreatments();
+
+    expect(fn () => $fake->createGroup(new NewSubscriptionGroup(1, 'A', true, null, [1, 3]), groupActor()))
+        ->toThrow(ContractException::class, 'Für eine zusammengefasste Gruppe mit verschiedenen Steuersätzen muss die Steuerkategorie der Gruppe gewählt werden.')
+        ->and(fn () => $fake->createGroup(new NewSubscriptionGroup(1, 'A', true, null, [1, 3]), groupActor()))
+        ->toThrow(ContractException::class, 'Eigenständige Leistungen mit verschiedenen Sätzen müssen getrennt ausgewiesen werden.')
+        ->and($fake->groupsForContact(1))->toBe([]);
+});
+
+it('accepts mixed members with a category and normalises it away otherwise', function () {
+    $fake = fakeWithTaxTreatments();
+
+    $mixed = $fake->createGroup(new NewSubscriptionGroup(1, 'Mixed', true, null, [1, 3], 10), groupActor());
+    $uniform = $fake->createGroup(new NewSubscriptionGroup(1, 'Uniform', true, null, [2], 10), groupActor());
+    $expanded = $fake->createGroup(new NewSubscriptionGroup(1, 'Expanded', false, null, [], 10), groupActor());
+    $plain = $fake->createGroup(new NewSubscriptionGroup(1, 'Plain'), groupActor());
+
+    expect($mixed->taxCategoryId)->toBe(10)->and($mixed->toArray()['tax_category_id'])->toBe(10)
+        ->and($uniform->taxCategoryId)->toBeNull()
+        ->and($expanded->taxCategoryId)->toBeNull()
+        ->and($plain->taxCategoryId)->toBeNull();
+});
+
+it('refuses an unknown tax category', function () {
+    $fake = fakeWithTaxTreatments();
+    $group = $fake->createGroup(new NewSubscriptionGroup(1, 'A', true, null, [1]), groupActor());
+
+    expect(fn () => $fake->createGroup(new NewSubscriptionGroup(1, 'B', true, null, [1, 3], 99), groupActor()))->toThrow(ContractException::class, 'Die Steuerkategorie ist unbekannt.')
+        ->and(fn () => $fake->updateGroup($group->id, null, null, null, false, 99, false, groupActor()))->toThrow(ContractException::class, 'Die Steuerkategorie ist unbekannt.');
+});
+
+it('sets, keeps and clears the category on update', function () {
+    $fake = fakeWithTaxTreatments();
+    $group = $fake->createGroup(new NewSubscriptionGroup(1, 'A', true, null, [1, 3], 10), groupActor());
+    $count = count($fake->groupEvents());
+
+    $changed = $fake->updateGroup($group->id, null, null, null, false, 11, false, groupActor());
+    expect($changed->taxCategoryId)->toBe(11)
+        ->and($fake->groupEvents()[$count]['payload']['tax_category_id'])->toBe(11);
+
+    expect($fake->updateGroup($group->id, 'B', null, null, false, null, false, groupActor())->taxCategoryId)->toBe(11)
+        ->and(fn () => $fake->updateGroup($group->id, null, null, null, false, null, true, groupActor()))->toThrow(ContractException::class, 'muss die Steuerkategorie der Gruppe gewählt werden')
+        ->and($fake->findGroup($group->id)->taxCategoryId)->toBe(11);
+});
+
+it('clears the category when the group is expanded and requires it again on collapsing', function () {
+    $fake = fakeWithTaxTreatments();
+    $group = $fake->createGroup(new NewSubscriptionGroup(1, 'A', true, null, [1, 3], 10), groupActor());
+
+    expect($fake->updateGroup($group->id, null, false, null, false, null, false, groupActor())->taxCategoryId)->toBeNull()
+        ->and(fn () => $fake->updateGroup($group->id, null, true, null, false, null, false, groupActor()))->toThrow(ContractException::class, 'Steuerkategorie')
+        ->and($fake->updateGroup($group->id, null, true, null, false, 11, false, groupActor())->taxCategoryId)->toBe(11);
+});
+
+it('clearTaxCategory wins over a given category on a uniform group', function () {
+    $fake = fakeWithTaxTreatments();
+    $group = $fake->createGroup(new NewSubscriptionGroup(1, 'A', true, null, [1, 2]), groupActor());
+
+    expect($fake->updateGroup($group->id, null, null, null, false, 10, true, groupActor())->taxCategoryId)->toBeNull();
+});
+
+it('re-checks the category on membership changes', function () {
+    $fake = fakeWithTaxTreatments();
+    $uniform = $fake->createGroup(new NewSubscriptionGroup(1, 'U', true, null, [1, 2]), groupActor());
+    $mixed = $fake->createGroup(new NewSubscriptionGroup(1, 'M', true, null, [1, 3], 10), groupActor());
+
+    expect(fn () => $fake->addGroupMember($uniform->id, 3, null, groupActor()))->toThrow(ContractException::class, 'verschiedenen Steuersätzen')
+        ->and(fn () => $fake->setGroupMembers($uniform->id, [2, 3], groupActor()))->toThrow(ContractException::class, 'verschiedenen Steuersätzen')
+        ->and($fake->findGroup($uniform->id)->memberIds)->toBe([2]);
+
+    expect($fake->setGroupMembers($mixed->id, [3], groupActor())->taxCategoryId)->toBeNull();
+});
+
+it('keeps constructing group data and new groups without the tax category', function () {
+    $new = new NewSubscriptionGroup(1, 'A');
+    $data = new SubscriptionGroupData(1, 1, 'A', 1, true, null, [], SubscriptionGroupData::invoiceGroupIdFor(1), '2026-11-08T00:00:00+00:00');
+
+    expect($new->taxCategoryId)->toBeNull()->and($data->taxCategoryId)->toBeNull()->and($data->toArray())->toHaveKey('tax_category_id', null);
 });

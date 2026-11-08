@@ -126,7 +126,8 @@ interface Subscriptions
      * Creates a group at the end of the contact's groups with the given
      * subscriptions as members in that order. Members of another group move
      * over. Fires `SubscriptionGroupCreated` after the commit, plus
-     * `SubscriptionGroupUpdated` for every group that lost a member.
+     * `SubscriptionGroupUpdated` for every group that lost a member. The tax
+     * category rules of {@see updateGroup()} apply.
      *
      * @throws SubscriptionNotFoundException if a member id is unknown.
      * @throws ContractException if the name is empty or longer than 120 characters, a subscription is listed twice
@@ -140,10 +141,25 @@ interface Subscriptions
      * `$clearNote = true` removes the note (and wins over `$note`). Fires
      * `SubscriptionGroupUpdated` only when something changed.
      *
+     * `$taxCategoryId` sets the group's own tax category, which governs every
+     * member line of a collapsed group; `null` keeps it, `$clearTaxCategory = true`
+     * removes it (and wins over `$taxCategoryId`). A collapsed group whose members
+     * have different tax treatments requires a category. A category set on an
+     * expanded group or on a group with uniform members is dropped (stored as
+     * `null`); switching `$collapseOnInvoice` to `false` clears it.
+     * `createGroup()`, `setGroupMembers()` and `addGroupMember()` re-check the
+     * same rule: a membership change that makes a collapsed group mixed
+     * without a category is refused.
+     *
      * @throws SubscriptionGroupNotFoundException if `$id` is unknown.
-     * @throws ContractException if the name is empty („Der Gruppenname darf nicht leer sein.“) or longer than 120 characters.
+     * @throws ContractException if the name is empty („Der Gruppenname darf nicht leer sein.“) or longer than 120 characters,
+     *                           the tax category is unknown („Die Steuerkategorie ist unbekannt.“), or a collapsed group has
+     *                           members with different tax treatments and no category („Für eine zusammengefasste Gruppe mit
+     *                           verschiedenen Steuersätzen muss die Steuerkategorie der Gruppe gewählt werden. Nur zulässig,
+     *                           wenn das Paket eine einheitliche Leistung ist (Haupt-/Nebenleistung). Eigenständige Leistungen
+     *                           mit verschiedenen Sätzen müssen getrennt ausgewiesen werden.“).
      */
-    public function updateGroup(int $id, ?string $name, ?bool $collapseOnInvoice, ?string $note, bool $clearNote, ActorRef $actor): SubscriptionGroupData;
+    public function updateGroup(int $id, ?string $name, ?bool $collapseOnInvoice, ?string $note, bool $clearNote, ?int $taxCategoryId, bool $clearTaxCategory, ActorRef $actor): SubscriptionGroupData;
 
     /**
      * Sets the order of the contact's groups. Fires `SubscriptionGroupUpdated`

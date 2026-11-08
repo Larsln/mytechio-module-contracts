@@ -211,7 +211,10 @@ the type `generic`; all other types and all sources come from plugin modules.
   `SubscriptionGroupNotFoundException` / `SubscriptionNotFoundException`. The
   core fires `SubscriptionGroupCreated`, `SubscriptionGroupUpdated` and
   `SubscriptionGroupDissolved` after the commit; `FakeSubscriptions` records
-  them in `groupEvents()`.
+  them in `groupEvents()`. A group may carry its own tax category
+  (`taxCategoryId`) that governs all member lines of a collapsed group; a
+  collapsed group with mixed tax treatments requires it (`updateGroup()` takes
+  `$taxCategoryId` and `$clearTaxCategory`; `FakeSubscriptions::seedTaxTreatment()`).
 
 ### Subscription types
 

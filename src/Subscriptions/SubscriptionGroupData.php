@@ -18,7 +18,9 @@ use MyTechIO\Contracts\ContractException;
  * with its sum. `invoiceGroupId` is the UUID the billing run uses as `group_id`
  * of the invoice items: the name-based UUIDv5 (URL namespace) of
  * `mytechio:subscription-group:<id>`, see {@see invoiceGroupIdFor()}.
- * `createdAt` is ISO 8601.
+ * `createdAt` is ISO 8601. `taxCategoryId` is the group's own tax category
+ * that governs the tax of every member line of a collapsed group; `null`
+ * means the tax is inherited from the members.
  */
 final readonly class SubscriptionGroupData
 {
@@ -35,6 +37,7 @@ final readonly class SubscriptionGroupData
         public array $memberIds,
         public string $invoiceGroupId,
         public string $createdAt,
+        public ?int $taxCategoryId = null,
     ) {
         if ($name === '') {
             throw new ContractException('name must not be empty.');
@@ -78,6 +81,7 @@ final readonly class SubscriptionGroupData
             'member_ids' => $this->memberIds,
             'invoice_group_id' => $this->invoiceGroupId,
             'created_at' => $this->createdAt,
+            'tax_category_id' => $this->taxCategoryId,
         ];
     }
 }

@@ -55,7 +55,7 @@ final class FakeSubscriptions implements Subscriptions
     private array $actors = [];
 
     /**
-     * @var array<int, array{id: int, contactId: int, name: string, collapseOnInvoice: bool, note: ?string, createdAt: string, memberIds: list<int>}>
+     * @var array<int, array{id: int, contactId: int, name: string, collapseOnInvoice: bool, note: ?string, createdAt: string, memberIds: list<int>, taxCategoryId: ?int}>
      */
     private array $groups = [];
 
@@ -63,6 +63,16 @@ final class FakeSubscriptions implements Subscriptions
      * @var array<int, list<string>>
      */
     private array $endOptions = [];
+
+    /**
+     * @var array<int, string>
+     */
+    private array $taxTreatments = [];
+
+    /**
+     * @var array<int, true>
+     */
+    private array $taxCategories = [];
 
     /**
      * @var list<array{event: string, payload: array<string, mixed>, actor: ActorRef}>
@@ -223,9 +233,32 @@ final class FakeSubscriptions implements Subscriptions
             'note' => $group->note,
             'createdAt' => $group->createdAt,
             'memberIds' => $group->memberIds,
+            'taxCategoryId' => $group->taxCategoryId,
         ];
         $this->nextGroupId = max($this->nextGroupId, $group->id + 1);
         $this->groupPositions[$group->id] = $group->position;
+    }
+
+    /**
+     * Declares the (opaque) tax treatment of a subscription, e.g. `'19'` or `'7'`.
+     * A collapsed group whose members have different treatments requires a
+     * tax category; subscriptions without a treatment count as uniform with any.
+     *
+     * @throws SubscriptionNotFoundException if `$subscriptionId` is unknown.
+     */
+    public function seedTaxTreatment(int $subscriptionId, string $treatment): void
+    {
+        $this->get($subscriptionId);
+        $this->taxTreatments[$subscriptionId] = $treatment;
+    }
+
+    /**
+     * Declares a known tax category id. While none is declared every id is
+     * accepted; once one is, other ids are refused as unknown.
+     */
+    public function seedTaxCategory(int $taxCategoryId): void
+    {
+        $this->taxCategories[$taxCategoryId] = true;
     }
 
     /**
@@ -273,6 +306,7 @@ final class FakeSubscriptions implements Subscriptions
     {
         $name = $this->validName($group->name);
         $this->assertMembers($group->contactId, $group->memberIds);
+        $taxCategoryId = $this->effectiveTaxCategory($group->collapseOnInvoice, $group->memberIds, $group->taxCategoryId);
 
         $id = $this->nextGroupId++;
         $this->groupPositions[$id] = count($this->groupIdsOf($group->contactId)) + 1;
@@ -284,6 +318,7 @@ final class FakeSubscriptions implements Subscriptions
             'note' => $group->note,
             'createdAt' => gmdate('c'),
             'memberIds' => [],
+            'taxCategoryId' => $taxCategoryId,
         ];
 
         $this->syncMembers($id, $group->memberIds, $actor, announceGroup: false);
@@ -292,7 +327,7 @@ final class FakeSubscriptions implements Subscriptions
         return $this->groupData($id);
     }
 
-    public function updateGroup(int $id, ?string $name, ?bool $collapseOnInvoice, ?string $note, bool $clearNote, ActorRef $actor): SubscriptionGroupData
+    public function updateGroup(int $id, ?string $name, ?bool $collapseOnInvoice, ?string $note, bool $clearNote, ?int $taxCategoryId, bool $clearTaxCategory, ActorRef $actor): SubscriptionGroupData
     {
         $group = $this->group($id);
         $changed = $group;
@@ -310,6 +345,14 @@ final class FakeSubscriptions implements Subscriptions
         } elseif ($note !== null) {
             $changed['note'] = $note;
         }
+
+        if ($clearTaxCategory) {
+            $changed['taxCategoryId'] = null;
+        } elseif ($taxCategoryId !== null) {
+            $changed['taxCategoryId'] = $taxCategoryId;
+        }
+
+        $changed['taxCategoryId'] = $this->effectiveTaxCategory($changed['collapseOnInvoice'], $changed['memberIds'], $changed['taxCategoryId']);
 
         if ($changed !== $group) {
             $this->groups[$id] = $changed;
@@ -346,6 +389,7 @@ final class FakeSubscriptions implements Subscriptions
         $group = $this->group($groupId);
         $subscriptionIds = array_values($subscriptionIds);
         $this->assertMembers($group['contactId'], $subscriptionIds);
+        $this->normaliseTaxCategory($groupId, $subscriptionIds);
         $this->syncMembers($groupId, $subscriptionIds, $actor);
 
         return $this->groupData($groupId);
@@ -358,6 +402,7 @@ final class FakeSubscriptions implements Subscriptions
 
         $ids = array_values(array_filter($group['memberIds'], static fn (int $id): bool => $id !== $subscriptionId));
         array_splice($ids, $position === null ? count($ids) : max(0, min($position - 1, count($ids))), 0, [$subscriptionId]);
+        $this->normaliseTaxCategory($groupId, $ids);
         $this->syncMembers($groupId, $ids, $actor);
 
         return $this->groupData($groupId);
@@ -555,6 +600,7 @@ final class FakeSubscriptions implements Subscriptions
             memberIds: $group['memberIds'],
             invoiceGroupId: SubscriptionGroupData::invoiceGroupIdFor($id),
             createdAt: $group['createdAt'],
+            taxCategoryId: $group['taxCategoryId'],
         );
     }
 
@@ -613,6 +659,45 @@ final class FakeSubscriptions implements Subscriptions
     }
 
     /**
+     * The category to store: refused when unknown, `null` for an expanded
+     * group or uniform members, and required for collapsed mixed members.
+     *
+     * @param  list<int>  $memberIds
+     *
+     * @throws ContractException
+     */
+    private function effectiveTaxCategory(bool $collapseOnInvoice, array $memberIds, ?int $taxCategoryId): ?int
+    {
+        if ($taxCategoryId !== null && $this->taxCategories !== [] && ! isset($this->taxCategories[$taxCategoryId])) {
+            throw new ContractException('Die Steuerkategorie ist unbekannt.');
+        }
+
+        if (! $collapseOnInvoice || count(array_unique(array_intersect_key($this->taxTreatments, array_flip($memberIds)))) < 2) {
+            return null;
+        }
+
+        return $taxCategoryId ?? throw new ContractException(
+            'Für eine zusammengefasste Gruppe mit verschiedenen Steuersätzen muss die Steuerkategorie der Gruppe gewählt werden. '
+            .'Nur zulässig, wenn das Paket eine einheitliche Leistung ist (Haupt-/Nebenleistung). '
+            .'Eigenständige Leistungen mit verschiedenen Sätzen müssen getrennt ausgewiesen werden.'
+        );
+    }
+
+    /**
+     * Re-checks the group's tax category against a new member list and drops
+     * it when the members became uniform.
+     *
+     * @param  list<int>  $memberIds
+     *
+     * @throws ContractException
+     */
+    private function normaliseTaxCategory(int $groupId, array $memberIds): void
+    {
+        $group = $this->groups[$groupId];
+        $this->groups[$groupId]['taxCategoryId'] = $this->effectiveTaxCategory($group['collapseOnInvoice'], $memberIds, $group['taxCategoryId']);
+    }
+
+    /**
      * Makes `$subscriptionIds` the validated members of the group, in order,
      * moving members over from other groups, and records an update for every
      * group whose member list changed (`$announceGroup = false` leaves the
@@ -648,6 +733,7 @@ final class FakeSubscriptions implements Subscriptions
     {
         $this->recordGroupEvent('SubscriptionGroupUpdated', $groupId, $actor, [
             'collapse_on_invoice' => $this->groups[$groupId]['collapseOnInvoice'],
+            'tax_category_id' => $this->groups[$groupId]['taxCategoryId'],
             'member_ids' => $this->groups[$groupId]['memberIds'],
         ]);
     }
