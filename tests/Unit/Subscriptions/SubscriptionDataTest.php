@@ -72,6 +72,8 @@ it('converts to an array with snake_case keys and the status value', function ()
         'payment_method' => null,
         'price_period_unit' => null,
         'price_period_count' => null,
+        'group_id' => null,
+        'group_position' => null,
     ]);
 });
 
@@ -153,6 +155,8 @@ it('converts a cancelled, sourced subscription with attributes to an array', fun
         'payment_method' => null,
         'price_period_unit' => null,
         'price_period_count' => null,
+        'group_id' => null,
+        'group_position' => null,
     ]);
 });
 
@@ -195,3 +199,20 @@ it('rejects a half-set or invalid price period', function (?string $unit, ?int $
     'unknown unit' => ['decade', 1],
     'zero count' => ['month', 0],
 ])->throws(ContractException::class);
+
+it('constructs without the group arguments and keeps them null', function () {
+    $subscription = subscriptionData();
+
+    expect($subscription->groupId)->toBeNull()
+        ->and($subscription->groupPosition)->toBeNull();
+});
+
+it('carries the group id and position together', function () {
+    $subscription = subscriptionData(['groupId' => 4, 'groupPosition' => 2]);
+
+    expect($subscription->toArray())->toMatchArray(['group_id' => 4, 'group_position' => 2]);
+});
+
+it('rejects a group id without a position', function () {
+    subscriptionData(['groupId' => 4]);
+})->throws(ContractException::class, 'groupId and groupPosition');

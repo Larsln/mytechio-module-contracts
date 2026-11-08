@@ -196,6 +196,20 @@ the type `generic`; all other types and all sources come from plugin modules.
   ended; unknown IDs throw `SubscriptionNotFoundException`.
 - `source` and `externalId` are always set together; a subscription without a
   source can carry a free-text `providerName`.
+- Service groups (German UI: "Leistungsgruppen") bundle one contact's
+  subscriptions that the billing run bills together on one invoice item group
+  (`SubscriptionGroupData::$invoiceGroupId`). Reading: `findGroup()`,
+  `groupsForContact()`, `groupOf()`; `SubscriptionData::$groupId`/`$groupPosition`
+  name the group of a subscription. Writing: `createGroup(NewSubscriptionGroup)`,
+  `updateGroup()`, `reorderGroups()`, `setGroupMembers()`, `addGroupMember()`,
+  `removeGroupMember()`, `dissolveGroup()` and `cancelGroup($groupId, $endsOn)`
+  (a shared end date is required; `groupEndOptions()` lists the common ones).
+  A subscription is in at most one group and only in one of its own contact;
+  violations throw `ContractException`, unknown ids
+  `SubscriptionGroupNotFoundException` / `SubscriptionNotFoundException`. The
+  core fires `SubscriptionGroupCreated`, `SubscriptionGroupUpdated` and
+  `SubscriptionGroupDissolved` after the commit; `FakeSubscriptions` records
+  them in `groupEvents()`.
 
 ### Subscription types
 

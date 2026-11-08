@@ -36,6 +36,10 @@ use MyTechIO\Contracts\Invoices\Validate;
  * option prices a smaller period than it bills (e.g. per month, billed every
  * 3 months), otherwise `null` and the price is per billing period.
  *
+ * `groupId` is the service group (`SubscriptionGroupData`) the subscription
+ * belongs to, `groupPosition` its 1-based position inside it; both are set or
+ * both are `null` when it is ungrouped.
+ *
  * `paymentMethod` is the service's own payment method (`"bank_transfer"` or
  * `"direct_debit"`) for its invoices; `null` means the contact's default decides.
  *
@@ -77,6 +81,8 @@ final readonly class SubscriptionData
         public ?string $paymentMethod = null,
         public ?string $pricePeriodUnit = null,
         public ?int $pricePeriodCount = null,
+        public ?int $groupId = null,
+        public ?int $groupPosition = null,
     ) {
         Validate::decimal($quantity, 'quantity');
         Validate::date($startsOn, 'startsOn');
@@ -103,6 +109,10 @@ final readonly class SubscriptionData
 
         if ($pricePeriodCount !== null && $pricePeriodCount < 1) {
             throw new ContractException('pricePeriodCount must be at least 1.');
+        }
+
+        if (($groupId === null) !== ($groupPosition === null)) {
+            throw new ContractException('groupId and groupPosition must either both be set or both be null.');
         }
 
         if (($source === null) !== ($externalId === null)) {
@@ -144,6 +154,8 @@ final readonly class SubscriptionData
             'payment_method' => $this->paymentMethod,
             'price_period_unit' => $this->pricePeriodUnit,
             'price_period_count' => $this->pricePeriodCount,
+            'group_id' => $this->groupId,
+            'group_position' => $this->groupPosition,
         ];
     }
 }
