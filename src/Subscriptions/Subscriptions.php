@@ -216,9 +216,13 @@ interface Subscriptions
      * without end options accept any date and do not narrow the list. The
      * core returns at most 12 dates.
      *
-     * @return list<string>
+     * `null` means no active member has a billing grid, so any date is valid.
+     * An empty list means constrained members share no period boundary: the
+     * group cannot be cancelled as a whole.
+     *
+     * @return list<string>|null
      *
      * @throws SubscriptionGroupNotFoundException if `$groupId` is unknown.
      */
-    public function groupEndOptions(int $groupId): array;
+    public function groupEndOptions(int $groupId): ?array;
 }

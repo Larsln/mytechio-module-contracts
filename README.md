@@ -203,7 +203,9 @@ the type `generic`; all other types and all sources come from plugin modules.
   name the group of a subscription. Writing: `createGroup(NewSubscriptionGroup)`,
   `updateGroup()`, `reorderGroups()`, `setGroupMembers()`, `addGroupMember()`,
   `removeGroupMember()`, `dissolveGroup()` and `cancelGroup($groupId, $endsOn)`
-  (a shared end date is required; `groupEndOptions()` lists the common ones).
+  (a shared end date is required; `groupEndOptions()` lists the common ones,
+  `null` when no member has a billing grid so any date is valid, `[]` when the
+  members share no period boundary and the group cannot be cancelled as a whole).
   A subscription is in at most one group and only in one of its own contact;
   violations throw `ContractException`, unknown ids
   `SubscriptionGroupNotFoundException` / `SubscriptionNotFoundException`. The

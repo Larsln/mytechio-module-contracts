@@ -305,8 +305,19 @@ it('intersects the end options of the active members', function () {
     $a = $fake->createGroup(new NewSubscriptionGroup(1, 'A', memberIds: [1, 2, 3]), groupActor());
 
     expect($fake->groupEndOptions($a->id))->toBe(['2026-09-30', '2027-03-31'])
-        ->and($fake->groupEndOptions($fake->createGroup(new NewSubscriptionGroup(1, 'leer'), groupActor())->id))->toBe([])
+        ->and($fake->groupEndOptions($fake->createGroup(new NewSubscriptionGroup(1, 'leer'), groupActor())->id))->toBeNull()
         ->and(fn () => $fake->groupEndOptions(99))->toThrow(SubscriptionGroupNotFoundException::class);
+});
+
+it('distinguishes an unconstrained group (null) from an empty intersection ([])', function () {
+    $fake = fakeWithSubscriptions();
+    $fake->seedEndOptions(1, ['2026-09-30']);
+    $fake->seedEndOptions(2, ['2026-12-31']);
+    $constrained = $fake->createGroup(new NewSubscriptionGroup(1, 'A', memberIds: [1, 2]), groupActor());
+    $free = $fake->createGroup(new NewSubscriptionGroup(1, 'B', memberIds: [3]), groupActor());
+
+    expect($fake->groupEndOptions($constrained->id))->toBe([])
+        ->and($fake->groupEndOptions($free->id))->toBeNull();
 });
 
 it('rejects a malformed end option on seeding', function () {

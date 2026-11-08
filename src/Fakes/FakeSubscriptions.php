@@ -31,7 +31,8 @@ use MyTechIO\Contracts\Subscriptions\SubscriptionStatus;
  * positions of groups per contact and of members per group. `seedGroup()`
  * seeds a group (its members' `groupId`/`groupPosition` are then filled on
  * every read); `seedEndOptions()` gives a subscription end options, which
- * `groupEndOptions()` intersects and `cancelGroup()` enforces (a subscription
+ * `groupEndOptions()` intersects (`null` while no active member has end options,
+ * `[]` for an empty intersection) and `cancelGroup()` enforces (a subscription
  * without end options accepts any date). Group writes record
  * `SubscriptionGroupCreated`, `SubscriptionGroupUpdated` and
  * `SubscriptionGroupDissolved` with payload and actor in `groupEvents()`.
@@ -418,7 +419,7 @@ final class FakeSubscriptions implements Subscriptions
         return array_map(fn (SubscriptionData $member): SubscriptionData => $this->cancel($member->id, $endsOn, $actor), $members);
     }
 
-    public function groupEndOptions(int $groupId): array
+    public function groupEndOptions(int $groupId): ?array
     {
         $common = null;
 
@@ -432,7 +433,7 @@ final class FakeSubscriptions implements Subscriptions
             $common = $common === null ? $options : array_values(array_intersect($common, $options));
         }
 
-        return array_slice($common ?? [], 0, 12);
+        return $common === null ? null : array_slice($common, 0, 12);
     }
 
     /**
