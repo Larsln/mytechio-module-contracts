@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.15.0] - 2026-11-09
+
+### Added
+
+- `Tax\TaxCategories` contract (read-only: `all(bool $includeInactive = false)`, `find(int $id)`), `TaxCategoryData` and `FakeTaxCategories`.
+- `ArticleData::$subscriptionType` and `ArticleData::$taxCategoryId` (appended, default `null`).
+- `NewSubscription::$unitPriceNetOverride` (appended, default `null`; decimal string of at least zero) that overrides the net unit price of the price option / price list; `FakeSubscriptions::create()` stores it.
+
 ## [2.14.0] - 2026-11-08
 
 ### Added

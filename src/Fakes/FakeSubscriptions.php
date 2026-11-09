@@ -172,6 +172,7 @@ final class FakeSubscriptions implements Subscriptions
             autorenew: $subscription->autorenew,
             attributes: $subscription->attributes,
             paymentMethod: $subscription->paymentMethod,
+            unitPriceNetOverride: $subscription->unitPriceNetOverride,
         );
 
         $this->subscriptions[$id] = $data;

@@ -20,6 +20,9 @@ use MyTechIO\Contracts\Invoices\Validate;
  * schema of the `SubscriptionType`; the core validates them server-side.
  * `paymentMethod` is the service's own payment method (`"bank_transfer"` or
  * `"direct_debit"`) for its invoices; `null` means the contact's default decides.
+ * `unitPriceNetOverride` is a decimal string of at least zero that overrides the
+ * net unit price of the price option / price list; `null` means the core
+ * resolves the price.
  */
 final readonly class NewSubscription
 {
@@ -41,6 +44,7 @@ final readonly class NewSubscription
         public ?bool $autorenew = null,
         public array $attributes = [],
         public ?string $paymentMethod = null,
+        public ?string $unitPriceNetOverride = null,
     ) {
         if ($priceOptionId !== null && $articleId === null) {
             throw new ContractException('priceOptionId requires articleId.');
@@ -50,6 +54,14 @@ final readonly class NewSubscription
 
         if (str_starts_with($quantity, '-') || preg_match('/^0*(\.0+)?$/', $quantity) === 1) {
             throw new ContractException("quantity must be greater than zero, got \"{$quantity}\".");
+        }
+
+        if ($unitPriceNetOverride !== null) {
+            Validate::decimal($unitPriceNetOverride, 'unitPriceNetOverride');
+
+            if (str_starts_with($unitPriceNetOverride, '-')) {
+                throw new ContractException("unitPriceNetOverride must not be negative, got \"{$unitPriceNetOverride}\".");
+            }
         }
 
         foreach (['startsOn' => $startsOn, 'renewsOn' => $renewsOn] as $field => $date) {
@@ -83,6 +95,7 @@ final readonly class NewSubscription
             'autorenew' => $this->autorenew,
             'attributes' => $this->attributes,
             'payment_method' => $this->paymentMethod,
+            'unit_price_net_override' => $this->unitPriceNetOverride,
         ];
     }
 }

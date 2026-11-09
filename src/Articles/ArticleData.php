@@ -30,6 +30,9 @@ use MyTechIO\Contracts\Invoices\Validate;
  * manufacturer's own designation of the article ("Bezeichnung des Herstellers"),
  * `productGroupId` and `productGroupName` the product group the article is filed
  * under; each is `null` when not maintained.
+ * `subscriptionType` is the subscription type key of a subscribable article
+ * (one with a period price option), `null` otherwise; `taxCategoryId` is the
+ * id of the article's default tax category (`null` when none is set).
  */
 final readonly class ArticleData
 {
@@ -58,6 +61,8 @@ final readonly class ArticleData
         public ?string $manufacturerLabel = null,
         public ?int $productGroupId = null,
         public ?string $productGroupName = null,
+        public ?string $subscriptionType = null,
+        public ?int $taxCategoryId = null,
     ) {
         Validate::decimal($priceB2cNet, 'priceB2cNet');
         Validate::decimal($priceB2bNet, 'priceB2bNet');
@@ -115,6 +120,8 @@ final readonly class ArticleData
             'manufacturer_label' => $this->manufacturerLabel,
             'product_group_id' => $this->productGroupId,
             'product_group_name' => $this->productGroupName,
+            'subscription_type' => $this->subscriptionType,
+            'tax_category_id' => $this->taxCategoryId,
         ];
     }
 }

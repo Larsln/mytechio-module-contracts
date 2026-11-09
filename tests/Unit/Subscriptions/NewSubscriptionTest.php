@@ -18,6 +18,7 @@ it('defaults to quantity 1 and null for everything optional', function () {
         ->and($subscription->renewsOn)->toBeNull()
         ->and($subscription->autorenew)->toBeNull()
         ->and($subscription->paymentMethod)->toBeNull()
+        ->and($subscription->unitPriceNetOverride)->toBeNull()
         ->and($subscription->attributes)->toBe([]);
 });
 
@@ -39,8 +40,20 @@ it('converts to an array with snake_case keys', function () {
         'autorenew' => null,
         'attributes' => [],
         'payment_method' => null,
+        'unit_price_net_override' => null,
     ]);
 });
+
+it('carries a price override and accepts zero', function () {
+    $subscription = new NewSubscription(contactId: 2, type: 'domain', label: 'x', unitPriceNetOverride: '9.5000');
+
+    expect($subscription->toArray()['unit_price_net_override'])->toBe('9.5000')
+        ->and((new NewSubscription(contactId: 2, type: 'domain', label: 'x', unitPriceNetOverride: '0'))->unitPriceNetOverride)->toBe('0');
+});
+
+it('rejects a negative or malformed price override', function (string $value) {
+    new NewSubscription(contactId: 2, type: 'domain', label: 'x', unitPriceNetOverride: $value);
+})->with(['-1', '-0.5000', 'abc'])->throws(ContractException::class);
 
 it('converts a fully specified subscription to an array', function () {
     $subscription = new NewSubscription(
@@ -74,6 +87,7 @@ it('converts a fully specified subscription to an array', function () {
         'autorenew' => true,
         'attributes' => ['registrar' => 'kyberio'],
         'payment_method' => 'direct_debit',
+        'unit_price_net_override' => null,
     ]);
 });
 

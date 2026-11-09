@@ -106,6 +106,15 @@ it('throws SubscriptionNotFoundException when linking an invoice item to an unkn
     (new FakeSubscriptions)->linkInvoiceItem(55, 999);
 })->throws(SubscriptionNotFoundException::class);
 
+it('stores the price override of a new subscription', function () {
+    $created = (new FakeSubscriptions)->create(
+        new NewSubscription(contactId: 1, type: 'domain', label: 'example.de', unitPriceNetOverride: '12.5000'),
+        new ActorRef(7, 'Admin'),
+    );
+
+    expect($created->unitPriceNetOverride)->toBe('12.5000');
+});
+
 it('creates an active subscription with an auto id, today as default start and the actor recorded', function () {
     $subscriptions = new FakeSubscriptions;
     $actor = new ActorRef(7, 'Admin');

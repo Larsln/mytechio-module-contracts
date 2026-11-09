@@ -69,7 +69,36 @@ it('converts to an array with snake_case keys and enum values', function () {
         'manufacturer_label' => null,
         'product_group_id' => null,
         'product_group_name' => null,
+        'subscription_type' => null,
+        'tax_category_id' => null,
     ]);
+});
+
+it('carries the subscription type and the default tax category', function () {
+    $article = new ArticleData(
+        id: 7,
+        articleNumber: 'ART-0007',
+        name: 'Webhosting Basic',
+        description: null,
+        kind: ArticleKind::ElectronicService,
+        taxClassification: TaxClassification::ElectronicService,
+        unit: 'Std',
+        unitName: 'Stunde',
+        unitUneceCode: 'HUR',
+        priceB2cNet: '11.9000',
+        priceB2bNet: '10.0000',
+        stockTracked: false,
+        isActive: true,
+        defaultPriceOptionId: 70,
+        priceOptions: [oneOffOption()],
+        subscriptionType: 'hosting',
+        taxCategoryId: 3,
+    );
+
+    expect($article->subscriptionType)->toBe('hosting')
+        ->and($article->taxCategoryId)->toBe(3)
+        ->and($article->toArray()['subscription_type'])->toBe('hosting')
+        ->and($article->toArray()['tax_category_id'])->toBe(3);
 });
 
 it('carries manufacturer, manufacturer label and product group', function () {
