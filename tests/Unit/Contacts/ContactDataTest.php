@@ -47,5 +47,8 @@ it('converts to an array with snake_case keys', function () {
         'mobile' => '+49 170 1',
         'website' => 'https://example.de',
         'updated_at' => '2026-10-07T08:00:00+00:00',
+        'customer_number' => null,
+        'vat_id_valid' => null,
+        'salutation' => null,
     ]);
 });

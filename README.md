@@ -32,7 +32,7 @@ composer require mytechio/module-contracts
 | `Subscriptions` | `Subscriptions` | Subscriptions (Leistungen) of contacts, implemented by the core; see section "Subscriptions". `cancel()` ends a subscription on the earliest date allowed by minimum term and notice period, or on an explicit later date. |
 | `Subscriptions` | `SubscriptionType` | Subscription type provided by a plugin module (field schema plus lifecycle hooks), container tag `mytechio.subscription_types`; see section "Subscriptions". |
 | `Subscriptions` | `SubscriptionSource` | Subscription suggestions and actions of an external source (e.g. a registrar), container tag `mytechio.subscription_sources`; see section "Subscriptions". |
-| `Contacts` | `Contacts` | Read-only contact access — modules do not create or modify contacts. |
+| `Contacts` | `Contacts` | Contact access: reads for every module; since 2.15 `create()`, `update()` (replaces the customer-facing fields, keeps the rest) and `findByEmail()` for modules that onboard customers themselves. Writes run through the core's contact service; refusals are a `ContactValidationException` with German messages per field. Deleting stays with the core. |
 | `SepaMandates` | `Contacts\SepaMandates` | Read, create and revoke SEPA mandates of contacts (provider modules). |
 | `Accounting` | `Journal` | Debit must equal credit (enforced via `UnbalancedEntryException`); closed periods are rejected (`PeriodClosedException`). |
 | `Orders` | `Orders` | Read access to orders: `find()` returns the `OrderRef` (number, page URL, lines) for an order reference. Creating and changing orders stays with the core UI; modules join the lifecycle through `OrderHook`. |
@@ -307,7 +307,7 @@ $this->app->instance(Subscriptions::class, new FakeSubscriptions);
 
 - `FakeDocumentStore` — returns deterministic paths/hashes, `stored()` for assertions.
 - `FakeMailOutbox` — `sent()`/`sentTo(email)` with no PHPUnit dependency.
-- `FakeContacts` — `seed()`, `setCountries()`.
+- `FakeContacts` — `seed()`, `setCountries()`; `create()`/`update()`/`findByEmail()` with the core's rules, `vatIdValidity()` declares VIES answers, `actors()` records writes.
 - `FakeSepaMandates` — `created()`, `revocations()`.
 - `FakeArticles` — `seed()`; `search()` filters by case-insensitive substring over article number and name in insertion order and skips inactive articles unless `$includeInactive`.
 - `FakeUnits` — `seed()` in picker order; seeding a second default clears the first one's flag.
