@@ -26,8 +26,15 @@ interface ContactMarker
     /** German label for the filter and the tooltip, e.g. `Shop-Konto`. */
     public function label(): string;
 
-    /** One or two characters shown next to the name, e.g. `S`. */
+    /** One or two characters shown next to the name, e.g. `S`; the fallback when the icon is unknown. */
     public function symbol(): string;
+
+    /**
+     * Name of an icon from the core's module icon map (the names allowed for
+     * `navigation[].icon` in the manifest, e.g. `ShoppingCart`), shown instead
+     * of the symbol; null shows the symbol.
+     */
+    public function icon(): ?string;
 
     /**
      * The marked contacts among the given ones, with an optional German

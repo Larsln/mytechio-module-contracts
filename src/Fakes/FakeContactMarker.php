@@ -19,6 +19,7 @@ final class FakeContactMarker implements ContactMarker
         private readonly string $key = 'fake',
         private readonly string $label = 'Fake-Markierung',
         private readonly string $symbol = 'F',
+        private readonly ?string $icon = null,
     ) {}
 
     public function mark(int $contactId, ?string $detail = null): void
@@ -44,6 +45,11 @@ final class FakeContactMarker implements ContactMarker
     public function symbol(): string
     {
         return $this->symbol;
+    }
+
+    public function icon(): ?string
+    {
+        return $this->icon;
     }
 
     public function detailsFor(array $contactIds): array
