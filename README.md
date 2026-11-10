@@ -198,7 +198,9 @@ the type `generic`; all other types and all sources come from plugin modules.
   `$endsOn` is before the earliest allowed date or the subscription already
   ended; unknown IDs throw `SubscriptionNotFoundException`.
 - Packages: `NewSubscription::$components` (`PackageComponentInput`: component
-  `articleId` plus the type-field `attributes` of its subscription) supplies the
+  `articleId` plus the type-field `attributes` of its subscription and an
+  optional `source` / `externalId` binding it to a provider source entry like
+  `NewSubscription::$source`) supplies the
   object values for the component subscriptions of a package article, matched by
   article id and ignored for non-package articles. `SubscriptionData::$isPackage`
   marks the head subscription, `$packageSubscriptionId` names it on a component.

@@ -145,5 +145,5 @@ it('carries package component inputs', function () {
         components: [new PackageComponentInput(9, ['fqdn' => 'example.de'])],
     );
 
-    expect($subscription->toArray()['components'])->toBe([['article_id' => 9, 'attributes' => ['fqdn' => 'example.de']]]);
+    expect($subscription->toArray()['components'])->toBe([['article_id' => 9, 'attributes' => ['fqdn' => 'example.de'], 'source' => null, 'external_id' => null]]);
 });

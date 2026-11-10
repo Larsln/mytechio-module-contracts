@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Package articles: `Articles\ArticleComponentData` and `ArticleData::$components` / `$listComponents` (appended, default `[]` / `true`).
 - `Documents\ItemComponentRef` and `InvoiceItemRef::$components` / `OrderItemRef::$components` (appended, default `[]`): the components of a package line, quantity already multiplied by the line quantity.
-- `Subscriptions\PackageComponentInput` and `NewSubscription::$components` (appended, default `[]`): type-field values of the component subscriptions of a package article; `SubscriptionData::$packageSubscriptionId` and `$isPackage` (appended). `FakeSubscriptions::create()` sets `isPackage` and `componentsOf()` returns the given components.
+- `Subscriptions\PackageComponentInput` and `NewSubscription::$components` (appended, default `[]`): type-field values and optional `source` / `externalId` (appended, default `null`) of the component subscriptions of a package article; `SubscriptionData::$packageSubscriptionId` and `$isPackage` (appended). `FakeSubscriptions::create()` sets `isPackage` and `componentsOf()` returns the given components.
 
 ## [2.15.0] - 2026-11-09
 
