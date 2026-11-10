@@ -51,4 +51,11 @@ interface ContactMarker
      * @return list<int>
      */
     public function contactIds(): array;
+
+    /**
+     * Core-relative URL (starts with `/`) of the marked object of a contact in
+     * the module, e.g. its shop account; the contact page offers it as
+     * "<label> öffnen" in its menu. Null when the contact is not marked.
+     */
+    public function url(int $contactId): ?string;
 }

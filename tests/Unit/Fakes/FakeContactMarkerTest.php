@@ -7,7 +7,7 @@ use MyTechIO\Contracts\Fakes\FakeContactMarker;
 
 it('marks contacts with a detail and answers the list lookups', function () {
     $marker = new FakeContactMarker('shop', 'Shop-Konto', 'S', 'ShoppingCart');
-    $marker->mark(7, 'Aktiv');
+    $marker->mark(7, 'Aktiv', '/shop/accounts?search=7');
     $marker->mark(9);
 
     expect($marker)->toBeInstanceOf(ContactMarker::class)
@@ -18,10 +18,14 @@ it('marks contacts with a detail and answers the list lookups', function () {
         ->and($marker->icon())->toBe('ShoppingCart')
         ->and((new FakeContactMarker)->icon())->toBeNull()
         ->and($marker->detailsFor([7, 8, 9]))->toBe([7 => 'Aktiv', 9 => null])
-        ->and($marker->contactIds())->toBe([7, 9]);
+        ->and($marker->contactIds())->toBe([7, 9])
+        ->and($marker->url(7))->toBe('/shop/accounts?search=7')
+        ->and($marker->url(9))->toBeNull()
+        ->and($marker->url(8))->toBeNull();
 
     $marker->unmark(7);
 
     expect($marker->contactIds())->toBe([9])
-        ->and($marker->detailsFor([7]))->toBe([]);
+        ->and($marker->detailsFor([7]))->toBe([])
+        ->and($marker->url(7))->toBeNull();
 });

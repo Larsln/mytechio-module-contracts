@@ -15,6 +15,9 @@ final class FakeContactMarker implements ContactMarker
     /** @var array<int, string|null> */
     private array $marked = [];
 
+    /** @var array<int, string> */
+    private array $urls = [];
+
     public function __construct(
         private readonly string $key = 'fake',
         private readonly string $label = 'Fake-Markierung',
@@ -22,14 +25,18 @@ final class FakeContactMarker implements ContactMarker
         private readonly ?string $icon = null,
     ) {}
 
-    public function mark(int $contactId, ?string $detail = null): void
+    public function mark(int $contactId, ?string $detail = null, ?string $url = null): void
     {
         $this->marked[$contactId] = $detail;
+
+        if ($url !== null) {
+            $this->urls[$contactId] = $url;
+        }
     }
 
     public function unmark(int $contactId): void
     {
-        unset($this->marked[$contactId]);
+        unset($this->marked[$contactId], $this->urls[$contactId]);
     }
 
     public function key(): string
@@ -60,5 +67,10 @@ final class FakeContactMarker implements ContactMarker
     public function contactIds(): array
     {
         return array_keys($this->marked);
+    }
+
+    public function url(int $contactId): ?string
+    {
+        return array_key_exists($contactId, $this->marked) ? ($this->urls[$contactId] ?? null) : null;
     }
 }
