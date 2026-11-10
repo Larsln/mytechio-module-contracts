@@ -516,6 +516,7 @@ final class FakeOrders implements Orders
             skontoDays: $input->skontoDays,
             bankAccountId: $input->bankAccountId,
             billingSnapshot: $input->billingSnapshot,
+            deliverySnapshot: $input->deliverySnapshot,
             invoiceIds: $previous->invoiceIds ?? [],
             createdBy: $previous->createdBy ?? null,
             createdAt: $createdAt,

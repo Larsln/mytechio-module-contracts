@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.18.0] - 2026-11-11
+
+### Added
+
+- `Payments\CardPayments` (exclusive capability `card_payments`) with `NewCardPayment`, `CardPaymentSession`, `CardPaymentData`, `CardPaymentStatus` and `CardPaymentException`: card payments on a provider's hosted page where the amount is reserved first. `FakeCardPayments` for tests.
+- `Orders\NewOrder::$deliverySnapshot` and `Orders\OrderRef::$deliverySnapshot`: the delivery address of an order when it is not the billing address.
+
 ## [2.17.0] - 2026-11-11
 
 ### Added
