@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.14.0] - 2026-11-09
+
+### Added
+
+- `Web\WebsiteClients`: a module that exposes its own `/api/web/*` endpoints to the website (e.g. a shop) asks the holder of `public_links` whether a request's `Authorization: Bearer <key>` is a known, unrevoked website key whose IP allowlist admits the request. `authenticate(secret, ip)` answers a `Web\WebsiteAuthResult` with a `Web\WebsiteAuthStatus` (`ok`, `unknown_key`, `ip_denied`, `unavailable`) and, when the key was found, the client's ID and name; `available()` tells whether a holder is active. The core binds a null implementation that answers `unavailable`. `FakeWebsiteClients` for module tests (`seed()` with an optional allowlist of exact IPs and CIDR ranges, `revoke()`, `setAvailable()`, `calls()`).
+
 ## [2.13.1] - 2026-11-06
 
 ### Changed

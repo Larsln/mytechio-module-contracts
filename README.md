@@ -52,6 +52,7 @@ composer require mytechio/module-contracts
 | `Tax` | `VatIdChecker` | VIES check of a VAT ID. Without an active module, the core binds a null client that always throws `VatIdCheckUnavailableException` (today's "VIES unavailable" path); `InvalidVatIdFormatException` on a formally invalid VAT ID. |
 | `Settings` | `ModuleSettings` | Module-specific settings; ENV/config always takes precedence over the database (`isFromEnvironment()`). Implementation not until phase 3 — only the interface and fake exist so far. |
 | `Connectors` | `Connector` | A uniform set of status queries/actions for external registrars/license servers; `sync()` may run for a long time and belongs on a queue. |
+| `Web` | `WebsiteClients` | The website's API keys, checked on behalf of other modules (since 2.14): a module with its own `/api/web/*` endpoints asks `authenticate(secret, ip)` whether a bearer key is known, unrevoked and admitted from the request IP; the holder of `public_links` implements it, the core binds a null implementation that answers `unavailable`. |
 | `Modules` | `ModuleLifecycle` | Lifecycle hooks (`onInstall`/`onEnable`/`onDisable`/`onUninstall`), resolved by the core via the manifest key `lifecycle`; `onEnable()` may throw (the module stays disabled), `onDisable()` must not. `AbstractModuleLifecycle` provides empty implementations to extend. |
 | `Modules` | `HealthCheck` | Health status (`HealthStatus`) for the module overview; the core calls `health()` only there, and with timeout protection — implementations must not perform slow network calls. |
 | `Modules` | `ModuleState` | Runtime state of a module for background code (see section "Module state in background code"): `isActive()` checks known+enabled+compatible, `isEnabled()` checks only the raw toggle. |
@@ -281,6 +282,16 @@ resolver per kind; a kind is `<module>.<name>`, e.g. the Stripe module's
   reason (`not_found`, `expired`, `revoked`, `used`, `no_resolver`, or one the
   resolver chooses such as `already_done`) and a German message for the visitor.
 
+## Website clients
+
+`Web\WebsiteClients` lets a module that answers the website itself (for example a
+shop under `/api/web/shop/*`) reuse the website keys of the `public_links` holder
+instead of issuing keys of its own. `authenticate($secret, $ip)` returns a
+`Web\WebsiteAuthResult`: status `ok` with the key's ID and name, `unknown_key`
+(missing, unknown or revoked), `ip_denied` (the key exists, the request IP is
+outside its allowlist) or `unavailable` (no holder active; the core's null
+implementation). The secret is never logged or returned.
+
 ## Fakes for module tests
 
 Every contract has an in-memory test double under `MyTechIO\Contracts\Fakes\*`
@@ -322,6 +333,7 @@ $this->app->instance(Subscriptions::class, new FakeSubscriptions);
 - `FakeFetchStatementSource` — like `FakeFileStatementSource` for `FetchStatementSource`, plus `withStatus()` for `connectionStatus()`; fetch windows recorded in `calls()`.
 - `FakeStructuredCompletion` — returns a preconfigured answer (`returns()`) or throws a `StructuredCompletionException` (`throws()`), `withConfigured()` to toggle, calls recorded in `calls()`.
 - `FakeStructuredCompletions` — serves one provider or none (`with()` swaps it).
+- `FakeWebsiteClients` — `seed(secret, clientId, clientName, ipAllowlist)` registers keys (exact IPs and CIDR ranges, IPv4 and IPv6), `revoke()`, `setAvailable()`, `calls()` records every check without the secret.
 - `FakeModuleState` — every module is active by default; `activate()`/`deactivate()` toggle a module for the test.
 
 ## Versioning
