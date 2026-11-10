@@ -29,7 +29,10 @@ use MyTechIO\Contracts\Invoices\Validate;
  * `manufacturer` is the manufacturer's name, `manufacturerLabel` the
  * manufacturer's own designation of the article ("Bezeichnung des Herstellers"),
  * `productGroupId` and `productGroupName` the product group the article is filed
- * under; each is `null` when not maintained.
+ * under; each is `null` when not maintained. `taxCategoryId` is the article's
+ * tax category in the core (since 2.17), which a module passes on as
+ * `NewOrderItem::$taxCategoryId` or `Tax\PreviewLine::$taxCategoryId` when it
+ * puts the article on a document.
  */
 final readonly class ArticleData
 {
@@ -58,6 +61,7 @@ final readonly class ArticleData
         public ?string $manufacturerLabel = null,
         public ?int $productGroupId = null,
         public ?string $productGroupName = null,
+        public ?int $taxCategoryId = null,
     ) {
         Validate::decimal($priceB2cNet, 'priceB2cNet');
         Validate::decimal($priceB2bNet, 'priceB2bNet');
@@ -115,6 +119,7 @@ final readonly class ArticleData
             'manufacturer_label' => $this->manufacturerLabel,
             'product_group_id' => $this->productGroupId,
             'product_group_name' => $this->productGroupName,
+            'tax_category_id' => $this->taxCategoryId,
         ];
     }
 }

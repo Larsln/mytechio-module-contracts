@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.17.0] - 2026-11-11
+
+### Added
+
+- `Tax\DocumentPreview` with `PreviewLine`, `PreviewedLine`, `DocumentPreviewData` and `DocumentPreviewException`: the tax result of a document that does not exist yet (scenario, rate and amounts per line, totals, tax per rate, payable amount, `requiresTaxReview`), computed like a saved order. `FakeDocumentPreview` for tests.
+- `Tax\Decimal`: the document arithmetic on decimal strings (four decimals per step, half to even).
+- `Articles\ArticleData::$taxCategoryId` (`tax_category_id` in `toArray()`), optional.
+
 ## [2.16.0] - 2026-11-10
 
 ### Added
