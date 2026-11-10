@@ -7,6 +7,7 @@ use MyTechIO\Contracts\Connectors\ConnectorStatus;
 use MyTechIO\Contracts\ContractException;
 use MyTechIO\Contracts\Fakes\FakeSubscriptions;
 use MyTechIO\Contracts\Subscriptions\NewSubscription;
+use MyTechIO\Contracts\Subscriptions\PackageComponentInput;
 use MyTechIO\Contracts\Subscriptions\SubscriptionData;
 use MyTechIO\Contracts\Subscriptions\SubscriptionNotFoundException;
 use MyTechIO\Contracts\Subscriptions\Subscriptions;
@@ -113,6 +114,19 @@ it('stores the price override of a new subscription', function () {
     );
 
     expect($created->unitPriceNetOverride)->toBe('12.5000');
+});
+
+it('marks a subscription created with package components as a package', function () {
+    $subscriptions = new FakeSubscriptions;
+    $input = new PackageComponentInput(9, ['fqdn' => 'example.de']);
+
+    $package = $subscriptions->create(new NewSubscription(contactId: 1, type: 'generic', label: 'Paket', components: [$input]), new ActorRef(7, 'Admin'));
+    $plain = $subscriptions->create(new NewSubscription(contactId: 1, type: 'generic', label: 'Einzeln'), new ActorRef(7, 'Admin'));
+
+    expect($package->isPackage)->toBeTrue()
+        ->and($subscriptions->componentsOf($package->id))->toBe([$input])
+        ->and($plain->isPackage)->toBeFalse()
+        ->and($subscriptions->componentsOf($plain->id))->toBe([]);
 });
 
 it('creates an active subscription with an auto id, today as default start and the actor recorded', function () {

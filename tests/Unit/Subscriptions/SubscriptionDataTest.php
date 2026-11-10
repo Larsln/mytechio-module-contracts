@@ -74,6 +74,8 @@ it('converts to an array with snake_case keys and the status value', function ()
         'price_period_count' => null,
         'group_id' => null,
         'group_position' => null,
+        'package_subscription_id' => null,
+        'is_package' => false,
     ]);
 });
 
@@ -157,6 +159,8 @@ it('converts a cancelled, sourced subscription with attributes to an array', fun
         'price_period_count' => null,
         'group_id' => null,
         'group_position' => null,
+        'package_subscription_id' => null,
+        'is_package' => false,
     ]);
 });
 
@@ -216,3 +220,11 @@ it('carries the group id and position together', function () {
 it('rejects a group id without a position', function () {
     subscriptionData(['groupId' => 4]);
 })->throws(ContractException::class, 'groupId and groupPosition');
+
+it('names the head subscription of a package component and marks the head', function () {
+    $component = subscriptionData(['packageSubscriptionId' => 5]);
+    $head = subscriptionData(['isPackage' => true]);
+
+    expect($component->toArray())->toMatchArray(['package_subscription_id' => 5, 'is_package' => false])
+        ->and($head->toArray())->toMatchArray(['package_subscription_id' => null, 'is_package' => true]);
+});

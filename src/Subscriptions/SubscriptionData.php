@@ -43,6 +43,9 @@ use MyTechIO\Contracts\Invoices\Validate;
  * `paymentMethod` is the service's own payment method (`"bank_transfer"` or
  * `"direct_debit"`) for its invoices; `null` means the contact's default decides.
  *
+ * `packageSubscriptionId` is the head subscription of a component subscription
+ * that was created as part of a package; `isPackage` marks that head.
+ *
  * `attributes` are the type-specific fields according to the schema of the
  * subscription's `SubscriptionType`. Secret fields are delivered decrypted:
  * modules are trusted code and must never log them.
@@ -83,6 +86,8 @@ final readonly class SubscriptionData
         public ?int $pricePeriodCount = null,
         public ?int $groupId = null,
         public ?int $groupPosition = null,
+        public ?int $packageSubscriptionId = null,
+        public bool $isPackage = false,
     ) {
         Validate::decimal($quantity, 'quantity');
         Validate::date($startsOn, 'startsOn');
@@ -156,6 +161,8 @@ final readonly class SubscriptionData
             'price_period_count' => $this->pricePeriodCount,
             'group_id' => $this->groupId,
             'group_position' => $this->groupPosition,
+            'package_subscription_id' => $this->packageSubscriptionId,
+            'is_package' => $this->isPackage,
         ];
     }
 }

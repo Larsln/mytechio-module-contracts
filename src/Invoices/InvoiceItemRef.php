@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MyTechIO\Contracts\Invoices;
 
+use MyTechIO\Contracts\Documents\ItemComponentRef;
+
 /**
  * Reference to an invoice line item including its invoice.
  *
@@ -15,9 +17,14 @@ namespace MyTechIO\Contracts\Invoices;
  * reference is part of an `InvoiceRef` handed to an `InvoiceHook`: `position`,
  * the linked `articleId`, `quantity` (decimal string), `unit` code and the
  * line's `netAmount` (4 decimals, negative on cancellation invoices).
+ * `components` lists the components of a package line (see `ItemComponentRef`),
+ * empty for other lines.
  */
 final readonly class InvoiceItemRef
 {
+    /**
+     * @param  list<ItemComponentRef>  $components
+     */
     public function __construct(
         public int $id,
         public int $invoiceId,
@@ -30,6 +37,7 @@ final readonly class InvoiceItemRef
         public ?string $quantity = null,
         public ?string $unit = null,
         public ?string $netAmount = null,
+        public array $components = [],
     ) {}
 
     /**
@@ -49,6 +57,7 @@ final readonly class InvoiceItemRef
             'quantity' => $this->quantity,
             'unit' => $this->unit,
             'net_amount' => $this->netAmount,
+            'components' => array_map(static fn (ItemComponentRef $component): array => $component->toArray(), $this->components),
         ];
     }
 }

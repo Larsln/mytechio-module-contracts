@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MyTechIO\Contracts\Orders;
 
+use MyTechIO\Contracts\Documents\ItemComponentRef;
+
 /**
  * One line of an order. `articleId` is `null` for free-text lines; `quantity`
  * is a decimal string, `unit` the unit code and `netAmount` the line's net
@@ -20,9 +22,14 @@ namespace MyTechIO\Contracts\Orders;
  * (`full_return` or `consumed`) is set once the order was cancelled. `groupId`,
  * `groupName` and `groupCollapsed` describe the line group on the document;
  * `subscriptionId` names the subscription the line started on confirmation.
+ * `components` lists the components of a package line (see `ItemComponentRef`),
+ * empty for other lines.
  */
 final readonly class OrderItemRef
 {
+    /**
+     * @param  list<ItemComponentRef>  $components
+     */
     public function __construct(
         public int $id,
         public int $position,
@@ -57,6 +64,7 @@ final readonly class OrderItemRef
         public ?bool $groupCollapsed = null,
         public ?int $quoteItemId = null,
         public ?int $subscriptionId = null,
+        public array $components = [],
     ) {}
 
     /**
@@ -98,6 +106,7 @@ final readonly class OrderItemRef
             'group_collapsed' => $this->groupCollapsed,
             'quote_item_id' => $this->quoteItemId,
             'subscription_id' => $this->subscriptionId,
+            'components' => array_map(static fn (ItemComponentRef $component): array => $component->toArray(), $this->components),
         ];
     }
 }

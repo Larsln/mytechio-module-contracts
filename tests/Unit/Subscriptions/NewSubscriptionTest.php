@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use MyTechIO\Contracts\ContractException;
 use MyTechIO\Contracts\Subscriptions\NewSubscription;
+use MyTechIO\Contracts\Subscriptions\PackageComponentInput;
 
 it('defaults to quantity 1 and null for everything optional', function () {
     $subscription = new NewSubscription(contactId: 2, type: 'domain', label: 'example.de');
@@ -41,6 +42,7 @@ it('converts to an array with snake_case keys', function () {
         'attributes' => [],
         'payment_method' => null,
         'unit_price_net_override' => null,
+        'components' => [],
     ]);
 });
 
@@ -88,6 +90,7 @@ it('converts a fully specified subscription to an array', function () {
         'attributes' => ['registrar' => 'kyberio'],
         'payment_method' => 'direct_debit',
         'unit_price_net_override' => null,
+        'components' => [],
     ]);
 });
 
@@ -132,3 +135,15 @@ it('rejects a source without an external id and vice versa', function (?string $
     'source only' => ['domainrobot', null],
     'external id only' => [null, 'example.de'],
 ])->throws(ContractException::class);
+
+it('carries package component inputs', function () {
+    $subscription = new NewSubscription(
+        contactId: 2,
+        type: 'generic',
+        label: 'Paket',
+        articleId: 8,
+        components: [new PackageComponentInput(9, ['fqdn' => 'example.de'])],
+    );
+
+    expect($subscription->toArray()['components'])->toBe([['article_id' => 9, 'attributes' => ['fqdn' => 'example.de']]]);
+});

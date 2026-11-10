@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use MyTechIO\Contracts\ContractException;
+use MyTechIO\Contracts\Documents\ItemComponentRef;
 use MyTechIO\Contracts\Orders\NewOrder;
 use MyTechIO\Contracts\Orders\NewOrderItem;
 use MyTechIO\Contracts\Orders\OrderCancellation;
@@ -95,4 +96,20 @@ it('names the unknown order in German', function () {
     expect($exception)->toBeInstanceOf(ContractException::class)
         ->and($exception->id)->toBe(42)
         ->and($exception->getMessage())->toBe('Auftrag mit ID 42 wurde nicht gefunden.');
+});
+
+it('serializes the components of a package line', function () {
+    $item = new OrderItemRef(1, 1, 5, 'Paket', '1.0000', 'Stk', '10.0000', components: [
+        new ItemComponentRef(9, 'ART-0009', 'Domain', '2.0000', 'Stk'),
+    ]);
+
+    expect((new OrderItemRef(1, 1, null, 'x', '1', null, '0'))->toArray()['components'])->toBe([])
+        ->and($item->toArray()['components'])->toBe([[
+            'article_id' => 9,
+            'article_number' => 'ART-0009',
+            'name' => 'Domain',
+            'quantity' => '2.0000',
+            'unit' => 'Stk',
+            'object' => null,
+        ]]);
 });

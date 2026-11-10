@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use MyTechIO\Contracts\Articles\ArticleComponentData;
 use MyTechIO\Contracts\Articles\ArticleData;
 use MyTechIO\Contracts\Articles\ArticleKind;
 use MyTechIO\Contracts\Articles\PriceForm;
@@ -71,6 +72,8 @@ it('converts to an array with snake_case keys and enum values', function () {
         'product_group_name' => null,
         'subscription_type' => null,
         'tax_category_id' => null,
+        'components' => [],
+        'list_components' => true,
     ]);
 });
 
@@ -166,3 +169,34 @@ it('rejects a default price option that is not listed', function () {
 it('rejects a price option list that holds anything but price options', function () {
     new ArticleData(1, 'A-1', 'Hosting', null, ArticleKind::Goods, TaxClassification::SupplyOfGoods, 'Stk', 'Stück', 'H87', '1', '1', false, true, 70, [oneOffOption(70, '1', '1'), 'x']);
 })->throws(ContractException::class);
+
+it('is not a package by default and serializes its components', function () {
+    expect(articleData()->components)->toBe([])
+        ->and(articleData()->listComponents)->toBeTrue();
+
+    $component = new ArticleComponentData(9, 'ART-0009', 'Domain', '2.0000');
+    $package = new ArticleData(
+        id: 8,
+        articleNumber: 'ART-0008',
+        name: 'Paket',
+        description: null,
+        kind: ArticleKind::ElectronicService,
+        taxClassification: TaxClassification::ElectronicService,
+        unit: 'Stk',
+        unitName: 'Stück',
+        unitUneceCode: 'H87',
+        priceB2cNet: '11.9000',
+        priceB2bNet: '10.0000',
+        stockTracked: false,
+        isActive: true,
+        defaultPriceOptionId: 70,
+        priceOptions: [oneOffOption()],
+        components: [$component],
+        listComponents: false,
+    );
+
+    expect($package->toArray())->toMatchArray([
+        'components' => [['article_id' => 9, 'article_number' => 'ART-0009', 'name' => 'Domain', 'quantity' => '2.0000']],
+        'list_components' => false,
+    ])->and(articleData()->toArray())->toMatchArray(['components' => [], 'list_components' => true]);
+});

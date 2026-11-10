@@ -33,11 +33,14 @@ use MyTechIO\Contracts\Invoices\Validate;
  * `subscriptionType` is the subscription type key of a subscribable article
  * (one with a period price option), `null` otherwise; `taxCategoryId` is the
  * id of the article's default tax category (`null` when none is set).
+ * An article with `components` is a package: one line on documents at the
+ * package price, its components listed beneath when `listComponents` is set.
  */
 final readonly class ArticleData
 {
     /**
      * @param  list<PriceOptionData>  $priceOptions
+     * @param  list<ArticleComponentData>  $components
      */
     public function __construct(
         public int $id,
@@ -63,6 +66,8 @@ final readonly class ArticleData
         public ?string $productGroupName = null,
         public ?string $subscriptionType = null,
         public ?int $taxCategoryId = null,
+        public array $components = [],
+        public bool $listComponents = true,
     ) {
         Validate::decimal($priceB2cNet, 'priceB2cNet');
         Validate::decimal($priceB2bNet, 'priceB2bNet');
@@ -122,6 +127,11 @@ final readonly class ArticleData
             'product_group_name' => $this->productGroupName,
             'subscription_type' => $this->subscriptionType,
             'tax_category_id' => $this->taxCategoryId,
+            'components' => array_map(
+                static fn (ArticleComponentData $component): array => $component->toArray(),
+                $this->components,
+            ),
+            'list_components' => $this->listComponents,
         ];
     }
 }

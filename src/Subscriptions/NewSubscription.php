@@ -23,11 +23,15 @@ use MyTechIO\Contracts\Invoices\Validate;
  * `unitPriceNetOverride` is a decimal string of at least zero that overrides the
  * net unit price of the price option / price list; `null` means the core
  * resolves the price.
+ * `components` are the type-field values of the component subscriptions of a
+ * package article, matched by component article id; they are ignored for
+ * articles that are not packages.
  */
 final readonly class NewSubscription
 {
     /**
      * @param  array<string, mixed>  $attributes
+     * @param  list<PackageComponentInput>  $components
      */
     public function __construct(
         public int $contactId,
@@ -45,6 +49,7 @@ final readonly class NewSubscription
         public array $attributes = [],
         public ?string $paymentMethod = null,
         public ?string $unitPriceNetOverride = null,
+        public array $components = [],
     ) {
         if ($priceOptionId !== null && $articleId === null) {
             throw new ContractException('priceOptionId requires articleId.');
@@ -96,6 +101,7 @@ final readonly class NewSubscription
             'attributes' => $this->attributes,
             'payment_method' => $this->paymentMethod,
             'unit_price_net_override' => $this->unitPriceNetOverride,
+            'components' => array_map(static fn (PackageComponentInput $component): array => $component->toArray(), $this->components),
         ];
     }
 }

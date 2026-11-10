@@ -10,6 +10,7 @@ use MyTechIO\Contracts\ContractException;
 use MyTechIO\Contracts\Invoices\Validate;
 use MyTechIO\Contracts\Subscriptions\NewSubscription;
 use MyTechIO\Contracts\Subscriptions\NewSubscriptionGroup;
+use MyTechIO\Contracts\Subscriptions\PackageComponentInput;
 use MyTechIO\Contracts\Subscriptions\SubscriptionData;
 use MyTechIO\Contracts\Subscriptions\SubscriptionGroupData;
 use MyTechIO\Contracts\Subscriptions\SubscriptionGroupNotFoundException;
@@ -78,6 +79,15 @@ final class FakeSubscriptions implements Subscriptions
      * @var list<array{event: string, payload: array<string, mixed>, actor: ActorRef}>
      */
     private array $groupEvents = [];
+
+    /**
+     * Package components handed to `create()`, by created subscription id. The
+     * fake creates no component subscriptions; `isPackage` is set whenever
+     * components were given.
+     *
+     * @var array<int, list<PackageComponentInput>>
+     */
+    private array $components = [];
 
     private int $nextId = 1;
 
@@ -173,12 +183,22 @@ final class FakeSubscriptions implements Subscriptions
             attributes: $subscription->attributes,
             paymentMethod: $subscription->paymentMethod,
             unitPriceNetOverride: $subscription->unitPriceNetOverride,
+            isPackage: $subscription->components !== [],
         );
 
         $this->subscriptions[$id] = $data;
+        $this->components[$id] = $subscription->components;
         $this->actors[] = ['action' => 'create', 'id' => $id, 'actor' => $actor];
 
         return $this->hydrate($data);
+    }
+
+    /**
+     * @return list<PackageComponentInput>
+     */
+    public function componentsOf(int $id): array
+    {
+        return $this->components[$id] ?? [];
     }
 
     public function attachSource(int $id, string $source, string $externalId): SubscriptionData
