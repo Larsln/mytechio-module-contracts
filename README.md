@@ -32,7 +32,7 @@ composer require mytechio/module-contracts
 | `Subscriptions` | `Subscriptions` | Subscriptions (Leistungen) of contacts, implemented by the core; see section "Subscriptions". `cancel()` ends a subscription on the earliest date allowed by minimum term and notice period, or on an explicit later date. |
 | `Subscriptions` | `SubscriptionType` | Subscription type provided by a plugin module (field schema plus lifecycle hooks), container tag `mytechio.subscription_types`; see section "Subscriptions". |
 | `Subscriptions` | `SubscriptionSource` | Subscription suggestions and actions of an external source (e.g. a registrar), container tag `mytechio.subscription_sources`; see section "Subscriptions". |
-| `Contacts` | `Contacts` | Read-only contact access — modules do not create or modify contacts. |
+| `Contacts` | `Contacts` | Contact access: reads for every module; since 2.15 `create()`, `update()` (replaces the customer-facing fields, keeps the rest) and `findByEmail()` for modules that onboard customers themselves. Writes run through the core's contact service; refusals are a `ContactValidationException` with German messages per field. Deleting stays with the core. |
 | `SepaMandates` | `Contacts\SepaMandates` | Read, create and revoke SEPA mandates of contacts (provider modules). |
 | `Accounting` | `Journal` | Debit must equal credit (enforced via `UnbalancedEntryException`); closed periods are rejected (`PeriodClosedException`). |
 | `Orders` | `Orders` | Read access to orders: `find()` returns the `OrderRef` (number, page URL, lines) for an order reference. Creating and changing orders stays with the core UI; modules join the lifecycle through `OrderHook`. |
@@ -52,6 +52,7 @@ composer require mytechio/module-contracts
 | `Tax` | `VatIdChecker` | VIES check of a VAT ID. Without an active module, the core binds a null client that always throws `VatIdCheckUnavailableException` (today's "VIES unavailable" path); `InvalidVatIdFormatException` on a formally invalid VAT ID. |
 | `Settings` | `ModuleSettings` | Module-specific settings; ENV/config always takes precedence over the database (`isFromEnvironment()`). Implementation not until phase 3 — only the interface and fake exist so far. |
 | `Connectors` | `Connector` | A uniform set of status queries/actions for external registrars/license servers; `sync()` may run for a long time and belongs on a queue. |
+| `Contacts` | `ContactMarker` | A marker a module puts on contacts in the core's contact list (since 2.15): symbol next to the name with a detail as tooltip, and a list filter; container tag `mytechio.contact_markers`. The shop module marks contacts with a shop login. |
 | `Web` | `WebsiteClients` | The website's API keys, checked on behalf of other modules (since 2.14): a module with its own `/api/web/*` endpoints asks `authenticate(secret, ip)` whether a bearer key is known, unrevoked and admitted from the request IP; the holder of `public_links` implements it, the core binds a null implementation that answers `unavailable`. |
 | `Modules` | `ModuleLifecycle` | Lifecycle hooks (`onInstall`/`onEnable`/`onDisable`/`onUninstall`), resolved by the core via the manifest key `lifecycle`; `onEnable()` may throw (the module stays disabled), `onDisable()` must not. `AbstractModuleLifecycle` provides empty implementations to extend. |
 | `Modules` | `HealthCheck` | Health status (`HealthStatus`) for the module overview; the core calls `health()` only there, and with timeout protection — implementations must not perform slow network calls. |
@@ -307,7 +308,7 @@ $this->app->instance(Subscriptions::class, new FakeSubscriptions);
 
 - `FakeDocumentStore` — returns deterministic paths/hashes, `stored()` for assertions.
 - `FakeMailOutbox` — `sent()`/`sentTo(email)` with no PHPUnit dependency.
-- `FakeContacts` — `seed()`, `setCountries()`.
+- `FakeContacts` — `seed()`, `setCountries()`; `create()`/`update()`/`findByEmail()` with the core's rules, `vatIdValidity()` declares VIES answers, `actors()` records writes.
 - `FakeSepaMandates` — `created()`, `revocations()`.
 - `FakeArticles` — `seed()`; `search()` filters by case-insensitive substring over article number and name in insertion order and skips inactive articles unless `$includeInactive`.
 - `FakeUnits` — `seed()` in picker order; seeding a second default clears the first one's flag.
@@ -315,6 +316,7 @@ $this->app->instance(Subscriptions::class, new FakeSubscriptions);
   `seedAccount()` for the chart of accounts.
 - `FakeOrders` — `seed(OrderRef)` for `find()`.
 - `FakeMaintenanceLog` — keeps the appended entries in `entries()`.
+- `FakeContactMarker` — marks contacts in memory (`mark(id, detail)`, `unmark(id)`) and answers `detailsFor()`/`contactIds()`.
 - `FakeJournalSourceResolver` — answers for the configured source types (`/prefix/{sourceId}` links, configurable reversal hint), asked entries recorded in `linkCalls`/`reversalHintCalls`.
 - `FakeInvoices` — remembers drafts, always returns status `draft`; `seedItem()` for `findItem()`, `seedPaidDocument()` for `paidBetween()` (sorted, filtered by period).
 - `FakeModuleSettings` — `markFromEnvironment()` simulates ENV precedence.

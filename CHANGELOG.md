@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.15.0] - 2026-11-09
+
+### Added
+
+- `Contacts\Contacts::create(NewContact, ActorRef)`, `update(id, ContactChanges, ActorRef)` and `findByEmail(email)`: modules that onboard customers themselves (the web shop) create and maintain customer contacts through the core's contact service (activity log, `ContactCreated`/`ContactUpdated`, VIES check of a new or changed VAT ID). `update()` replaces exactly the customer-facing fields and keeps everything else. Refusals are a `ContactValidationException` with German messages per field, an unknown id a `ContactNotFoundException`.
+- `Contacts\ContactData::$customerNumber`, `$vatIdValid` and `$salutation` (`customer_number`, `vat_id_valid`, `salutation` in `toArray()`), all optional.
+- `FakeContacts` implements the writes with the core's required-field and VAT-ID rules (`vatIdValidity()` declares how a VAT ID is answered) and records every write in `actors()`.
+- `Contacts\ContactMarker`: a marker a module puts on contacts in the core's contact list (an icon from the core's module icon map or a short symbol next to the name, the detail as tooltip, a list filter, and `url()` as the jump from the contact page to the marked object), e.g. "has a shop login". Collected through the container tag `mytechio.contact_markers` (`ContactMarker::TAG`); markers of disabled or incompatible modules stay invisible. `FakeContactMarker` for tests (`mark()`, `unmark()`).
+
 ## [2.14.0] - 2026-11-09
 
 ### Added
