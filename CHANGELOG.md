@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.16.0] - 2026-11-10
+
+### Added
+
+- `Articles\ArticleMarker`: a marker a module puts on articles in the core's article list (an icon from the core's module icon map or a short symbol next to the name, the detail as tooltip, a list filter); container tag `mytechio.article_markers`. `FakeArticleMarker` for tests.
+
 ## [2.15.0] - 2026-11-09
 
 ### Added
