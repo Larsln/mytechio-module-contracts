@@ -52,6 +52,7 @@ composer require mytechio/module-contracts
 | `Tax` | `VatIdChecker` | VIES check of a VAT ID. Without an active module, the core binds a null client that always throws `VatIdCheckUnavailableException` (today's "VIES unavailable" path); `InvalidVatIdFormatException` on a formally invalid VAT ID. |
 | `Settings` | `ModuleSettings` | Module-specific settings; ENV/config always takes precedence over the database (`isFromEnvironment()`). Implementation not until phase 3 — only the interface and fake exist so far. |
 | `Connectors` | `Connector` | A uniform set of status queries/actions for external registrars/license servers; `sync()` may run for a long time and belongs on a queue. |
+| `Articles` | `ArticleMarker` | A marker a module puts on articles in the core's article list (since 2.16): symbol next to the name with a detail as tooltip, and a list filter; container tag `mytechio.article_markers`. The shop module marks articles released in the shop. |
 | `Contacts` | `ContactMarker` | A marker a module puts on contacts in the core's contact list (since 2.15): symbol next to the name with a detail as tooltip, and a list filter; container tag `mytechio.contact_markers`. The shop module marks contacts with a shop login. |
 | `Web` | `WebsiteClients` | The website's API keys, checked on behalf of other modules (since 2.14): a module with its own `/api/web/*` endpoints asks `authenticate(secret, ip)` whether a bearer key is known, unrevoked and admitted from the request IP; the holder of `public_links` implements it, the core binds a null implementation that answers `unavailable`. |
 | `Modules` | `ModuleLifecycle` | Lifecycle hooks (`onInstall`/`onEnable`/`onDisable`/`onUninstall`), resolved by the core via the manifest key `lifecycle`; `onEnable()` may throw (the module stays disabled), `onDisable()` must not. `AbstractModuleLifecycle` provides empty implementations to extend. |
@@ -316,6 +317,7 @@ $this->app->instance(Subscriptions::class, new FakeSubscriptions);
   `seedAccount()` for the chart of accounts.
 - `FakeOrders` — `seed(OrderRef)` for `find()`.
 - `FakeMaintenanceLog` — keeps the appended entries in `entries()`.
+- `FakeArticleMarker` — marks articles in memory (`mark(id, detail)`, `unmark(id)`) and answers `detailsFor()`/`articleIds()`.
 - `FakeContactMarker` — marks contacts in memory (`mark(id, detail)`, `unmark(id)`) and answers `detailsFor()`/`contactIds()`.
 - `FakeJournalSourceResolver` — answers for the configured source types (`/prefix/{sourceId}` links, configurable reversal hint), asked entries recorded in `linkCalls`/`reversalHintCalls`.
 - `FakeInvoices` — remembers drafts, always returns status `draft`; `seedItem()` for `findItem()`, `seedPaidDocument()` for `paidBetween()` (sorted, filtered by period).
