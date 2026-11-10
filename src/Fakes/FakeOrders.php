@@ -516,7 +516,8 @@ final class FakeOrders implements Orders
             skontoDays: $input->skontoDays,
             bankAccountId: $input->bankAccountId,
             billingSnapshot: $input->billingSnapshot,
-            deliverySnapshot: $input->deliverySnapshot,
+            // An update keeps the delivery address the order was created with.
+            deliverySnapshot: $input instanceof NewOrder ? $input->deliverySnapshot : ($previous->deliverySnapshot ?? null),
             invoiceIds: $previous->invoiceIds ?? [],
             createdBy: $previous->createdBy ?? null,
             createdAt: $createdAt,
