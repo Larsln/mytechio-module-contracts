@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.20.0] - 2026-11-11
+
+### Added
+
+- `Invoices\Invoices::forOrder(orderId)`: the issued invoices of an order (the invoice and its cancellation invoices), oldest first.
+- `Invoices\Invoices::document(invoiceId)` with `InvoiceDocument`: the archived PDF of an issued invoice, for a module that shows customers their own invoices. `FakeInvoices` implements both (`seedDocument()`).
+
 ## [2.19.0] - 2026-11-11
 
 ### Added

@@ -64,4 +64,22 @@ interface Invoices
      *                           only the sending failed the invoice stays issued and a repeat sends it
      */
     public function issueAndSend(int $invoiceId, ActorRef $actor, bool $taxReviewConfirmed = false): InvoiceRef;
+
+    /**
+     * The issued papers of an order (since 2.20): its invoice and what
+     * followed it (cancellation invoices), oldest first, each as complete as
+     * `find()` returns it. Drafts and proformas are not papers yet and are
+     * left out.
+     *
+     * @return list<InvoiceRef>
+     */
+    public function forOrder(int $orderId): array;
+
+    /**
+     * The archived PDF of an issued invoice (since 2.20), the very file the
+     * customer was sent. `null` for an unknown invoice and for a draft or
+     * proforma, which has no binding paper yet. Whoever hands it on decides
+     * who may see it; the contract checks no permission.
+     */
+    public function document(int $invoiceId): ?InvoiceDocument;
 }

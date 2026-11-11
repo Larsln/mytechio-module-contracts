@@ -6,6 +6,7 @@ namespace MyTechIO\Contracts\Fakes;
 
 use MyTechIO\Contracts\Accounting\ActorRef;
 use MyTechIO\Contracts\ContractException;
+use MyTechIO\Contracts\Invoices\InvoiceDocument;
 use MyTechIO\Contracts\Invoices\InvoiceDraft;
 use MyTechIO\Contracts\Invoices\InvoiceItemRef;
 use MyTechIO\Contracts\Invoices\InvoiceRef;
@@ -19,6 +20,8 @@ use MyTechIO\Contracts\Invoices\PaidDocument;
  * `seedInvoice()`. `createFromOrder()` makes one draft per order and
  * `issueAndSend()` numbers it `RE-FAKE-…` and marks it sent (`sent()`);
  * `failNextIssue()` and `failNextSend()` play a core that refuses.
+ * `forOrder()` lists the issued invoices of an order and `document()`
+ * returns a made-up PDF for each (or the one given to `seedDocument()`).
  */
 final class FakeInvoices implements Invoices
 {
@@ -50,6 +53,9 @@ final class FakeInvoices implements Invoices
 
     /** @var list<int> */
     private array $sent = [];
+
+    /** @var array<int, InvoiceDocument> */
+    private array $documents = [];
 
     public function createDraft(InvoiceDraft $draft): InvoiceRef
     {
@@ -178,6 +184,31 @@ final class FakeInvoices implements Invoices
     public function sent(): array
     {
         return $this->sent;
+    }
+
+    public function forOrder(int $orderId): array
+    {
+        return array_values(array_filter(
+            $this->invoices,
+            static fn (InvoiceRef $invoice): bool => $invoice->orderId === $orderId && ! in_array($invoice->status, ['draft', 'proforma'], true),
+        ));
+    }
+
+    public function document(int $invoiceId): ?InvoiceDocument
+    {
+        $invoice = $this->invoices[$invoiceId] ?? null;
+
+        if ($invoice === null || in_array($invoice->status, ['draft', 'proforma'], true)) {
+            return null;
+        }
+
+        return $this->documents[$invoiceId] ?? new InvoiceDocument("%PDF-FAKE {$invoice->number}", 'application/pdf', ($invoice->number ?? "Rechnung-{$invoiceId}").'.pdf');
+    }
+
+    /** The paper `document()` returns for this invoice instead of the made-up one. */
+    public function seedDocument(int $invoiceId, InvoiceDocument $document): void
+    {
+        $this->documents[$invoiceId] = $document;
     }
 
     private function with(InvoiceRef $invoice, ?string $number, string $status, ?string $sentAt = null): InvoiceRef
