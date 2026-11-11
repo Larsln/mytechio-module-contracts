@@ -54,6 +54,13 @@ interface Shipments
     public function label(int $shipmentId, int $position): ?ShipmentLabel;
 
     /**
+     * Sends the labels of the shipment to the holder's label printer (again). Returns how many labels were queued.
+     *
+     * @throws ShipmentException when the shipment is unknown or cancelled, has no labels, or no printer is set up
+     */
+    public function printLabels(int $shipmentId, ActorRef $actor): int;
+
+    /**
      * Notes that the shipment left the house. Repeating it changes nothing.
      *
      * @throws ShipmentException when the shipment is unknown or cancelled

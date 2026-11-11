@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 
 - `Shipping\Shipments` (exclusive capability `shipping`) with `CarrierData`, `NewShipment`, `NewParcel`, `ShipmentAddress`, `ShipmentData`, `ParcelData`, `ShipmentStatus`, `ShipmentLabel` and `ShipmentException`: the shipping services, the default per country, shipments of orders with their parcels, labels of services with an interface, and the states shipped and delivered. `FakeShipments` for tests.
+- `Shipping\Shipments::printLabels(shipmentId, ActorRef)` and `ParcelData::$printState`: the labels of a shipment go to the holder's label printer and say where they stand there. `FakeShipments::withPrinter()`.
 - `Invoices\Invoices::createFromOrder(orderId, ActorRef, paymentMethod)` and `issueAndSend(invoiceId, ActorRef, taxReviewConfirmed)`: the invoice of an order, issued and mailed like the core's own action. `FakeInvoices` implements both (`failNextIssue()`, `failNextSend()`, `sent()`).
 - `Organization\\OrganizationProfile` with `OrganizationData`: the company's own name, address and contact data from the core's organization settings, for papers a module prints itself. `FakeOrganizationProfile` for tests.
 - `Purchasing\\ShoppingNeeds` (exclusive capability `shopping_list`) with `ShoppingNeed`: a module states what it needs bought and the shopping list follows (new needs appear, quantities follow, what is covered leaves), marked with where it comes from. `FakeShoppingNeeds` for tests.

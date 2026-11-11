@@ -45,7 +45,7 @@ it('keeps the typed tracking numbers of a service without an interface and has n
         ->and($shipment->carrierName)->toBe('GLS')
         ->and($shipment->parcels[0]->toArray())->toBe([
             'position' => 1, 'weight_grams' => 1200, 'length_mm' => 300, 'width_mm' => 200, 'height_mm' => 100,
-            'tracking_number' => '123456', 'tracking_url' => 'https://track.example.test/123456', 'has_label' => false, 'packaging' => 'Karton S',
+            'tracking_number' => '123456', 'tracking_url' => 'https://track.example.test/123456', 'has_label' => false, 'packaging' => 'Karton S', 'print_state' => null,
         ])
         ->and($shipment->parcels[1]->trackingNumber)->toBeNull()
         ->and($this->shipments->label($shipment->id, 1))->toBeNull()
@@ -120,4 +120,20 @@ it('plays a carrier that refuses once', function () {
 
     expect(fn () => $this->shipments->create(shipmentTo(55, $carrier->id, [new NewParcel(500)]), $this->actor))->toThrow(ShipmentException::class, 'DHL lehnt die Adresse ab.')
         ->and($this->shipments->create(shipmentTo(55, $carrier->id, [new NewParcel(500)]), $this->actor)->id)->toBe(1);
+});
+
+it('sends the labels to the printer only when one is set up and the shipment has labels', function () {
+    $dhl = $this->shipments->addCarrier('DHL', createsLabels: true);
+    $gls = $this->shipments->addCarrier('GLS');
+    $withLabels = $this->shipments->create(shipmentTo(55, $dhl->id, [new NewParcel(500), new NewParcel(700)]), $this->actor)->id;
+    $without = $this->shipments->create(shipmentTo(56, $gls->id, [new NewParcel(500)]), $this->actor)->id;
+
+    expect(fn () => $this->shipments->printLabels($withLabels, $this->actor))->toThrow(ShipmentException::class, 'kein Etikettendrucker');
+
+    $this->shipments->withPrinter();
+
+    expect($this->shipments->printLabels($withLabels, $this->actor))->toBe(2)
+        ->and($this->shipments->find($withLabels)->parcels[1]->printState)->toBe('queued')
+        ->and(fn () => $this->shipments->printLabels($without, $this->actor))->toThrow(ShipmentException::class, 'keine Etiketten')
+        ->and(fn () => $this->shipments->printLabels(99, $this->actor))->toThrow(ShipmentException::class);
 });

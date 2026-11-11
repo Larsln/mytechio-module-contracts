@@ -38,6 +38,8 @@ final class FakeShipments implements Shipments
 
     private ?string $failure = null;
 
+    private bool $printer = false;
+
     public function addCarrier(string $name, bool $createsLabels = false): CarrierData
     {
         $id = count($this->carriers) + 1;
@@ -148,6 +150,38 @@ final class FakeShipments implements Shipments
         }
 
         return null;
+    }
+
+    public function printLabels(int $shipmentId, ActorRef $actor): int
+    {
+        $shipment = $this->active($shipmentId);
+        $labels = count(array_filter($shipment->parcels, static fn (ParcelData $parcel): bool => $parcel->hasLabel));
+
+        if (! $this->printer) {
+            throw new ShipmentException('Es ist kein Etikettendrucker eingerichtet.');
+        }
+
+        if ($labels === 0) {
+            throw new ShipmentException('Die Sendung hat keine Etiketten.');
+        }
+
+        $this->actors[] = ['action' => 'print', 'shipment' => $shipmentId, 'actor' => $actor];
+        $this->shipments[$shipmentId] = new ShipmentData(
+            $shipment->id, $shipment->orderId, $shipment->carrierId, $shipment->carrierName, $shipment->status, $shipment->recipient,
+            array_map(static fn (ParcelData $parcel): ParcelData => new ParcelData(
+                $parcel->position, $parcel->weightGrams, $parcel->lengthMm, $parcel->widthMm, $parcel->heightMm, $parcel->trackingNumber,
+                $parcel->trackingUrl, $parcel->hasLabel, $parcel->packaging, $parcel->hasLabel ? 'queued' : null,
+            ), $shipment->parcels),
+            $shipment->shippedAt, $shipment->deliveredOn, $shipment->deliveryNote,
+        );
+
+        return $labels;
+    }
+
+    /** Declares that a label printer is set up, so `printLabels()` works. */
+    public function withPrinter(bool $printer = true): void
+    {
+        $this->printer = $printer;
     }
 
     public function markShipped(int $shipmentId, ActorRef $actor): ShipmentData

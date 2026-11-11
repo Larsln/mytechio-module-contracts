@@ -8,6 +8,8 @@ namespace MyTechIO\Contracts\Shipping;
  * A parcel of a shipment. `position` counts from 1. `trackingUrl` is the
  * carrier's tracking page for the parcel (null without a tracking number or
  * a link template); `hasLabel` says that `Shipments::label()` returns one.
+ * `printState` is where the label stands at the holder's printer: `queued`,
+ * `printed` or `failed`, and null when it was never sent to a printer.
  */
 final readonly class ParcelData
 {
@@ -21,6 +23,7 @@ final readonly class ParcelData
         public ?string $trackingUrl = null,
         public bool $hasLabel = false,
         public ?string $packaging = null,
+        public ?string $printState = null,
     ) {}
 
     /**
@@ -38,6 +41,7 @@ final readonly class ParcelData
             'tracking_url' => $this->trackingUrl,
             'has_label' => $this->hasLabel,
             'packaging' => $this->packaging,
+            'print_state' => $this->printState,
         ];
     }
 }
