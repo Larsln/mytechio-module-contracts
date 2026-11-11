@@ -9,8 +9,9 @@ namespace MyTechIO\Contracts\Payments;
  * exclusive capability (`card_payments`) a payment module holds. A caller
  * (the shop) starts a payment, sends the customer to the page and asks on
  * the customer's return whether the amount is reserved. The amount is only
- * reserved (authorized); collecting, releasing on a cancelled order and
- * refunding are the holder's own business.
+ * reserved (authorized) until `capture()` collects it (since 2.19);
+ * collecting before a reservation runs out, releasing on a cancelled order
+ * and refunding are the holder's own business.
  *
  * The holder also fires its own event when an amount was reserved without
  * the customer coming back, so a caller can finish the purchase anyway; the
@@ -50,6 +51,16 @@ interface CardPayments
      * @throws CardPaymentException when the payment is unknown, already collected or the provider cannot be reached
      */
     public function release(string $paymentId): CardPaymentData;
+
+    /**
+     * Collects the reserved amount (since 2.19). `invoiceId` names the
+     * invoice the money settles, so the holder can match the payout to it.
+     * A payment that is already collected is returned as it is.
+     *
+     * @throws CardPaymentException when the payment is unknown, not reserved (open, released, run out) or the
+     *                              provider refuses or cannot be reached
+     */
+    public function capture(string $paymentId, ?int $invoiceId = null): CardPaymentData;
 
     public function find(string $paymentId): ?CardPaymentData;
 

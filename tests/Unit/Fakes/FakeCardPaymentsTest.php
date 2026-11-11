@@ -81,3 +81,25 @@ it('carries the delivery address of an order', function () {
     expect($input->toArray()['delivery_snapshot'])->toBe($delivery)
         ->and((new NewOrder(7, '2026-11-11', 14, []))->deliverySnapshot)->toBeNull();
 });
+
+it('collects a reserved amount once, for an invoice, and nothing that is not reserved', function () {
+    $payments = new FakeCardPayments;
+    $payments->authorize(newCardPayment());
+    $payments->authorize(newCardPayment('q_2'));
+
+    expect(fn () => $payments->capture('pay_1'))->toThrow(CardPaymentException::class, 'nicht reserviert');
+
+    $payments->settle('pay_1', CardPaymentStatus::Authorized);
+
+    expect($payments->capture('pay_1', 91)->status)->toBe(CardPaymentStatus::Captured)
+        ->and($payments->capture('pay_1', 92)->status)->toBe(CardPaymentStatus::Captured)
+        ->and($payments->captured())->toBe(['pay_1' => 91])
+        ->and($payments->find('pay_1')?->status)->toBe(CardPaymentStatus::Captured)
+        ->and(fn () => $payments->capture('pay_9'))->toThrow(CardPaymentException::class);
+
+    $payments->settle('pay_2', CardPaymentStatus::Authorized);
+    $payments->failNext('Stripe ist nicht erreichbar.');
+
+    expect(fn () => $payments->capture('pay_2'))->toThrow(CardPaymentException::class, 'nicht erreichbar')
+        ->and($payments->find('pay_2')?->status)->toBe(CardPaymentStatus::Open);
+});

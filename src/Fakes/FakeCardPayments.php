@@ -14,7 +14,8 @@ use MyTechIO\Contracts\Payments\NewCardPayment;
 /**
  * Test double for `CardPayments`. Payments get the ids `pay_1`, `pay_2`, …
  * and start `Open`; the test plays the provider with `settle()` (what the
- * next `refresh()` will find). `unavailable()` and `failNext()` simulate a
+ * next `refresh()` will find). `capture()` collects a reserved payment (`captured()` lists them);
+ * `unavailable()` and `failNext()` simulate a
  * provider that is off or refuses; `started()` lists what was asked for.
  */
 final class FakeCardPayments implements CardPayments
@@ -34,6 +35,9 @@ final class FakeCardPayments implements CardPayments
 
     /** @var list<string> */
     private array $released = [];
+
+    /** @var array<string, int|null> */
+    private array $captured = [];
 
     public function unavailable(): void
     {
@@ -123,6 +127,34 @@ final class FakeCardPayments implements CardPayments
         $this->provider[$paymentId] = CardPaymentStatus::Canceled;
 
         return $this->payments[$paymentId] = new CardPaymentData($payment->paymentId, $payment->reference, $payment->contactId, CardPaymentStatus::Canceled, $payment->amount, $payment->currency, $payment->orderId);
+    }
+
+    public function capture(string $paymentId, ?int $invoiceId = null): CardPaymentData
+    {
+        $this->failIfAsked();
+        $payment = $this->get($paymentId);
+        $status = $this->provider[$paymentId] ?? $payment->status;
+
+        if ($status === CardPaymentStatus::Captured) {
+            return $this->refresh($paymentId);
+        }
+
+        if ($status !== CardPaymentStatus::Authorized) {
+            throw new CardPaymentException('Der Betrag ist nicht reserviert und kann nicht eingezogen werden.');
+        }
+
+        $this->captured[$paymentId] = $invoiceId;
+        $this->provider[$paymentId] = CardPaymentStatus::Captured;
+
+        return $this->refresh($paymentId);
+    }
+
+    /**
+     * @return array<string, int|null> the invoice each collected payment was collected for, by payment id
+     */
+    public function captured(): array
+    {
+        return $this->captured;
     }
 
     public function find(string $paymentId): ?CardPaymentData

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use MyTechIO\Contracts\Accounting\ActorRef;
+use MyTechIO\Contracts\ContractException;
 use MyTechIO\Contracts\Fakes\FakeInvoices;
 use MyTechIO\Contracts\Invoices\InvoiceDraft;
 use MyTechIO\Contracts\Invoices\InvoiceItemRef;
@@ -63,4 +65,44 @@ it('finds created drafts and seeded invoices by id, or null when unknown', funct
     expect($invoices->find($draft->id)?->status)->toBe('draft')
         ->and($invoices->find(40)?->openAmount)->toBe('10.0000')
         ->and($invoices->find(999))->toBeNull();
+});
+
+it('makes one draft invoice per order with the payment method asked for', function () {
+    $invoices = new FakeInvoices;
+    $actor = new ActorRef(3, 'Lars');
+
+    $draft = $invoices->createFromOrder(55, $actor, 'card');
+
+    expect($draft->status)->toBe('draft')
+        ->and($draft->number)->toBeNull()
+        ->and($draft->orderId)->toBe(55)
+        ->and($draft->paymentMethod)->toBe('card')
+        ->and($invoices->createFromOrder(55, $actor)->id)->toBe($draft->id)
+        ->and($invoices->createFromOrder(56, $actor)->paymentMethod)->toBe('bank_transfer')
+        ->and(fn () => $invoices->createFromOrder(57, $actor, 'cash'))->toThrow(ContractException::class, 'Zahlart');
+});
+
+it('issues and sends an invoice once and picks up where a failure left it', function () {
+    $invoices = new FakeInvoices;
+    $actor = new ActorRef(3, 'Lars');
+    $id = $invoices->createFromOrder(55, $actor, 'card')->id;
+
+    $invoices->failNextIssue('Die Steuerprüfung fehlt.');
+    expect(fn () => $invoices->issueAndSend($id, $actor))->toThrow(ContractException::class, 'Steuerprüfung')
+        ->and($invoices->find($id)?->status)->toBe('draft');
+
+    $invoices->failNextSend();
+    expect(fn () => $invoices->issueAndSend($id, $actor))->toThrow(ContractException::class, 'verschickt')
+        ->and($invoices->find($id)?->status)->toBe('issued')
+        ->and($invoices->find($id)?->number)->toBe('RE-FAKE-00001')
+        ->and($invoices->sent())->toBe([]);
+
+    $sent = $invoices->issueAndSend($id, $actor);
+
+    expect($sent->status)->toBe('awaiting_payment')
+        ->and($sent->sentAt)->not->toBeNull()
+        ->and($sent->paymentMethod)->toBe('card')
+        ->and($invoices->issueAndSend($id, $actor)->number)->toBe('RE-FAKE-00001')
+        ->and($invoices->sent())->toBe([$id])
+        ->and(fn () => $invoices->issueAndSend(99, $actor))->toThrow(ContractException::class);
 });

@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace MyTechIO\Contracts\Invoices;
 
+use MyTechIO\Contracts\Accounting\ActorRef;
+use MyTechIO\Contracts\ContractException;
+
 /**
- * Creation of invoice drafts from modules.
+ * Invoices for modules: drafts, the invoice of an order and (since 2.19)
+ * issuing and sending it the way the core's own action does.
  *
- * Core semantics: always returns an invoice in draft status — finalization,
- * sending, and cancellation (Storno) remain exclusively the responsibility
- * of the core UI and are not reachable through this contract.
+ * `createDraft()` always returns a draft. Cancellation (Storno) remains
+ * exclusively the responsibility of the core UI and is not reachable
+ * through this contract.
  */
 interface Invoices
 {
@@ -35,4 +39,29 @@ interface Invoices
      * @return list<PaidDocument>
      */
     public function paidBetween(string $from, string $to): array;
+
+    /**
+     * Draft invoice of a confirmed or completed order with the order's lines,
+     * totals and tax carried over (since 2.19). `paymentMethod`
+     * (`bank_transfer`, `direct_debit`, `card`) overrides the contact's
+     * default. An order that already has an invoice that is not cancelled
+     * returns that one instead of a second.
+     *
+     * @throws ContractException when the order is unknown, a draft or cancelled, or the payment method is unknown
+     */
+    public function createFromOrder(int $orderId, ActorRef $actor, ?string $paymentMethod = null): InvoiceRef;
+
+    /**
+     * Issues a draft (number, document, booking) and mails it to the
+     * contact's invoice address with the core's template, exactly like the
+     * core's "issue and send" (since 2.19). It picks up where it stands: an
+     * issued invoice that was not sent is only sent, a sent one is returned
+     * as it is. A tax treatment that needs a person's confirmation is only
+     * issued with `$taxReviewConfirmed`.
+     *
+     * @throws ContractException when the invoice is unknown or cancelled, the contact has no address to mail to,
+     *                           the tax treatment needs the confirmation or the core refuses the issuing; when
+     *                           only the sending failed the invoice stays issued and a repeat sends it
+     */
+    public function issueAndSend(int $invoiceId, ActorRef $actor, bool $taxReviewConfirmed = false): InvoiceRef;
 }

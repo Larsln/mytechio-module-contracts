@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.19.0] - 2026-11-11
+
+### Added
+
+- `Shipping\Shipments` (exclusive capability `shipping`) with `CarrierData`, `NewShipment`, `NewParcel`, `ShipmentAddress`, `ShipmentData`, `ParcelData`, `ShipmentStatus`, `ShipmentLabel` and `ShipmentException`: the shipping services, the default per country, shipments of orders with their parcels, labels of services with an interface, and the states shipped and delivered. `FakeShipments` for tests.
+- `Invoices\Invoices::createFromOrder(orderId, ActorRef, paymentMethod)` and `issueAndSend(invoiceId, ActorRef, taxReviewConfirmed)`: the invoice of an order, issued and mailed like the core's own action. `FakeInvoices` implements both (`failNextIssue()`, `failNextSend()`, `sent()`).
+- Payment method `card` on invoices (`InvoiceRef::$paymentMethod`).
+- `Payments\CardPayments::capture(paymentId, invoiceId)`: collects a reserved amount. `FakeCardPayments::captured()`.
+
 ## [2.18.0] - 2026-11-11
 
 ### Added
