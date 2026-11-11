@@ -40,11 +40,11 @@ final class FakeShipments implements Shipments
 
     private bool $printer = false;
 
-    public function addCarrier(string $name, bool $createsLabels = false): CarrierData
+    public function addCarrier(string $name, bool $createsLabels = false, ?string $publicName = null): CarrierData
     {
         $id = count($this->carriers) + 1;
 
-        return $this->carriers[$id] = new CarrierData($id, $name, $createsLabels);
+        return $this->carriers[$id] = new CarrierData($id, $name, $createsLabels, $publicName);
     }
 
     public function setDefault(string $country, int $carrierId): void
@@ -107,7 +107,7 @@ final class FakeShipments implements Shipments
 
         $this->actors[] = ['action' => 'create', 'shipment' => $id, 'actor' => $actor];
 
-        return $this->shipments[$id] = new ShipmentData($id, $shipment->orderId, $carrier->id, $carrier->name, ShipmentStatus::Created, $shipment->recipient, $parcels);
+        return $this->shipments[$id] = new ShipmentData($id, $shipment->orderId, $carrier->id, $carrier->name, ShipmentStatus::Created, $shipment->recipient, $parcels, carrierPublicName: $carrier->publicName);
     }
 
     public function find(int $shipmentId): ?ShipmentData
@@ -172,7 +172,7 @@ final class FakeShipments implements Shipments
                 $parcel->position, $parcel->weightGrams, $parcel->lengthMm, $parcel->widthMm, $parcel->heightMm, $parcel->trackingNumber,
                 $parcel->trackingUrl, $parcel->hasLabel, $parcel->packaging, $parcel->hasLabel ? 'queued' : null,
             ), $shipment->parcels),
-            $shipment->shippedAt, $shipment->deliveredOn, $shipment->deliveryNote,
+            $shipment->shippedAt, $shipment->deliveredOn, $shipment->deliveryNote, $shipment->carrierPublicName,
         );
 
         return $labels;
@@ -238,7 +238,7 @@ final class FakeShipments implements Shipments
 
     private function with(ShipmentData $shipment, ShipmentStatus $status, ?string $shippedAt, ?string $deliveredOn = null, ?string $note = null): ShipmentData
     {
-        return new ShipmentData($shipment->id, $shipment->orderId, $shipment->carrierId, $shipment->carrierName, $status, $shipment->recipient, $shipment->parcels, $shippedAt, $deliveredOn, $note);
+        return new ShipmentData($shipment->id, $shipment->orderId, $shipment->carrierId, $shipment->carrierName, $status, $shipment->recipient, $shipment->parcels, $shippedAt, $deliveredOn, $note, $shipment->carrierPublicName);
     }
 
     private function failIfAsked(): void

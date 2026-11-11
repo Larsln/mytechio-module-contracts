@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - `Invoices\Invoices::forOrder(orderId)`: the issued invoices of an order (the invoice and its cancellation invoices), oldest first.
 - `Invoices\Invoices::document(invoiceId)` with `InvoiceDocument`: the archived PDF of an issued invoice, for a module that shows customers their own invoices. `FakeInvoices` implements both (`seedDocument()`).
+- `Shipping\CarrierData::$publicName`, `ShipmentData::$carrierPublicName` and `ShipmentData::customerCarrierName()`: a holder may keep a carrier name for customers apart from the one staff uses ("DHL" for a service staff calls "DHL (Schnittstelle)"). `FakeShipments::addCarrier()` takes it as third argument.
 
 ## [2.19.0] - 2026-11-11
 
