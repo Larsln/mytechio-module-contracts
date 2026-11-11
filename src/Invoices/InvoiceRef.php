@@ -16,7 +16,7 @@ namespace MyTechIO\Contracts\Invoices;
  * (`Y-m-d`), `orderId` (set when the invoice was generated from an order, so
  * it moved no stock itself), `cancelsInvoiceId` (set on a cancellation
  * invoice), the `items` in position order and the `paymentMethod`
- * (`bank_transfer` or `direct_debit`).
+ * (`bank_transfer`, `direct_debit` or, since 2.19, `card`).
  *
  * `find()` additionally fills the money and dating fields: `grossTotal`
  * (decimal string, 4 places), `openAmount` (gross total minus what is paid,

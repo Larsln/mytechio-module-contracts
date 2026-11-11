@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.19.0] - 2026-11-11
+
+### Added
+
+- `Shipping\Shipments` (exclusive capability `shipping`) with `CarrierData`, `NewShipment`, `NewParcel`, `ShipmentAddress`, `ShipmentData`, `ParcelData`, `ShipmentStatus`, `ShipmentLabel` and `ShipmentException`: the shipping services, the default per country, shipments of orders with their parcels, labels of services with an interface, and the states shipped and delivered. `FakeShipments` for tests.
+- `Shipping\Shipments::printLabels(shipmentId, ActorRef)` and `ParcelData::$printState`: the labels of a shipment go to the holder's label printer and say where they stand there. `FakeShipments::withPrinter()`.
+- `Invoices\Invoices::createFromOrder(orderId, ActorRef, paymentMethod)` and `issueAndSend(invoiceId, ActorRef, taxReviewConfirmed)`: the invoice of an order, issued and mailed like the core's own action. `FakeInvoices` implements both (`failNextIssue()`, `failNextSend()`, `sent()`).
+- `Organization\\OrganizationProfile` with `OrganizationData`: the company's own name, address and contact data from the core's organization settings, for papers a module prints itself. `FakeOrganizationProfile` for tests.
+- `Purchasing\\ShoppingNeeds` (exclusive capability `shopping_list`) with `ShoppingNeed`: a module states what it needs bought and the shopping list follows (new needs appear, quantities follow, what is covered leaves), marked with where it comes from. `FakeShoppingNeeds` for tests.
+- Payment method `card` on invoices (`InvoiceRef::$paymentMethod`).
+- `Payments\CardPayments::capture(paymentId, invoiceId)`: collects a reserved amount. `FakeCardPayments::captured()`.
+
+## [2.18.0] - 2026-11-11
+
+### Added
+
+- `Payments\CardPayments` (exclusive capability `card_payments`) with `NewCardPayment`, `CardPaymentSession`, `CardPaymentData`, `CardPaymentStatus` and `CardPaymentException`: card payments on a provider's hosted page where the amount is reserved first. `FakeCardPayments` for tests.
+- `Orders\NewOrder::$deliverySnapshot` and `Orders\OrderRef::$deliverySnapshot`: the delivery address of an order when it is not the billing address.
+
+## [2.17.0] - 2026-11-11
+
+### Added
+
+- `Tax\DocumentPreview` with `PreviewLine`, `PreviewedLine`, `DocumentPreviewData` and `DocumentPreviewException`: the tax result of a document that does not exist yet (scenario, rate and amounts per line, totals, tax per rate, payable amount, `requiresTaxReview`), computed like a saved order. `FakeDocumentPreview` for tests.
+- `Tax\Decimal`: the document arithmetic on decimal strings (four decimals per step, half to even).
+- `Articles\ArticleData::$taxCategoryId` (`tax_category_id` in `toArray()`), optional.
+
 ## [2.16.0] - 2026-11-10
 
 ### Added

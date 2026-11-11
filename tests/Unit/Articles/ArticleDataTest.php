@@ -69,7 +69,14 @@ it('converts to an array with snake_case keys and enum values', function () {
         'manufacturer_label' => null,
         'product_group_id' => null,
         'product_group_name' => null,
+        'tax_category_id' => null,
     ]);
+});
+
+it('carries the tax category a module needs to put the article on a document', function () {
+    $article = new ArticleData(1, 'A-1', 'Kabel', null, ArticleKind::Goods, TaxClassification::SupplyOfGoods, 'Stk', 'Stück', 'H87', '1', '1', true, true, 70, [oneOffOption(70, '1', '1')], taxCategoryId: 3);
+
+    expect($article->taxCategoryId)->toBe(3)->and($article->toArray()['tax_category_id'])->toBe(3);
 });
 
 it('carries manufacturer, manufacturer label and product group', function () {
