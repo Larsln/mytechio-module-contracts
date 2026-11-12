@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MyTechIO\Contracts\Fakes;
 
+use MyTechIO\Contracts\Shipping\Carriers\PickupPointProvider;
 use MyTechIO\Contracts\Shipping\PickupPoint;
 use MyTechIO\Contracts\Shipping\PickupPoints;
 use MyTechIO\Contracts\Shipping\ShipmentException;
@@ -11,9 +12,10 @@ use MyTechIO\Contracts\Shipping\ShipmentException;
 /**
  * Test double for `PickupPoints`: `seed()` puts a point at a postcode,
  * `failNext()` plays a carrier that cannot be asked, `searches()` lists
- * what was asked for. Post numbers are 6 to 10 digits, like DHL's.
+ * what was asked for. Post numbers are 6 to 10 digits, like DHL's. It also
+ * serves as a `PickupPointProvider` for a module that gathers providers.
  */
-final class FakePickupPoints implements PickupPoints
+final class FakePickupPoints implements PickupPointProvider, PickupPoints
 {
     /** @var list<PickupPoint> */
     private array $points = [];
@@ -37,6 +39,11 @@ final class FakePickupPoints implements PickupPoints
     public function deliverIn(array $countries): void
     {
         $this->countries = array_map('strtoupper', $countries);
+    }
+
+    public function carrier(): string
+    {
+        return 'Testdienst';
     }
 
     public function countries(): array
