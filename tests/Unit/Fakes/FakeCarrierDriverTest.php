@@ -29,14 +29,18 @@ it('books every parcel with a number and a label, and cancels by reference', fun
         ->and(array_map(fn ($parcel) => $parcel->trackingNumber, $parcels))->toBe(['GLS-1', 'GLS-2'])
         ->and($parcels[0]->reference)->toBe('GLS-1')
         ->and(base64_decode((string) $parcels[0]->labelBase64))->toStartWith('%PDF-')
+        ->and($parcels[0]->labelFormat)->toBeNull()
         ->and($driver->booked())->toHaveCount(1);
+
+    $driver->labelFormat('A5');
+    expect($driver->createShipment(driverShipment())[0]->labelFormat)->toBe('A5')->and($driver->booked())->toHaveCount(2);
 
     $driver->cancelShipment(['GLS-1', 'GLS-2']);
     expect($driver->cancelled())->toBe([['GLS-1', 'GLS-2']]);
 
     $driver->failNext('GLS lehnt ab.');
     expect(fn () => $driver->createShipment(driverShipment()))->toThrow(ShipmentException::class, 'GLS lehnt ab.')
-        ->and($driver->booked())->toHaveCount(1);
+        ->and($driver->booked())->toHaveCount(2);
 
     $driver->ready(false);
     expect($driver->createsLabels())->toBeFalse()->and($driver->returnsReady())->toBeFalse();

@@ -34,6 +34,8 @@ final class FakeCarrierDriver implements CarrierDriver, CreatesReturnLabels, Tra
 
     private int $counter = 0;
 
+    private ?string $labelFormat = null;
+
     /** @var list<NewShipment> */
     private array $booked = [];
 
@@ -54,6 +56,12 @@ final class FakeCarrierDriver implements CarrierDriver, CreatesReturnLabels, Tra
     public function ready(bool $ready = true): void
     {
         $this->ready = $ready;
+    }
+
+    /** The paper the labels are made for from now on, e.g. `A5`. */
+    public function labelFormat(?string $format): void
+    {
+        $this->labelFormat = $format;
     }
 
     public function trackingOn(bool $on = true): void
@@ -125,7 +133,7 @@ final class FakeCarrierDriver implements CarrierDriver, CreatesReturnLabels, Tra
 
         foreach ($shipment->parcels as $ignored) {
             $number = strtoupper($this->key).'-'.(++$this->counter);
-            $parcels[] = new DriverParcel($number, $number, base64_encode("%PDF-1.4\n% label {$number}\n"), 'application/pdf');
+            $parcels[] = new DriverParcel($number, $number, base64_encode("%PDF-1.4\n% label {$number}\n"), 'application/pdf', $this->labelFormat);
         }
 
         return $parcels;
