@@ -10,6 +10,12 @@ namespace MyTechIO\Contracts\Shipping;
  * a link template); `hasLabel` says that `Shipments::label()` returns one.
  * `printState` is where the label stands at the holder's printer: `queued`,
  * `printed` or `failed`, and null when it was never sent to a printer.
+ *
+ * Since 2.20 the holder may follow the parcel at the carrier:
+ * `trackingStatus` is `pre-transit`, `transit`, `delivered`, `failure` or
+ * `unknown` (null while the carrier was never asked), `trackingText` the
+ * carrier's own words for where the parcel is and `trackingAt` the moment
+ * of that event (ISO 8601).
  */
 final readonly class ParcelData
 {
@@ -24,6 +30,9 @@ final readonly class ParcelData
         public bool $hasLabel = false,
         public ?string $packaging = null,
         public ?string $printState = null,
+        public ?string $trackingStatus = null,
+        public ?string $trackingText = null,
+        public ?string $trackingAt = null,
     ) {}
 
     /**
@@ -42,6 +51,9 @@ final readonly class ParcelData
             'has_label' => $this->hasLabel,
             'packaging' => $this->packaging,
             'print_state' => $this->printState,
+            'tracking_status' => $this->trackingStatus,
+            'tracking_text' => $this->trackingText,
+            'tracking_at' => $this->trackingAt,
         ];
     }
 }

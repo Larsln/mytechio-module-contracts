@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `Invoices\Invoices::forOrder(orderId)`: the issued invoices of an order (the invoice and its cancellation invoices), oldest first.
 - `Invoices\Invoices::document(invoiceId)` with `InvoiceDocument`: the archived PDF of an issued invoice, for a module that shows customers their own invoices. `FakeInvoices` implements both (`seedDocument()`).
 - `Shipping\ReturnLabels` with `ReturnOffer` and `ReturnLabelData`: return labels for shipments at a price per country (`offer()`, `offers()`, `create()`, `forShipment()`, `label()`), offered by a shipping module that can create them; resolve optionally. `FakeReturnLabels` for tests.
+- `Shipping\PickupPoints` with `PickupPoint`: parcel lockers and post offices near a postcode (`countries()`, `near()`, `find()`, `validPostNumber()`); a shipment goes there through the new `ShipmentAddress::$pickupType`, `$pickupId` and `$postNumber`. Resolve optionally. `FakePickupPoints` for tests.
+- `Shipping\Shipments::track(shipmentId)` and `ParcelData::$trackingStatus`, `$trackingText`, `$trackingAt`: the holder asks the carrier where the parcels are and notes the delivery itself once all are delivered. `FakeShipments::carrierSays()` and `tracked()`.
 - `Shipping\CarrierData::$publicName`, `ShipmentData::$carrierPublicName` and `ShipmentData::customerCarrierName()`: a holder may keep a carrier name for customers apart from the one staff uses ("DHL" for a service staff calls "DHL (Schnittstelle)"). `FakeShipments::addCarrier()` takes it as third argument.
 
 ## [2.19.0] - 2026-11-11

@@ -46,6 +46,7 @@ it('keeps the typed tracking numbers of a service without an interface and has n
         ->and($shipment->parcels[0]->toArray())->toBe([
             'position' => 1, 'weight_grams' => 1200, 'length_mm' => 300, 'width_mm' => 200, 'height_mm' => 100,
             'tracking_number' => '123456', 'tracking_url' => 'https://track.example.test/123456', 'has_label' => false, 'packaging' => 'Karton S', 'print_state' => null,
+            'tracking_status' => null, 'tracking_text' => null, 'tracking_at' => null,
         ])
         ->and($shipment->parcels[1]->trackingNumber)->toBeNull()
         ->and($this->shipments->label($shipment->id, 1))->toBeNull()
