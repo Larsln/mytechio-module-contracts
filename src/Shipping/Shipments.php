@@ -82,4 +82,14 @@ interface Shipments
      * @throws ShipmentException when the shipment is unknown, already on its way or the carrier refuses
      */
     public function cancel(int $shipmentId, ActorRef $actor): ShipmentData;
+
+    /**
+     * Asks the carrier where the parcels of a shipment are (since 2.20) and returns the shipment with what it
+     * said. When every parcel is delivered the holder notes the delivery itself, with the carrier's date. A
+     * shipment whose carrier cannot be asked, or that is cancelled, comes back unchanged; so does one the
+     * holder asked about only a moment ago (carriers limit how often they may be asked).
+     *
+     * @throws ShipmentException when the shipment is unknown
+     */
+    public function track(int $shipmentId): ShipmentData;
 }

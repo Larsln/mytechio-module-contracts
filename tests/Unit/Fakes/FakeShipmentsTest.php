@@ -29,8 +29,8 @@ it('knows the shipping services and the one preselected for a country', function
 
     expect($this->shipments)->toBeInstanceOf(Shipments::class)
         ->and(array_map(fn ($carrier) => $carrier->toArray(), $this->shipments->carriers()))->toBe([
-            ['id' => 1, 'name' => 'GLS', 'creates_labels' => false],
-            ['id' => 2, 'name' => 'DHL', 'creates_labels' => true],
+            ['id' => 1, 'name' => 'GLS', 'creates_labels' => false, 'public_name' => null],
+            ['id' => 2, 'name' => 'DHL', 'creates_labels' => true, 'public_name' => null],
         ])
         ->and($this->shipments->carrierFor('DE')?->id)->toBe($dhl->id)
         ->and($this->shipments->carrierFor('AT'))->toBeNull()
@@ -46,6 +46,7 @@ it('keeps the typed tracking numbers of a service without an interface and has n
         ->and($shipment->parcels[0]->toArray())->toBe([
             'position' => 1, 'weight_grams' => 1200, 'length_mm' => 300, 'width_mm' => 200, 'height_mm' => 100,
             'tracking_number' => '123456', 'tracking_url' => 'https://track.example.test/123456', 'has_label' => false, 'packaging' => 'Karton S', 'print_state' => null,
+            'tracking_status' => null, 'tracking_text' => null, 'tracking_at' => null,
         ])
         ->and($shipment->parcels[1]->trackingNumber)->toBeNull()
         ->and($this->shipments->label($shipment->id, 1))->toBeNull()
@@ -136,4 +137,27 @@ it('sends the labels to the printer only when one is set up and the shipment has
         ->and($this->shipments->find($withLabels)->parcels[1]->printState)->toBe('queued')
         ->and(fn () => $this->shipments->printLabels($without, $this->actor))->toThrow(ShipmentException::class, 'keine Etiketten')
         ->and(fn () => $this->shipments->printLabels(99, $this->actor))->toThrow(ShipmentException::class);
+});
+
+it('keeps a carrier name for customers apart from the one staff uses', function () {
+    $shipments = new FakeShipments;
+    $actor = new ActorRef(1, 'Lars');
+    $plain = $shipments->addCarrier('GLS');
+    $named = $shipments->addCarrier('DHL (Schnittstelle)', true, 'DHL');
+    $to = new ShipmentAddress('Erika Muster', 'Pontstraße 1', '52062', 'Aachen', 'DE');
+
+    $first = $shipments->create(new NewShipment(1, $plain->id, $to, [new NewParcel(1000, trackingNumber: 'A1')]), $actor);
+    $second = $shipments->create(new NewShipment(2, $named->id, $to, [new NewParcel(1000)]), $actor);
+
+    $shipments->withPrinter();
+
+    expect($first->carrierPublicName)->toBeNull()
+        ->and($first->customerCarrierName())->toBe('GLS')
+        ->and($second->carrierName)->toBe('DHL (Schnittstelle)')
+        ->and($second->customerCarrierName())->toBe('DHL')
+        ->and($second->toArray()['carrier_public_name'])->toBe('DHL')
+        // The name survives printing and the states after it.
+        ->and($shipments->printLabels($second->id, $actor))->toBeGreaterThan(0)
+        ->and($shipments->markShipped($second->id, $actor)->customerCarrierName())->toBe('DHL')
+        ->and($shipments->find($second->id)?->customerCarrierName())->toBe('DHL');
 });

@@ -40,11 +40,17 @@ final class FakeShipments implements Shipments
 
     private bool $printer = false;
 
-    public function addCarrier(string $name, bool $createsLabels = false): CarrierData
+    /** @var array<int, array{0: string, 1: string, 2: string}> */
+    private array $carrierSays = [];
+
+    /** @var list<int> */
+    private array $tracked = [];
+
+    public function addCarrier(string $name, bool $createsLabels = false, ?string $publicName = null): CarrierData
     {
         $id = count($this->carriers) + 1;
 
-        return $this->carriers[$id] = new CarrierData($id, $name, $createsLabels);
+        return $this->carriers[$id] = new CarrierData($id, $name, $createsLabels, $publicName);
     }
 
     public function setDefault(string $country, int $carrierId): void
@@ -107,7 +113,7 @@ final class FakeShipments implements Shipments
 
         $this->actors[] = ['action' => 'create', 'shipment' => $id, 'actor' => $actor];
 
-        return $this->shipments[$id] = new ShipmentData($id, $shipment->orderId, $carrier->id, $carrier->name, ShipmentStatus::Created, $shipment->recipient, $parcels);
+        return $this->shipments[$id] = new ShipmentData($id, $shipment->orderId, $carrier->id, $carrier->name, ShipmentStatus::Created, $shipment->recipient, $parcels, carrierPublicName: $carrier->publicName);
     }
 
     public function find(int $shipmentId): ?ShipmentData
@@ -172,7 +178,7 @@ final class FakeShipments implements Shipments
                 $parcel->position, $parcel->weightGrams, $parcel->lengthMm, $parcel->widthMm, $parcel->heightMm, $parcel->trackingNumber,
                 $parcel->trackingUrl, $parcel->hasLabel, $parcel->packaging, $parcel->hasLabel ? 'queued' : null,
             ), $shipment->parcels),
-            $shipment->shippedAt, $shipment->deliveredOn, $shipment->deliveryNote,
+            $shipment->shippedAt, $shipment->deliveredOn, $shipment->deliveryNote, $shipment->carrierPublicName,
         );
 
         return $labels;
@@ -225,6 +231,44 @@ final class FakeShipments implements Shipments
         return $this->shipments[$shipmentId] = $this->with($shipment, ShipmentStatus::Cancelled, null);
     }
 
+    public function track(int $shipmentId): ShipmentData
+    {
+        $shipment = $this->shipments[$shipmentId] ?? throw new ShipmentException('Die Sendung wurde nicht gefunden.');
+        $this->tracked[] = $shipmentId;
+        $answer = $this->carrierSays[$shipmentId] ?? null;
+
+        if ($answer === null || $shipment->status === ShipmentStatus::Cancelled) {
+            return $shipment;
+        }
+
+        [$status, $text, $at] = $answer;
+        $parcels = array_map(static fn (ParcelData $parcel): ParcelData => new ParcelData(
+            $parcel->position, $parcel->weightGrams, $parcel->lengthMm, $parcel->widthMm, $parcel->heightMm, $parcel->trackingNumber,
+            $parcel->trackingUrl, $parcel->hasLabel, $parcel->packaging, $parcel->printState, $status, $text, $at,
+        ), $shipment->parcels);
+        $delivered = $status === 'delivered';
+
+        return $this->shipments[$shipmentId] = new ShipmentData(
+            $shipment->id, $shipment->orderId, $shipment->carrierId, $shipment->carrierName, $delivered ? ShipmentStatus::Delivered : $shipment->status,
+            $shipment->recipient, $parcels, $shipment->shippedAt ?? ($delivered ? $at : null), $delivered ? substr($at, 0, 10) : $shipment->deliveredOn,
+            $delivered ? 'laut Sendungsverfolgung' : $shipment->deliveryNote, $shipment->carrierPublicName,
+        );
+    }
+
+    /** What the carrier answers the next time `track()` asks about this shipment: status, its words, the moment. */
+    public function carrierSays(int $shipmentId, string $status, string $text, string $at = '2030-01-04T09:30:00+00:00'): void
+    {
+        $this->carrierSays[$shipmentId] = [$status, $text, $at];
+    }
+
+    /**
+     * @return list<int> the shipments `track()` asked about, in order
+     */
+    public function tracked(): array
+    {
+        return $this->tracked;
+    }
+
     private function active(int $shipmentId): ShipmentData
     {
         $shipment = $this->shipments[$shipmentId] ?? throw new ShipmentException('Die Sendung wurde nicht gefunden.');
@@ -238,7 +282,7 @@ final class FakeShipments implements Shipments
 
     private function with(ShipmentData $shipment, ShipmentStatus $status, ?string $shippedAt, ?string $deliveredOn = null, ?string $note = null): ShipmentData
     {
-        return new ShipmentData($shipment->id, $shipment->orderId, $shipment->carrierId, $shipment->carrierName, $status, $shipment->recipient, $shipment->parcels, $shippedAt, $deliveredOn, $note);
+        return new ShipmentData($shipment->id, $shipment->orderId, $shipment->carrierId, $shipment->carrierName, $status, $shipment->recipient, $shipment->parcels, $shippedAt, $deliveredOn, $note, $shipment->carrierPublicName);
     }
 
     private function failIfAsked(): void

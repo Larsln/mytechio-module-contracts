@@ -7,7 +7,9 @@ namespace MyTechIO\Contracts\Shipping;
 /**
  * A shipping service staff can send with. `createsLabels` says that the
  * holder creates the label (and the tracking number) through the carrier's
- * interface; without it staff types the tracking number in.
+ * interface; without it staff types the tracking number in. `publicName`
+ * (since 2.20) is the name customers are shown when it differs from the
+ * name staff uses.
  */
 final readonly class CarrierData
 {
@@ -15,6 +17,7 @@ final readonly class CarrierData
         public int $id,
         public string $name,
         public bool $createsLabels = false,
+        public ?string $publicName = null,
     ) {}
 
     /**
@@ -26,6 +29,7 @@ final readonly class CarrierData
             'id' => $this->id,
             'name' => $this->name,
             'creates_labels' => $this->createsLabels,
+            'public_name' => $this->publicName,
         ];
     }
 }

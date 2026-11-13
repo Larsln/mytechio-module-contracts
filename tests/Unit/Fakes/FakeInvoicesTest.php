@@ -5,6 +5,7 @@ declare(strict_types=1);
 use MyTechIO\Contracts\Accounting\ActorRef;
 use MyTechIO\Contracts\ContractException;
 use MyTechIO\Contracts\Fakes\FakeInvoices;
+use MyTechIO\Contracts\Invoices\InvoiceDocument;
 use MyTechIO\Contracts\Invoices\InvoiceDraft;
 use MyTechIO\Contracts\Invoices\InvoiceItemRef;
 use MyTechIO\Contracts\Invoices\InvoiceRef;
@@ -105,4 +106,31 @@ it('issues and sends an invoice once and picks up where a failure left it', func
         ->and($invoices->issueAndSend($id, $actor)->number)->toBe('RE-FAKE-00001')
         ->and($invoices->sent())->toBe([$id])
         ->and(fn () => $invoices->issueAndSend(99, $actor))->toThrow(ContractException::class);
+});
+
+it('lists the issued invoices of an order and hands out their papers', function () {
+    $invoices = new FakeInvoices;
+    $actor = new ActorRef(3, 'Lars');
+    $id = $invoices->createFromOrder(55, $actor, 'card')->id;
+    $other = $invoices->createFromOrder(56, $actor)->id;
+
+    // A draft is no paper yet.
+    expect($invoices->forOrder(55))->toBe([])
+        ->and($invoices->document($id))->toBeNull()
+        ->and($invoices->document(999))->toBeNull();
+
+    $invoices->issueAndSend($id, $actor);
+    $invoices->seedInvoice(new InvoiceRef(id: 70, number: 'ST-1', status: 'issued', type: 'cancellation', orderId: 55, cancelsInvoiceId: $id));
+
+    expect(array_map(static fn (InvoiceRef $invoice): int => $invoice->id, $invoices->forOrder(55)))->toBe([$id, 70])
+        ->and($invoices->forOrder(56))->toBe([])
+        ->and($invoices->document($other))->toBeNull();
+
+    $made = $invoices->document($id);
+    expect($made)->toBeInstanceOf(InvoiceDocument::class)
+        ->and($made->mimeType)->toBe('application/pdf')
+        ->and($made->filename)->toBe('RE-FAKE-00001.pdf');
+
+    $invoices->seedDocument($id, new InvoiceDocument('%PDF-1.7 real', 'application/pdf', 'Rechnung.pdf'));
+    expect($invoices->document($id)?->content)->toBe('%PDF-1.7 real');
 });
