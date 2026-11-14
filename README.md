@@ -32,13 +32,13 @@ composer require mytechio/module-contracts
 | `Subscriptions` | `Subscriptions` | Subscriptions (Leistungen) of contacts, implemented by the core; see section "Subscriptions". `cancel()` ends a subscription on the earliest date allowed by minimum term and notice period, or on an explicit later date. |
 | `Subscriptions` | `SubscriptionType` | Subscription type provided by a plugin module (field schema plus lifecycle hooks), container tag `mytechio.subscription_types`; see section "Subscriptions". |
 | `Subscriptions` | `SubscriptionSource` | Subscription suggestions and actions of an external source (e.g. a registrar), container tag `mytechio.subscription_sources`; see section "Subscriptions". |
-| `Contacts` | `Contacts` | Read-only contact access — modules do not create or modify contacts. |
+| `Contacts` | `Contacts` | Contact access: reads for every module; since 2.15 `create()`, `update()` (replaces the customer-facing fields, keeps the rest) and `findByEmail()` for modules that onboard customers themselves. Writes run through the core's contact service; refusals are a `ContactValidationException` with German messages per field. Deleting stays with the core. |
 | `SepaMandates` | `Contacts\SepaMandates` | Read, create and revoke SEPA mandates of contacts (provider modules). |
 | `Accounting` | `Journal` | Debit must equal credit (enforced via `UnbalancedEntryException`); closed periods are rejected (`PeriodClosedException`). |
 | `Orders` | `Orders` | Read access to orders: `find()` returns the `OrderRef` (number, page URL, lines) for an order reference. Creating and changing orders stays with the core UI; modules join the lifecycle through `OrderHook`. |
 | `Audit` | `MaintenanceLog` | Appends a superadmin break-glass action to the core's hash-chained maintenance log (`record()`); reading and verifying stay with the core. |
 | `Accounting` | `JournalSourceResolver` | A module explains the journal entries it posted (`sourceTypes()`, `link()`, `reversalHint()`), container tag `mytechio.journal_source_resolvers`; the core asks it for the link on the journal pages and for the refusal text of a manual reversal. |
-| `Invoices` | `Invoices` | `createDraft()` always returns an invoice in draft status; defaults (bank account, payment terms, tax category) are filled in by the core. Finalization/sending/cancellation remain the responsibility of the core UI. `findItem()` returns the reference to an invoice item (including invoice number/status and core URL) by its ID, or `null`. `paidBetween()` returns all outgoing invoices paid within the period as `PaidDocument` (`type = "invoice"`), e.g. for the profit split. |
+| `Invoices` | `Invoices` | `createDraft()` always returns an invoice in draft status; defaults (bank account, payment terms, tax category) are filled in by the core. `createFromOrder()` drafts the invoice of an order and `issueAndSend()` issues and mails it like the core's own action (both since 2.19); `forOrder()` lists the issued invoices of an order and `document()` returns the archived PDF of one (both since 2.20); cancellation remains the responsibility of the core UI. `findItem()` returns the reference to an invoice item (including invoice number/status and core URL) by its ID, or `null`. `paidBetween()` returns all outgoing invoices paid within the period as `PaidDocument` (`type = "invoice"`), e.g. for the profit split. |
 | `Invoices` | `InvoiceItemExtension` | A module's extension of an invoice item (see section "Invoice item extensions"). |
 | `Documents` | `IncomingInvoices` | Read-only access to incoming invoices (Eingangsrechnungen). `paidBetween()` returns all incoming invoices paid within the period as `PaidDocument` (`type = "incoming_invoice"`); `find()` returns the reference to an incoming invoice by its ID, or `null`. |
 | `Documents` | `InvoiceExtractor` | AI extraction provider for incoming invoices, container tag `mytechio.invoice_extractors`. The core selects exactly one driver via configuration; `extract()` returns the raw §7.6 payload (validation is done by the core) and throws `ExtractionFailedException` on transport errors or blocked generation. |
@@ -50,9 +50,21 @@ composer require mytechio/module-contracts
 | `Units` | `Units` | Read-only access to the core's units of measure — the master data behind the unit picker on document lines; modules show the same list and store the unit code, never create or change units. `all()` returns every unit in the core's picker order, `find()` looks up by exact code, `default()` returns the unit the core pre-selects for new lines (`null` when none is marked). `UnitData` carries code, German name, optional English name, optional UN/ECE Rec. 20 code and the default flag. |
 | `Articles` | `ArticleStatistics` | Read-only access to article BI analytics (revenue, cost of goods, gross profit); the core implements this contract via the core tables, a module merely displays the data. The array shapes in `ArticleOverview`/`ArticleDetailStats` match the core implementation exactly. |
 | `Tax` | `TaxCategories` | Read-only view of the organisation's tax categories (`TaxCategoryData`: id, code, name, rate as a two-place decimal string, active flag and the display label the core shows, e.g. "19 % (Standard)"). `all()` returns them in the core's order and skips inactive ones unless `$includeInactive` is set, `find()` looks up by id. |
+| `Tax` | `DocumentPreview` | Tax preview of a document before it exists (since 2.17): `preview(contactId, date, lines)` answers per line the scenario, the rate and the amounts, the totals, the tax per rate, the payable amount and whether the order would need a tax review — computed by the same rules and arithmetic as a saved order. `Tax\Decimal` carries that arithmetic (four decimals per step, half to even) for modules that must reproduce an amount. The core implements it. |
+| `Payments` | `CardPayments` | Card payments on a payment provider's hosted page (since 2.18), exclusive capability `card_payments`: `authorize()` starts a payment and returns the page URL, `refresh()` asks the provider for the state, `assignOrder()`, `release()`, `find()`, `findByReference()`, `forOrder()`. The amount is reserved first; `capture()` collects it (since 2.19), refunding is the holder's business. Resolve optionally. |
+| `Organization` | `OrganizationProfile` | The company's own master data (since 2.19): `current()` returns name, address, e-mail, phone, website and VAT ID from the core's organization settings, or `null` while the organization is not set up. |
+| `Purchasing` | `ShoppingNeeds` | What modules need bought, kept on the shopping list (since 2.19), exclusive capability `shopping_list`: `replace(source, sourceLabel, needs)` makes the items of a source equal to what it needs now, `open(source)` reads them back. Items people wrote themselves are never touched. Resolve optionally. |
+| `Shipping` | `Shipments` | Shipments of orders (since 2.19), exclusive capability `shipping`: `carriers()`, `carrierFor(country)`, `create()` (labels and tracking numbers where the service has an interface), `label()`, `markShipped()`, `markDelivered()`, `cancel()`, `find()`, `forOrder()`, `forOrders()`. Moves no stock and writes no documents. Resolve optionally. |
+| `Shipping` | `PickupPoints` | Parcel lockers and post offices of the carrier (since 2.20): `near(country, postalCode, city, street)` lists them nearest first, `find()` checks one a customer chose, `validPostNumber()` checks the format of the customer's number with the carrier. A shipment goes to one through `ShipmentAddress::$pickupType`, `$pickupId`, `$postNumber`. Resolve optionally. |
+| `Shipping\Carriers` | `CarrierDriver` | How shipments reach a carrier (since 2.20): a module that connects a carrier's interface tags its driver with `CarrierDriver::TAG`; the holder of `shipping` lets staff set a carrier to it. Optional abilities of a driver: `TracksParcels` (where a parcel is, within a daily budget) and `CreatesReturnLabels`. |
+| `Shipping\Carriers` | `PickupPointProvider` | A carrier module's source of pickup points (since 2.20), tagged with `PickupPointProvider::TAG` and gathered by the module that offers `PickupPoints`. Other modules use `PickupPoints`. |
+| `Shipping` | `ReturnLabels` | Return labels for shipments (since 2.20): `offer(country)` and `offers()` give the price per country, `create(shipmentId, actor)` makes a label for the way back of a shipped shipment, `forShipment()` lists them, `label()` returns the file. Books nothing; who pays the price is the caller's business. Resolve optionally. |
 | `Tax` | `VatIdChecker` | VIES check of a VAT ID. Without an active module, the core binds a null client that always throws `VatIdCheckUnavailableException` (today's "VIES unavailable" path); `InvalidVatIdFormatException` on a formally invalid VAT ID. |
 | `Settings` | `ModuleSettings` | Module-specific settings; ENV/config always takes precedence over the database (`isFromEnvironment()`). Implementation not until phase 3 — only the interface and fake exist so far. |
 | `Connectors` | `Connector` | A uniform set of status queries/actions for external registrars/license servers; `sync()` may run for a long time and belongs on a queue. |
+| `Articles` | `ArticleMarker` | A marker a module puts on articles in the core's article list (since 2.16): symbol next to the name with a detail as tooltip, and a list filter; container tag `mytechio.article_markers`. The shop module marks articles released in the shop. |
+| `Contacts` | `ContactMarker` | A marker a module puts on contacts in the core's contact list (since 2.15): symbol next to the name with a detail as tooltip, and a list filter; container tag `mytechio.contact_markers`. The shop module marks contacts with a shop login. |
+| `Web` | `WebsiteClients` | The website's API keys, checked on behalf of other modules (since 2.14): a module with its own `/api/web/*` endpoints asks `authenticate(secret, ip)` whether a bearer key is known, unrevoked and admitted from the request IP; the holder of `public_links` implements it, the core binds a null implementation that answers `unavailable`. |
 | `Modules` | `ModuleLifecycle` | Lifecycle hooks (`onInstall`/`onEnable`/`onDisable`/`onUninstall`), resolved by the core via the manifest key `lifecycle`; `onEnable()` may throw (the module stays disabled), `onDisable()` must not. `AbstractModuleLifecycle` provides empty implementations to extend. |
 | `Modules` | `HealthCheck` | Health status (`HealthStatus`) for the module overview; the core calls `health()` only there, and with timeout protection — implementations must not perform slow network calls. |
 | `Modules` | `ModuleState` | Runtime state of a module for background code (see section "Module state in background code"): `isActive()` checks known+enabled+compatible, `isEnabled()` checks only the raw toggle. |
@@ -315,6 +327,16 @@ resolver per kind; a kind is `<module>.<name>`, e.g. the Stripe module's
   reason (`not_found`, `expired`, `revoked`, `used`, `no_resolver`, or one the
   resolver chooses such as `already_done`) and a German message for the visitor.
 
+## Website clients
+
+`Web\WebsiteClients` lets a module that answers the website itself (for example a
+shop under `/api/web/shop/*`) reuse the website keys of the `public_links` holder
+instead of issuing keys of its own. `authenticate($secret, $ip)` returns a
+`Web\WebsiteAuthResult`: status `ok` with the key's ID and name, `unknown_key`
+(missing, unknown or revoked), `ip_denied` (the key exists, the request IP is
+outside its allowlist) or `unavailable` (no holder active; the core's null
+implementation). The secret is never logged or returned.
+
 ## Fakes for module tests
 
 Every contract has an in-memory test double under `MyTechIO\Contracts\Fakes\*`
@@ -330,7 +352,7 @@ $this->app->instance(Subscriptions::class, new FakeSubscriptions);
 
 - `FakeDocumentStore` — returns deterministic paths/hashes, `stored()` for assertions.
 - `FakeMailOutbox` — `sent()`/`sentTo(email)` with no PHPUnit dependency.
-- `FakeContacts` — `seed()`, `setCountries()`.
+- `FakeContacts` — `seed()`, `setCountries()`; `create()`/`update()`/`findByEmail()` with the core's rules, `vatIdValidity()` declares VIES answers, `actors()` records writes.
 - `FakeSepaMandates` — `created()`, `revocations()`.
 - `FakeArticles` — `seed()`; `search()` filters by case-insensitive substring over article number and name in insertion order and skips inactive articles unless `$includeInactive`.
 - `FakeTaxCategories` — `seed()` in core order; `all()` skips inactive categories unless asked.
@@ -339,8 +361,16 @@ $this->app->instance(Subscriptions::class, new FakeSubscriptions);
   `seedAccount()` for the chart of accounts.
 - `FakeOrders` — `seed(OrderRef)` for `find()`.
 - `FakeMaintenanceLog` — keeps the appended entries in `entries()`.
+- `FakeArticleMarker` — marks articles in memory (`mark(id, detail)`, `unmark(id)`) and answers `detailsFor()`/`articleIds()`.
+- `FakeDocumentPreview` — calculates like the core; `taxFor(contactId, scenario, rate)`, `categoryRate()`, `failFor()`, `warn()`, `calls()`.
+- `FakeCardPayments` — payments `pay_1`, …; `settle(id, status)` plays the provider, `unavailable()`, `failNext()`, `started()`, `released()`.
+- `FakeContactMarker` — marks contacts in memory (`mark(id, detail)`, `unmark(id)`) and answers `detailsFor()`/`contactIds()`.
 - `FakeJournalSourceResolver` — answers for the configured source types (`/prefix/{sourceId}` links, configurable reversal hint), asked entries recorded in `linkCalls`/`reversalHintCalls`.
-- `FakeInvoices` — remembers drafts, always returns status `draft`; `seedItem()` for `findItem()`, `seedPaidDocument()` for `paidBetween()` (sorted, filtered by period).
+- `FakeShipments` — shipping services via `addCarrier()`/`setDefault()`, tracking numbers and labels for services that create them, `failNext()`, `actors()`.
+- `FakeCarrierDriver` — a driver with labels, tracking and return labels: `ready()`, `failNext()`, `says()`, `trackingOn()`, `budget()`, `booked()`, `cancelled()`, `asked()`, `returns()`.
+- `FakePickupPoints` — `seed()`, `deliverIn()`, `failNext()`, `searches()`; also a `PickupPointProvider`.
+- `FakeReturnLabels` — on top of a `FakeShipments`: `setOffer()`, `failNext()`, `created()`, `purge()`.
+- `FakeInvoices` — remembers drafts, always returns status `draft`; `createFromOrder()`/`issueAndSend()` with `failNextIssue()`, `failNextSend()`, `sent()`; `forOrder()` and `document()` with `seedDocument()`; `seedItem()` for `findItem()`, `seedPaidDocument()` for `paidBetween()` (sorted, filtered by period).
 - `FakeModuleSettings` — `markFromEnvironment()` simulates ENV precedence.
 - `FakeConnector` — configurable key/types/status/actions/events.
 - `FakeModuleLifecycle` — counts calls per hook, `failOnEnable()` simulates a failing `onEnable()`.
@@ -357,6 +387,7 @@ $this->app->instance(Subscriptions::class, new FakeSubscriptions);
 - `FakeFetchStatementSource` — like `FakeFileStatementSource` for `FetchStatementSource`, plus `withStatus()` for `connectionStatus()`; fetch windows recorded in `calls()`.
 - `FakeStructuredCompletion` — returns a preconfigured answer (`returns()`) or throws a `StructuredCompletionException` (`throws()`), `withConfigured()` to toggle, calls recorded in `calls()`.
 - `FakeStructuredCompletions` — serves one provider or none (`with()` swaps it).
+- `FakeWebsiteClients` — `seed(secret, clientId, clientName, ipAllowlist)` registers keys (exact IPs and CIDR ranges, IPv4 and IPv6), `revoke()`, `setAvailable()`, `calls()` records every check without the secret.
 - `FakeModuleState` — every module is active by default; `activate()`/`deactivate()` toggle a module for the test.
 
 ## Versioning

@@ -33,6 +33,7 @@ final readonly class OrderRef
      * @param  array<string, mixed>|null  $billingSnapshot
      * @param  list<int>  $invoiceIds
      * @param  list<string>  $warnings
+     * @param  array<string, mixed>|null  $deliverySnapshot  where the goods go when not to the billing address (since 2.18)
      */
     public function __construct(
         public int $id,
@@ -73,6 +74,7 @@ final readonly class OrderRef
         public ?int $createdBy = null,
         public ?string $createdAt = null,
         public array $warnings = [],
+        public ?array $deliverySnapshot = null,
     ) {}
 
     /**
@@ -119,6 +121,7 @@ final readonly class OrderRef
             'created_by' => $this->createdBy,
             'created_at' => $this->createdAt,
             'warnings' => $this->warnings,
+            'delivery_snapshot' => $this->deliverySnapshot,
         ];
     }
 }

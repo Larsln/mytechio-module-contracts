@@ -29,12 +29,14 @@ use MyTechIO\Contracts\Invoices\Validate;
  * `manufacturer` is the manufacturer's name, `manufacturerLabel` the
  * manufacturer's own designation of the article ("Bezeichnung des Herstellers"),
  * `productGroupId` and `productGroupName` the product group the article is filed
- * under; each is `null` when not maintained.
- * `subscriptionType` is the subscription type key of a subscribable article
- * (one with a period price option), `null` otherwise; `taxCategoryId` is the
- * id of the article's default tax category (`null` when none is set).
- * An article with `components` is a package: one line on documents at the
- * package price, its components listed beneath when `listComponents` is set.
+ * under; each is `null` when not maintained. `taxCategoryId` is the article's
+ * tax category in the core (since 2.17), which a module passes on as
+ * `NewOrderItem::$taxCategoryId` or `Tax\PreviewLine::$taxCategoryId` when it
+ * puts the article on a document. `subscriptionType` is the subscription type
+ * key of a subscribable article (one with a period price option), `null`
+ * otherwise (since 2.21). An article with `components` is a package: one line
+ * on documents at the package price, its components listed beneath when
+ * `listComponents` is set (since 2.21).
  */
 final readonly class ArticleData
 {
@@ -64,8 +66,8 @@ final readonly class ArticleData
         public ?string $manufacturerLabel = null,
         public ?int $productGroupId = null,
         public ?string $productGroupName = null,
-        public ?string $subscriptionType = null,
         public ?int $taxCategoryId = null,
+        public ?string $subscriptionType = null,
         public array $components = [],
         public bool $listComponents = true,
     ) {
@@ -125,8 +127,8 @@ final readonly class ArticleData
             'manufacturer_label' => $this->manufacturerLabel,
             'product_group_id' => $this->productGroupId,
             'product_group_name' => $this->productGroupName,
-            'subscription_type' => $this->subscriptionType,
             'tax_category_id' => $this->taxCategoryId,
+            'subscription_type' => $this->subscriptionType,
             'components' => array_map(
                 static fn (ArticleComponentData $component): array => $component->toArray(),
                 $this->components,

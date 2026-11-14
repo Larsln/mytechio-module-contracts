@@ -34,6 +34,11 @@ final readonly class ContactData
         public ?string $mobile = null,
         public ?string $website = null,
         public ?string $updatedAt = null,
+        /** Since 2.15: the customer number, and the outcome of the core's latest VIES check of `vatId` (`null` = none or no VAT ID). */
+        public ?string $customerNumber = null,
+        public ?bool $vatIdValid = null,
+        /** Since 2.15: the salutation of a person (`b2c`) or of the primary contact person. */
+        public ?string $salutation = null,
     ) {}
 
     /**
@@ -61,6 +66,9 @@ final readonly class ContactData
             'mobile' => $this->mobile,
             'website' => $this->website,
             'updated_at' => $this->updatedAt,
+            'customer_number' => $this->customerNumber,
+            'vat_id_valid' => $this->vatIdValid,
+            'salutation' => $this->salutation,
         ];
     }
 }

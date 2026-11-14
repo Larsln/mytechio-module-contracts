@@ -7,28 +7,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [2.16.0] - 2026-11-10
+## [2.21.0] - 2026-11-14
 
-### Added
-
-- Package articles: `Articles\ArticleComponentData` and `ArticleData::$components` / `$listComponents` (appended, default `[]` / `true`).
-- `Documents\ItemComponentRef` and `InvoiceItemRef::$components` / `OrderItemRef::$components` (appended, default `[]`): the components of a package line, quantity already multiplied by the line quantity.
-- `Subscriptions\PackageComponentInput` and `NewSubscription::$components` (appended, default `[]`): type-field values and optional `source` / `externalId` (appended, default `null`) of the component subscriptions of a package article; `SubscriptionData::$packageSubscriptionId` and `$isPackage` (appended). `FakeSubscriptions::create()` sets `isPackage` and `componentsOf()` returns the given components.
-
-## [2.15.0] - 2026-11-09
-
-### Added
-
-- `Tax\TaxCategories` contract (read-only: `all(bool $includeInactive = false)`, `find(int $id)`), `TaxCategoryData` and `FakeTaxCategories`.
-- `ArticleData::$subscriptionType` and `ArticleData::$taxCategoryId` (appended, default `null`).
-- `NewSubscription::$unitPriceNetOverride` (appended, default `null`; decimal string of at least zero) that overrides the net unit price of the price option / price list; `FakeSubscriptions::create()` stores it.
-
-## [2.14.0] - 2026-11-08
+First release that joins the published shop track (2.14.0–2.20.0) with the service-group, tax-category and package work developed in parallel. Nothing published in 2.14.0–2.20.0 changes; everything below is appended.
 
 ### Added
 
 - Service groups in the `Subscriptions` contract: `SubscriptionGroupData`, `NewSubscriptionGroup`, `SubscriptionGroupNotFoundException`, and the methods `findGroup()`, `groupsForContact()`, `groupOf()`, `createGroup()`, `updateGroup()`, `reorderGroups()`, `setGroupMembers()`, `addGroupMember()`, `removeGroupMember()`, `dissolveGroup()`, `cancelGroup()` and `groupEndOptions()` (returns `?array`: `null` = no active member has a billing grid, any date is valid; `[]` = constrained members share no period boundary, the group cannot be cancelled as a whole). `SubscriptionData` gets `groupId` and `groupPosition` (appended, default `null`). `FakeSubscriptions` implements them with `seedGroup()`, `seedEndOptions()` and `groupEvents()` (`SubscriptionGroupCreated`, `SubscriptionGroupUpdated`, `SubscriptionGroupDissolved`).
 - A service group may carry its own tax category: `SubscriptionGroupData::$taxCategoryId` and `NewSubscriptionGroup::$taxCategoryId` (appended, default `null` = inherited from the members), and `updateGroup()` takes `?int $taxCategoryId, bool $clearTaxCategory` before `$actor`. A collapsed group whose members have different tax treatments requires a category (`ContractException`); a category on an expanded or uniform group is dropped to `null`; membership changes re-check. `FakeSubscriptions` gets `seedTaxTreatment()` and `seedTaxCategory()`, and `SubscriptionGroupUpdated` carries `tax_category_id`.
+- `Tax\TaxCategories` contract (read-only: `all(bool $includeInactive = false)`, `find(int $id)`), `TaxCategoryData` and `FakeTaxCategories`.
+- `ArticleData::$subscriptionType` (appended, default `null`; `$taxCategoryId` arrived in 2.17).
+- `NewSubscription::$unitPriceNetOverride` (appended, default `null`; decimal string of at least zero) that overrides the net unit price of the price option / price list; `FakeSubscriptions::create()` stores it.
+- Package articles: `Articles\ArticleComponentData` and `ArticleData::$components` / `$listComponents` (appended, default `[]` / `true`).
+- `Documents\ItemComponentRef` and `InvoiceItemRef::$components` / `OrderItemRef::$components` (appended, default `[]`): the components of a package line, quantity already multiplied by the line quantity.
+- `Subscriptions\PackageComponentInput` and `NewSubscription::$components` (appended, default `[]`): type-field values and optional `source` / `externalId` (appended, default `null`) of the component subscriptions of a package article; `SubscriptionData::$packageSubscriptionId` and `$isPackage` (appended). `FakeSubscriptions::create()` sets `isPackage` and `componentsOf()` returns the given components.
+
+## [2.20.0] - 2026-11-11
+
+### Added
+
+- `Invoices\Invoices::forOrder(orderId)`: the issued invoices of an order (the invoice and its cancellation invoices), oldest first.
+- `Invoices\Invoices::document(invoiceId)` with `InvoiceDocument`: the archived PDF of an issued invoice, for a module that shows customers their own invoices. `FakeInvoices` implements both (`seedDocument()`).
+- `Shipping\ReturnLabels` with `ReturnOffer` and `ReturnLabelData`: return labels for shipments at a price per country (`offer()`, `offers()`, `create()`, `forShipment()`, `label()`), offered by a shipping module that can create them; resolve optionally. `FakeReturnLabels` for tests.
+- `Shipping\PickupPoints` with `PickupPoint`: parcel lockers and post offices near a postcode (`countries()`, `near()`, `find()`, `validPostNumber()`); a shipment goes there through the new `ShipmentAddress::$pickupType`, `$pickupId` and `$postNumber`. Resolve optionally. `FakePickupPoints` for tests.
+- `Shipping\Shipments::track(shipmentId)` and `ParcelData::$trackingStatus`, `$trackingText`, `$trackingAt`: the holder asks the carrier where the parcels are and notes the delivery itself once all are delivered. `FakeShipments::carrierSays()` and `tracked()`.
+- `Shipping\Carriers\CarrierDriver` with `DriverParcel` (container tag `CarrierDriver::TAG`): a module that connects a carrier's interface offers a driver, and the holder of `shipping` lets staff set a carrier to it. A driver may also implement `Shipping\Carriers\TracksParcels` (with `TrackingState`) and `Shipping\Carriers\CreatesReturnLabels` (with `ReturnLabelFile`). `FakeCarrierDriver` for tests.
+- `Shipping\Carriers\PickupPointProvider` (container tag `PickupPointProvider::TAG`): a carrier module's source of pickup points, gathered by the module that offers `PickupPoints`. `FakePickupPoints` implements it too.
+- `Shipping\CarrierData::$publicName`, `ShipmentData::$carrierPublicName` and `ShipmentData::customerCarrierName()`: a holder may keep a carrier name for customers apart from the one staff uses ("DHL" for a service staff calls "DHL (Schnittstelle)"). `FakeShipments::addCarrier()` takes it as third argument.
+
+## [2.19.0] - 2026-11-11
+
+### Added
+
+- `Shipping\Shipments` (exclusive capability `shipping`) with `CarrierData`, `NewShipment`, `NewParcel`, `ShipmentAddress`, `ShipmentData`, `ParcelData`, `ShipmentStatus`, `ShipmentLabel` and `ShipmentException`: the shipping services, the default per country, shipments of orders with their parcels, labels of services with an interface, and the states shipped and delivered. `FakeShipments` for tests.
+- `Shipping\Shipments::printLabels(shipmentId, ActorRef)` and `ParcelData::$printState`: the labels of a shipment go to the holder's label printer and say where they stand there. `FakeShipments::withPrinter()`.
+- `Invoices\Invoices::createFromOrder(orderId, ActorRef, paymentMethod)` and `issueAndSend(invoiceId, ActorRef, taxReviewConfirmed)`: the invoice of an order, issued and mailed like the core's own action. `FakeInvoices` implements both (`failNextIssue()`, `failNextSend()`, `sent()`).
+- `Organization\\OrganizationProfile` with `OrganizationData`: the company's own name, address and contact data from the core's organization settings, for papers a module prints itself. `FakeOrganizationProfile` for tests.
+- `Purchasing\\ShoppingNeeds` (exclusive capability `shopping_list`) with `ShoppingNeed`: a module states what it needs bought and the shopping list follows (new needs appear, quantities follow, what is covered leaves), marked with where it comes from. `FakeShoppingNeeds` for tests.
+- Payment method `card` on invoices (`InvoiceRef::$paymentMethod`).
+- `Payments\CardPayments::capture(paymentId, invoiceId)`: collects a reserved amount. `FakeCardPayments::captured()`.
+
+## [2.18.0] - 2026-11-11
+
+### Added
+
+- `Payments\CardPayments` (exclusive capability `card_payments`) with `NewCardPayment`, `CardPaymentSession`, `CardPaymentData`, `CardPaymentStatus` and `CardPaymentException`: card payments on a provider's hosted page where the amount is reserved first. `FakeCardPayments` for tests.
+- `Orders\NewOrder::$deliverySnapshot` and `Orders\OrderRef::$deliverySnapshot`: the delivery address of an order when it is not the billing address.
+
+## [2.17.0] - 2026-11-11
+
+### Added
+
+- `Tax\DocumentPreview` with `PreviewLine`, `PreviewedLine`, `DocumentPreviewData` and `DocumentPreviewException`: the tax result of a document that does not exist yet (scenario, rate and amounts per line, totals, tax per rate, payable amount, `requiresTaxReview`), computed like a saved order. `FakeDocumentPreview` for tests.
+- `Tax\Decimal`: the document arithmetic on decimal strings (four decimals per step, half to even).
+- `Articles\ArticleData::$taxCategoryId` (`tax_category_id` in `toArray()`), optional.
+
+## [2.16.0] - 2026-11-10
+
+### Added
+
+- `Articles\ArticleMarker`: a marker a module puts on articles in the core's article list (an icon from the core's module icon map or a short symbol next to the name, the detail as tooltip, a list filter); container tag `mytechio.article_markers`. `FakeArticleMarker` for tests.
+
+## [2.15.0] - 2026-11-09
+
+### Added
+
+- `Contacts\Contacts::create(NewContact, ActorRef)`, `update(id, ContactChanges, ActorRef)` and `findByEmail(email)`: modules that onboard customers themselves (the web shop) create and maintain customer contacts through the core's contact service (activity log, `ContactCreated`/`ContactUpdated`, VIES check of a new or changed VAT ID). `update()` replaces exactly the customer-facing fields and keeps everything else. Refusals are a `ContactValidationException` with German messages per field, an unknown id a `ContactNotFoundException`.
+- `Contacts\ContactData::$customerNumber`, `$vatIdValid` and `$salutation` (`customer_number`, `vat_id_valid`, `salutation` in `toArray()`), all optional.
+- `FakeContacts` implements the writes with the core's required-field and VAT-ID rules (`vatIdValidity()` declares how a VAT ID is answered) and records every write in `actors()`.
+- `Contacts\ContactMarker`: a marker a module puts on contacts in the core's contact list (an icon from the core's module icon map or a short symbol next to the name, the detail as tooltip, a list filter, and `url()` as the jump from the contact page to the marked object), e.g. "has a shop login". Collected through the container tag `mytechio.contact_markers` (`ContactMarker::TAG`); markers of disabled or incompatible modules stay invisible. `FakeContactMarker` for tests (`mark()`, `unmark()`).
+
+## [2.14.0] - 2026-11-09
+
+### Added
+
+- `Web\WebsiteClients`: a module that exposes its own `/api/web/*` endpoints to the website (e.g. a shop) asks the holder of `public_links` whether a request's `Authorization: Bearer <key>` is a known, unrevoked website key whose IP allowlist admits the request. `authenticate(secret, ip)` answers a `Web\WebsiteAuthResult` with a `Web\WebsiteAuthStatus` (`ok`, `unknown_key`, `ip_denied`, `unavailable`) and, when the key was found, the client's ID and name; `available()` tells whether a holder is active. The core binds a null implementation that answers `unavailable`. `FakeWebsiteClients` for module tests (`seed()` with an optional allowlist of exact IPs and CIDR ranges, `revoke()`, `setAvailable()`, `calls()`).
 
 ## [2.13.1] - 2026-11-06
 

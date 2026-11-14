@@ -15,7 +15,11 @@ namespace MyTechIO\Contracts\Orders;
  * `business_proof_type` and `business_proof_reference`. `orderDate` and
  * `requestedDeliveryDate` are `Y-m-d`, the requested date may not precede the
  * order date. `skontoPercent` and `customerDiscountPercent` are decimal strings
- * with up to 2 decimals. The draft gets no number — `Orders::confirm()` draws
+ * with up to 2 decimals. `deliverySnapshot` (since 2.18) is where the goods go
+ * when that is not the billing address: `street`, `postal_code`, `city` and
+ * `country_code` are required, `company_name`, `first_name`, `last_name`,
+ * `house_number` and `address_addition` optional; `null` delivers to the
+ * billing address. The draft gets no number — `Orders::confirm()` draws
  * it.
  */
 final readonly class NewOrder
@@ -23,6 +27,7 @@ final readonly class NewOrder
     /**
      * @param  list<NewOrderItem>  $items
      * @param  array<string, mixed>|null  $billingSnapshot
+     * @param  array<string, mixed>|null  $deliverySnapshot
      */
     public function __construct(
         public ?int $contactId,
@@ -39,6 +44,7 @@ final readonly class NewOrder
         public ?int $skontoDays = null,
         public string $customerDiscountPercent = '0',
         public ?int $bankAccountId = null,
+        public ?array $deliverySnapshot = null,
     ) {}
 
     /**
@@ -61,6 +67,7 @@ final readonly class NewOrder
             'skonto_days' => $this->skontoDays,
             'customer_discount_percent' => $this->customerDiscountPercent,
             'bank_account_id' => $this->bankAccountId,
+            'delivery_snapshot' => $this->deliverySnapshot,
         ];
     }
 }
